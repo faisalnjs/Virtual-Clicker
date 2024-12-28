@@ -52,7 +52,7 @@ function setCookie(name, value, days) {
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     expires = "; expires=" + date.toUTCString();
   }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/; domain=.vssfalcons.com";
+  document.cookie = `${name}=${(value || "")}${expires}; path=/; domain=.${document.domain}`;
 }
 
 function getCookie(name) {
@@ -66,4 +66,4 @@ function getCookie(name) {
   return null;
 }
 
-export default new Storage("virtual-falcons-2");
+export default new Storage("virtual-falcons");
