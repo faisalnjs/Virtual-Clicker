@@ -225,7 +225,7 @@ function updateCode() {
     document.title = `Virtual Clicker (${storage.get("code")})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getPeriod() + 1;
     if (!matchesCurrentPeriod) {
-      ui.prompt("Mismatched Seat Code", "The current seat code does not match the class period you are currently in.", [
+      ui.prompt("Mismatched Seat Code", "Your current seat code does not match the class period you are currently in. Responses will not be recorded correctly. Are you sure you would like to continue?", [
         {
           text: "Change Code",
           close: true,
