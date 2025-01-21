@@ -82,7 +82,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     if (question && answer) {
       // Check if code matches current period
       const matchesCurrentPeriod =
-        parseInt(storage.get("code").slice(0, 1)) === getPeriod() + 1;
+        parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
       if (!matchesCurrentPeriod) {
         ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
           {
@@ -90,7 +90,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
             close: true,
           },
           {
-            text: "Submit Anyways",
+            text: "Submit Anyway",
             close: true,
             onclick: submit,
           },
@@ -223,7 +223,7 @@ function updateCode() {
       element.innerHTML = storage.get("code");
     });
     document.title = `Virtual Clicker (${storage.get("code")})`;
-    const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getPeriod() + 1;
+    const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if (!matchesCurrentPeriod) {
       ui.prompt("Mismatched Seat Code", "Your current seat code does not match the class period you are currently in. Responses will not be recorded correctly. Are you sure you would like to continue?", [
         {
