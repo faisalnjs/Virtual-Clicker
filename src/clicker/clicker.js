@@ -234,7 +234,7 @@ function updateCode() {
           },
         },
         {
-          text: "Continue Anyways",
+          text: "Continue Anyway",
           close: true,
         },
       ]);
