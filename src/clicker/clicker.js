@@ -82,7 +82,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     if (question && answer) {
       // Check if code matches current period
       const matchesCurrentPeriod =
-        parseInt(storage.get("code").slice(0, 1)) === getPeriod() + 1 || true;
+        parseInt(storage.get("code").slice(0, 1)) === getPeriod() + 1;
       if (!matchesCurrentPeriod) {
         ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
           {
