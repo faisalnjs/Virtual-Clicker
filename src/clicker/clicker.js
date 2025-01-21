@@ -81,12 +81,207 @@ document.getElementById("submit-button").addEventListener("click", () => {
   if (storage.get("code")) {
     if (question && answer) {
       // Check if code matches current period
-      const matchesCurrentPeriod =
-        parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-      if (!matchesCurrentPeriod) {
-        ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
+      const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
+      if (((new Date()).getDay() === 0) || ((new Date()).getDay() === 6)) {
+        ui.prompt("Are you making up clicks?", "You are submitting your click outside school hours. To make up clicks, select the date of the class to make up.", [
           {
             text: "Cancel",
+            close: true,
+          },
+          {
+            text: "Make Up Click",
+            close: true,
+            onclick: () => {
+              if (!matchesCurrentPeriod) {
+                ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: () => {
+                      if (question.length > 2) {
+                        ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
+                          {
+                            text: "Edit Response",
+                            close: true,
+                          },
+                          {
+                            text: "Submit Anyway",
+                            close: true,
+                            onclick: () => {
+                              if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                                  {
+                                    text: "Edit Response",
+                                    close: true,
+                                  },
+                                  {
+                                    text: "Submit Anyway",
+                                    close: true,
+                                    onclick: submit,
+                                  },
+                                ]);
+                              } else {
+                                submit();
+                              }
+                            },
+                          },
+                        ]);
+                      } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                          {
+                            text: "Edit Response",
+                            close: true,
+                          },
+                          {
+                            text: "Submit Anyway",
+                            close: true,
+                            onclick: submit,
+                          },
+                        ]);
+                      } else {
+                        submit();
+                      }
+                    },
+                  },
+                ]);
+              } else if (question.length > 2) {
+                ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: () => {
+                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                          {
+                            text: "Edit Response",
+                            close: true,
+                          },
+                          {
+                            text: "Submit Anyway",
+                            close: true,
+                            onclick: submit,
+                          },
+                        ]);
+                      } else {
+                        submit();
+                      }
+                    },
+                  },
+                ]);
+              } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: submit,
+                  },
+                ]);
+              } else {
+                submit();
+              }
+            },
+          },
+        ]);
+      } else if (!matchesCurrentPeriod) {
+        ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
+          {
+            text: "Edit Response",
+            close: true,
+          },
+          {
+            text: "Submit Anyway",
+            close: true,
+            onclick: () => {
+              if (question.length > 2) {
+                ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: () => {
+                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                          {
+                            text: "Edit Response",
+                            close: true,
+                          },
+                          {
+                            text: "Submit Anyway",
+                            close: true,
+                            onclick: submit,
+                          },
+                        ]);
+                      } else {
+                        submit();
+                      }
+                    },
+                  },
+                ]);
+              } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: submit,
+                  },
+                ]);
+              } else {
+                submit();
+              }
+            },
+          },
+        ]);
+      } else if (question.length > 2) {
+        ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
+          {
+            text: "Edit Response",
+            close: true,
+          },
+          {
+            text: "Submit Anyway",
+            close: true,
+            onclick: () => {
+              if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+                  {
+                    text: "Edit Response",
+                    close: true,
+                  },
+                  {
+                    text: "Submit Anyway",
+                    close: true,
+                    onclick: submit,
+                  },
+                ]);
+              } else {
+                submit();
+              }
+            },
+          },
+        ]);
+      } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
+        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
+          {
+            text: "Edit Response",
             close: true,
           },
           {
