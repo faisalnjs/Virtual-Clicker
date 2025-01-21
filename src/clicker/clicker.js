@@ -82,7 +82,53 @@ document.getElementById("submit-button").addEventListener("click", () => {
     if (question && answer) {
       // Check if code matches current period
       const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-      if (((new Date()).getDay() === 0) || ((new Date()).getDay() === 6)) {
+      const promptSubmit = (message, callback) => {
+        ui.prompt("Are you sure you want to submit?", message, [
+          {
+            text: "Edit Response",
+            close: true,
+          },
+          {
+            text: "Submit Anyway",
+            close: true,
+            onclick: callback,
+          },
+        ]);
+      };
+      const validateQuestion = (callback) => {
+        if (question.length > 2) {
+          promptSubmit("Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", () => {
+            if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(question)) {
+              promptSubmit("Question numbers should contain numbers (and possibly a letter) only. Remove any symbols to properly submit your click.", callback);
+            } else {
+              callback();
+            }
+          });
+        } else if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(question)) {
+          promptSubmit("Question numbers should contain numbers (and possibly a letter) only. Remove any symbols to properly submit your click.", callback);
+        } else {
+          callback();
+        }
+      };
+      const handleMakeUpClick = () => {
+        if (!matchesCurrentPeriod) {
+          ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
+            {
+              text: "Change Code",
+              close: true,
+              onclick: () => ui.view("settings/code"),
+            },
+            {
+              text: "Continue Anyway",
+              close: true,
+              onclick: () => validateQuestion(submit),
+            },
+          ]);
+        } else {
+          validateQuestion(submit);
+        }
+      };
+      if (((new Date()).getDay() === 0) || ((new Date()).getDay() === 6) || (getExtendedPeriod() === -1)) {
         ui.prompt("Are you making up clicks?", "You are submitting your click outside school hours. To make up clicks, select the date of the class to make up.", [
           {
             text: "Cancel",
@@ -91,207 +137,24 @@ document.getElementById("submit-button").addEventListener("click", () => {
           {
             text: "Make Up Click",
             close: true,
-            onclick: () => {
-              if (!matchesCurrentPeriod) {
-                ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: () => {
-                      if (question.length > 2) {
-                        ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
-                          {
-                            text: "Edit Response",
-                            close: true,
-                          },
-                          {
-                            text: "Submit Anyway",
-                            close: true,
-                            onclick: () => {
-                              if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                                  {
-                                    text: "Edit Response",
-                                    close: true,
-                                  },
-                                  {
-                                    text: "Submit Anyway",
-                                    close: true,
-                                    onclick: submit,
-                                  },
-                                ]);
-                              } else {
-                                submit();
-                              }
-                            },
-                          },
-                        ]);
-                      } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                          {
-                            text: "Edit Response",
-                            close: true,
-                          },
-                          {
-                            text: "Submit Anyway",
-                            close: true,
-                            onclick: submit,
-                          },
-                        ]);
-                      } else {
-                        submit();
-                      }
-                    },
-                  },
-                ]);
-              } else if (question.length > 2) {
-                ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: () => {
-                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                          {
-                            text: "Edit Response",
-                            close: true,
-                          },
-                          {
-                            text: "Submit Anyway",
-                            close: true,
-                            onclick: submit,
-                          },
-                        ]);
-                      } else {
-                        submit();
-                      }
-                    },
-                  },
-                ]);
-              } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: submit,
-                  },
-                ]);
-              } else {
-                submit();
-              }
-            },
+            onclick: handleMakeUpClick,
           },
         ]);
       } else if (!matchesCurrentPeriod) {
-        ui.prompt("Are you sure you want to submit?", "Your seat code isn't for this period!", [
+        ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
           {
-            text: "Edit Response",
+            text: "Change Code",
             close: true,
+            onclick: () => ui.view("settings/code"),
           },
           {
-            text: "Submit Anyway",
+            text: "Continue Anyway",
             close: true,
-            onclick: () => {
-              if (question.length > 2) {
-                ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: () => {
-                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                          {
-                            text: "Edit Response",
-                            close: true,
-                          },
-                          {
-                            text: "Submit Anyway",
-                            close: true,
-                            onclick: submit,
-                          },
-                        ]);
-                      } else {
-                        submit();
-                      }
-                    },
-                  },
-                ]);
-              } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: submit,
-                  },
-                ]);
-              } else {
-                submit();
-              }
-            },
-          },
-        ]);
-      } else if (question.length > 2) {
-        ui.prompt("Are you sure you want to submit?", "Question numbers are rarely that long. Are you sure you are entering the question number correctly, and are only inputting the number in this field?", [
-          {
-            text: "Edit Response",
-            close: true,
-          },
-          {
-            text: "Submit Anyway",
-            close: true,
-            onclick: () => {
-              if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-                ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-                  {
-                    text: "Edit Response",
-                    close: true,
-                  },
-                  {
-                    text: "Submit Anyway",
-                    close: true,
-                    onclick: submit,
-                  },
-                ]);
-              } else {
-                submit();
-              }
-            },
-          },
-        ]);
-      } else if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(question)) {
-        ui.prompt("Are you sure you want to submit?", "Question numbers should contain numbers (and possibly a letter) only.", [
-          {
-            text: "Edit Response",
-            close: true,
-          },
-          {
-            text: "Submit Anyway",
-            close: true,
-            onclick: submit,
+            onclick: () => validateQuestion(submit),
           },
         ]);
       } else {
-        submit();
+        validateQuestion(submit);
       }
     }
     if (!answer) {
@@ -420,7 +283,7 @@ function updateCode() {
     document.title = `Virtual Clicker (${storage.get("code")})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if (!matchesCurrentPeriod) {
-      ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${getExtendedPeriod() + 1}). Responses will not be recorded correctly. Are you sure you would like to continue?`, [
+      ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
         {
           text: "Change Code",
           close: true,
@@ -487,8 +350,8 @@ function answerMode(mode) {
     container,
     fromHeight
       ? {
-          height: fromHeight + "px",
-        }
+        height: fromHeight + "px",
+      }
       : undefined,
     {
       height: toHeight + "px",
