@@ -3,7 +3,7 @@ import storage from "/src/modules/storage.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
-import { getPeriod } from "/src/periods/periods";
+import { getPeriod, getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 ``;
 
