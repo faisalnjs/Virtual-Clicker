@@ -82,6 +82,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     })();
   if (storage.get("code")) {
     if (question && answer) {
+      const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
       const promptSubmit = (message, callback) => {
         ui.prompt("Are you sure you want to submit?", message, [
           {
@@ -113,6 +114,26 @@ document.getElementById("submit-button").addEventListener("click", () => {
       validateQuestion(() => {
         if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !storage.get("makeUpDate")) {
           ui.view("settings/makeup");
+        } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
+          ui.prompt("Currently In Class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+            {
+              text: "Do Not Make Up Clicks",
+              close: true,
+              onclick: () => {
+                storage.set("makeUpDate", null);
+                document.querySelectorAll("span.code").forEach((element) => {
+                  element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+                });
+                document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+                view("");
+              },
+            },
+            {
+              text: "Submit Anyway",
+              close: true,
+              onclick: submit,
+            },
+          ]);
         } else {
           submit();
         }
@@ -244,9 +265,9 @@ function updateCode() {
   if (storage.get("code")) {
     document.getElementById("code-input").value = storage.get("code");
     document.querySelectorAll("span.code").forEach((element) => {
-      element.innerHTML = storage.get("code") + ((storage.get("makeUpDate") != null) ? '*' : '');
+      element.innerHTML = storage.get("code") + (storage.get("makeUpDate") ? '*' : '');
     });
-    document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate") != null) ? '*' : ''})`;
+    document.title = `Virtual Clicker (${storage.get("code")}${storage.get("makeUpDate") ? '*' : ''})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
       ui.view("settings/makeup");
@@ -257,6 +278,25 @@ function updateCode() {
           close: true,
           onclick: () => {
             ui.view("settings/code");
+          },
+        },
+        {
+          text: "Continue Anyway",
+          close: true,
+        },
+      ]);
+    } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
+      ui.prompt("Currently In Class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+        {
+          text: "Do Not Make Up Clicks",
+          close: true,
+          onclick: () => {
+            storage.set("makeUpDate", null);
+            document.querySelectorAll("span.code").forEach((element) => {
+              element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+            });
+            document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+            view("");
           },
         },
         {
