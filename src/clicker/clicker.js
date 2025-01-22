@@ -3,7 +3,7 @@ import storage from "/src/modules/storage.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
-import { getPeriod, getExtendedPeriod } from "/src/periods/periods";
+import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 ``;
 
@@ -15,6 +15,8 @@ let currentAnswerMode;
 let multipleChoice = null;
 
 let historyIndex = 0;
+
+let makeUpDate = null;
 
 // Initialization
 {
@@ -80,8 +82,6 @@ document.getElementById("submit-button").addEventListener("click", () => {
     })();
   if (storage.get("code")) {
     if (question && answer) {
-      // Check if code matches current period
-      const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
       const promptSubmit = (message, callback) => {
         ui.prompt("Are you sure you want to submit?", message, [
           {
@@ -110,52 +110,33 @@ document.getElementById("submit-button").addEventListener("click", () => {
           callback();
         }
       };
-      const handleMakeUpClick = () => {
-        if (!matchesCurrentPeriod) {
-          ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
-            {
-              text: "Change Code",
-              close: true,
-              onclick: () => ui.view("settings/code"),
-            },
-            {
-              text: "Continue Anyway",
-              close: true,
-              onclick: () => validateQuestion(submit),
-            },
-          ]);
+      validateQuestion(() => {
+        if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !makeUpDate) {
+          ui.view("makeup");
+          const makeupClickButton = document.getElementById("makeup-click-button");
+          const newMakeupClickButton = makeupClickButton.cloneNode(true);
+          makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
+          newMakeupClickButton.addEventListener("click", () => {
+            if (document.getElementById("date-input").value != '') {
+              const date = new Date(document.getElementById("date-input").value);
+              let now = new Date();
+              let hours = now.getHours();
+              let ampm = hours >= 12 ? 'PM' : 'AM';
+              hours = hours % 12;
+              hours = hours ? hours : 12;
+              makeUpDate = `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`;
+              ui.view("");
+              submit();
+            } else {
+              makeUpDate = null;
+              document.getElementById("date-input").classList.add("attention");
+              document.getElementById("date-input").focus();
+            }
+          });
         } else {
-          validateQuestion(submit);
+          submit();
         }
-      };
-      if (((new Date()).getDay() === 0) || ((new Date()).getDay() === 6) || (getExtendedPeriod() === -1)) {
-        ui.prompt("Are you making up clicks?", "You are submitting your click outside school hours. To make up clicks, select the date of the class to make up.", [
-          {
-            text: "Cancel",
-            close: true,
-          },
-          {
-            text: "Make Up Click",
-            close: true,
-            onclick: handleMakeUpClick,
-          },
-        ]);
-      } else if (!matchesCurrentPeriod) {
-        ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
-          {
-            text: "Change Code",
-            close: true,
-            onclick: () => ui.view("settings/code"),
-          },
-          {
-            text: "Continue Anyway",
-            close: true,
-            onclick: () => validateQuestion(submit),
-          },
-        ]);
-      } else {
-        validateQuestion(submit);
-      }
+      });
     }
     if (!answer) {
       if (mode === "input") {
@@ -182,7 +163,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     }
     resetInputs();
     // Show submit confirmation
-    ui.modeless(`<i class="bi bi-check-lg"></i>`, "Submitted!");
+    ui.modeless(`<i class="bi bi-check-lg"></i>`, makeUpDate ? "Submitted Makeup!" : "Submitted!");
   }
 });
 
@@ -219,16 +200,18 @@ function resetInputs() {
   questionInput.focus();
 }
 
+// Cancel make up button
+document.getElementById("dismiss-makeup-button").addEventListener("click", () => ui.view(""));
+
 // Submit to Google Forms
 function submitClick(code, question, answer) {
   const fields = {
     "entry.1896388126": code,
-    "entry.1232458460": question,
+    "entry.1232458460": makeUpDate ? `${question} ${makeUpDate}` : question,
     "entry.1065046570": answer,
   };
   const params = new URLSearchParams(fields).toString();
-  const url =
-    "https://docs.google.com/forms/d/e/1FAIpQLSfwDCxVqO2GuB4jhk9iAl7lzoA2TsRlX6hz052XkEHbLrbryg/formResponse?";
+  const url = "https://docs.google.com/forms/d/e/1FAIpQLSfwDCxVqO2GuB4jhk9iAl7lzoA2TsRlX6hz052XkEHbLrbryg/formResponse?";
   fetch(url + params, {
     method: "POST",
     mode: "no-cors",
@@ -282,7 +265,28 @@ function updateCode() {
     });
     document.title = `Virtual Clicker (${storage.get("code")})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-    if (!matchesCurrentPeriod) {
+    if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
+      ui.view("makeup");
+      const makeupClickButton = document.getElementById("makeup-click-button");
+      const newMakeupClickButton = makeupClickButton.cloneNode(true);
+      makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
+      newMakeupClickButton.addEventListener("click", () => {
+        if (document.getElementById("date-input").value != '') {
+          const date = new Date(document.getElementById("date-input").value);
+          let now = new Date();
+          let hours = now.getHours();
+          let ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          makeUpDate = `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`;
+          ui.view("");
+        } else {
+          makeUpDate = null;
+          document.getElementById("date-input").classList.add("attention");
+          document.getElementById("date-input").focus();
+        }
+      });
+    } else if (!matchesCurrentPeriod) {
       ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
         {
           text: "Change Code",
@@ -373,6 +377,7 @@ function storeClick(code, question, answer, type) {
     "answer": answer,
     "timestamp": timestamp,
     "type": type || "text",
+    "makeup": makeUpDate,
   });
   storage.set("history", history);
   updateHistory();
@@ -451,9 +456,9 @@ function updateHistory() {
       const button = document.createElement("button");
       const latex = item.type === "latex";
       if (!latex) {
-        button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})</p>\n<p>${item.answer}</p>`;
+        button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
       } else {
-        button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})</p>\n${convertLatexToMarkup(item.answer)}\n<p class="hint">(Equation may not display properly)</p>`;
+        button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n${convertLatexToMarkup(item.answer)}\n<p class="hint">(Equation may not display properly)</p>`;
       }
       feed.prepend(button);
       renderMathInElement(button);
