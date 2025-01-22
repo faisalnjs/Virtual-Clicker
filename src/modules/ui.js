@@ -228,12 +228,26 @@ export function view(path) {
         hours = hours ? hours : 12;
         storage.set("makeUpDate", `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
         view("");
-        submit();
       } else {
         storage.set("makeUpDate", null);
         document.getElementById("date-input").classList.add("attention");
         document.getElementById("date-input").focus();
       }
+      document.querySelectorAll("span.code").forEach((element) => {
+        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+      });
+      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+    });
+    const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
+    const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
+    dismissMmakeupClickButton.parentNode.replaceChild(newDismissMmakeupClickButton, dismissMmakeupClickButton);
+    newDismissMmakeupClickButton.addEventListener("click", () => {
+      storage.set("makeUpDate", null);
+      document.querySelectorAll("span.code").forEach((element) => {
+        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+      });
+      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+      view("");
     });
   }
 }

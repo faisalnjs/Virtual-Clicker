@@ -181,7 +181,10 @@ function resetInputs() {
 }
 
 // Cancel make up button
-document.getElementById("dismiss-makeup-button").addEventListener("click", () => ui.view(""));
+document.getElementById("dismiss-makeup-button").addEventListener("click", () => {
+  storage.set("makeUpDate", null);
+  ui.view("");
+});
 
 // Submit to Google Forms
 function submitClick(code, question, answer) {
@@ -241,9 +244,9 @@ function updateCode() {
   if (storage.get("code")) {
     document.getElementById("code-input").value = storage.get("code");
     document.querySelectorAll("span.code").forEach((element) => {
-      element.innerHTML = storage.get("code");
+      element.innerHTML = storage.get("code") + ((storage.get("makeUpDate") != null) ? '*' : '');
     });
-    document.title = `Virtual Clicker (${storage.get("code")})`;
+    document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate") != null) ? '*' : ''})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
       ui.view("settings/makeup");
