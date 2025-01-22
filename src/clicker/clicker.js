@@ -70,7 +70,7 @@ if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 // Submit click
 document.getElementById("submit-button").addEventListener("click", () => {
   const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
-  const question = questionInput.value?.trim();
+  const question = questionInput.value?.trim().replaceAll(' ', '');
   const answer =
     multipleChoice ||
     (() => {
@@ -84,7 +84,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     if (question && answer) {
       const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
       const promptSubmit = (message, callback) => {
-        ui.prompt("Are you sure you want to submit?", message, [
+        ui.prompt("Check question number", message, [
           {
             text: "Edit Response",
             close: true,
@@ -115,7 +115,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
         if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !storage.get("makeUpDate")) {
           ui.view("settings/makeup");
         } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
-          ui.prompt("Currently In Class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+          ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
             {
               text: "Do Not Make Up Clicks",
               close: true,
@@ -272,7 +272,7 @@ function updateCode() {
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
       ui.view("settings/makeup");
     } else if (!matchesCurrentPeriod) {
-      ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
+      ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
         {
           text: "Change Code",
           close: true,
@@ -286,7 +286,7 @@ function updateCode() {
         },
       ]);
     } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
-      ui.prompt("Currently In Class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+      ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
         {
           text: "Do Not Make Up Clicks",
           close: true,
