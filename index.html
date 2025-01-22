@@ -132,6 +132,7 @@
     <button data-modal-view="settings/code">Seat Code</button>
     <button data-modal-view="settings/theme">Theme</button>
     <button data-modal-view="settings/keybinds">Keyboard Shortcuts</button>
+    <button data-modal-view="settings/makeup">Make Up Clicks</button>
     <button data-modal-view="settings/reset">Reset</button>
     <div class="row center">
       <a href="https://github.com/khui0/virtual-clicker" class="icon"><i class="bi bi-github"></i></a>
@@ -246,14 +247,14 @@
       <button data-reset="history">Clear History</button>
       <button data-reset="all">Reset All Settings</button>
     </div>
-  </dialog>
-  <dialog data-modal-page="makeup" data-page-title="Making Up Clicks?">
-    <p>You will be submitting your click outside school hours. To make up clicks, select the date of the class to make up.</p>
-    <label for="date-input">Date</label>
-    <input type="date" id="date-input" />
-    <div data-modal-actions>
-      <button id="dismiss-makeup-button">Dismiss</button>
-      <button id="makeup-click-button">Make Up Click</button>
+    <div data-modal-page="makeup" data-page-title="Making Up Clicks?">
+      <p>You will be submitting your click outside school hours. To make up clicks, select the date of the class to make up.</p>
+      <label for="date-input">Date</label>
+      <input type="date" id="date-input" />
+      <div data-modal-actions>
+        <button id="dismiss-makeup-button">Dismiss</button>
+        <button id="makeup-click-button">Make Up Click</button>
+      </div>
     </div>
   </dialog>
   <dialog data-modal-page="clear-data-fix" data-page-title="Settings May Not Save">

@@ -16,7 +16,7 @@ let multipleChoice = null;
 
 let historyIndex = 0;
 
-let makeUpDate = null;
+if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 
 // Initialization
 {
@@ -111,28 +111,8 @@ document.getElementById("submit-button").addEventListener("click", () => {
         }
       };
       validateQuestion(() => {
-        if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !makeUpDate) {
-          ui.view("makeup");
-          const makeupClickButton = document.getElementById("makeup-click-button");
-          const newMakeupClickButton = makeupClickButton.cloneNode(true);
-          makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
-          newMakeupClickButton.addEventListener("click", () => {
-            if (document.getElementById("date-input").value != '') {
-              const date = new Date(document.getElementById("date-input").value);
-              let now = new Date();
-              let hours = now.getHours();
-              let ampm = hours >= 12 ? 'PM' : 'AM';
-              hours = hours % 12;
-              hours = hours ? hours : 12;
-              makeUpDate = `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`;
-              ui.view("");
-              submit();
-            } else {
-              makeUpDate = null;
-              document.getElementById("date-input").classList.add("attention");
-              document.getElementById("date-input").focus();
-            }
-          });
+        if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !storage.get("makeUpDate")) {
+          ui.view("settings/makeup");
         } else {
           submit();
         }
@@ -163,7 +143,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
     }
     resetInputs();
     // Show submit confirmation
-    ui.modeless(`<i class="bi bi-check-lg"></i>`, makeUpDate ? "Submitted Makeup!" : "Submitted!");
+    ui.modeless(`<i class="bi bi-check-lg"></i>`, storage.get("makeUpDate") ? "Submitted Makeup!" : "Submitted!");
   }
 });
 
@@ -207,7 +187,7 @@ document.getElementById("dismiss-makeup-button").addEventListener("click", () =>
 function submitClick(code, question, answer) {
   const fields = {
     "entry.1896388126": code,
-    "entry.1232458460": makeUpDate ? `${question} ${makeUpDate}` : question,
+    "entry.1232458460": storage.get("makeUpDate") ? `${question} ${storage.get("makeUpDate")}` : question,
     "entry.1065046570": answer,
   };
   const params = new URLSearchParams(fields).toString();
@@ -266,28 +246,9 @@ function updateCode() {
     document.title = `Virtual Clicker (${storage.get("code")})`;
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
-      ui.view("makeup");
-      const makeupClickButton = document.getElementById("makeup-click-button");
-      const newMakeupClickButton = makeupClickButton.cloneNode(true);
-      makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
-      newMakeupClickButton.addEventListener("click", () => {
-        if (document.getElementById("date-input").value != '') {
-          const date = new Date(document.getElementById("date-input").value);
-          let now = new Date();
-          let hours = now.getHours();
-          let ampm = hours >= 12 ? 'PM' : 'AM';
-          hours = hours % 12;
-          hours = hours ? hours : 12;
-          makeUpDate = `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`;
-          ui.view("");
-        } else {
-          makeUpDate = null;
-          document.getElementById("date-input").classList.add("attention");
-          document.getElementById("date-input").focus();
-        }
-      });
+      ui.view("settings/makeup");
     } else if (!matchesCurrentPeriod) {
-      ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue?`, [
+      ui.prompt("Mismatched Seat Code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
         {
           text: "Change Code",
           close: true,
@@ -377,7 +338,7 @@ function storeClick(code, question, answer, type) {
     "answer": answer,
     "timestamp": timestamp,
     "type": type || "text",
-    "makeup": makeUpDate,
+    "makeup": storage.get("makeUpDate"),
   });
   storage.set("history", history);
   updateHistory();

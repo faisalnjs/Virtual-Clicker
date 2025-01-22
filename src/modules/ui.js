@@ -1,4 +1,5 @@
 import "./ui.css";
+import storage from "/src/modules/storage.js";
 
 export function alert(title, text, callback, blur) {
   return modal({
@@ -212,6 +213,29 @@ export function view(path) {
   show(document.querySelector(`[data-modal-page="${pages[0]}"]`), title, buttons);
   const event = new Event("view");
   target.dispatchEvent(event);
+  if (path.includes('makeup')) {
+    const makeupClickButton = document.getElementById("makeup-click-button");
+    const newMakeupClickButton = makeupClickButton.cloneNode(true);
+    makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
+    newMakeupClickButton.addEventListener("click", () => {
+      if (document.getElementById("date-input").value != '') {
+        document.getElementById("date-input").classList.remove("attention");
+        const date = new Date(document.getElementById("date-input").value);
+        let now = new Date();
+        let hours = now.getHours();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        storage.set("makeUpDate", `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
+        view("");
+        submit();
+      } else {
+        storage.set("makeUpDate", null);
+        document.getElementById("date-input").classList.add("attention");
+        document.getElementById("date-input").focus();
+      }
+    });
+  }
 }
 
 export function modeless(icon, message) {
