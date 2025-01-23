@@ -125,7 +125,7 @@ document.getElementById("submit-button").addEventListener("click", () => {
                   element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
                 });
                 document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-                view("");
+                ui.view("");
               },
             },
             {
@@ -296,7 +296,7 @@ function updateCode() {
               element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
             });
             document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-            view("");
+            ui.view("");
           },
         },
         {
