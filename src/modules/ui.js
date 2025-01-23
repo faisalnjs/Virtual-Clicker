@@ -221,13 +221,13 @@ export function view(path) {
     newMakeupClickButton.addEventListener("click", () => {
       if (document.getElementById("date-input").value != '') {
         document.getElementById("date-input").classList.remove("attention");
-        const date = new Date(document.getElementById("date-input").value);
+        let dateParts = document.getElementById("date-input").value.split("-");
         let now = new Date();
         let hours = now.getHours();
         let ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12;
-        storage.set("makeUpDate", `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
+        storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
         view("");
       } else {
         storage.set("makeUpDate", null);
