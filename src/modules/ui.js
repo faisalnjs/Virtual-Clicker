@@ -214,6 +214,7 @@ export function view(path) {
   const event = new Event("view");
   target.dispatchEvent(event);
   if (path.includes('makeup')) {
+    document.getElementById("dismiss-makeup-button").innerText = storage.get("makeUpDate") ? "Turn Off Makeup Mode" : "Dismiss";
     const makeupClickButton = document.getElementById("makeup-click-button");
     const newMakeupClickButton = makeupClickButton.cloneNode(true);
     makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
