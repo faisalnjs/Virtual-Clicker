@@ -6,9 +6,9 @@ export default {
   build: {
     rollupOptions: {
       output: {
-          entryFileNames: `[name].js?v=${version()}`,
-          chunkFileNames: `[name].js?v=${version()}`,
-          assetFileNames: `[name].[ext]?v=${version()}`
+          entryFileNames: `[name].js?v=${version().version}`,
+          chunkFileNames: `[name].js?v=${version().version}`,
+          assetFileNames: `[name].[ext]?v=${version().version}`
       }
     }
   }
