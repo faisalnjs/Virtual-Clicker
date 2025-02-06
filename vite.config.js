@@ -7,8 +7,8 @@ export default {
   build: {
     rollupOptions: {
       output: {
-          entryFileNames: `[name]-[hash].[format]?v=${packageJSON.version}`,
-          chunkFileNames: `[name]-[hash].[format]?v=${packageJSON.version}`,
+          entryFileNames: `[name]-[hash].js?v=${packageJSON.version}`,
+          chunkFileNames: `[name]-[hash].js?v=${packageJSON.version}`,
           assetFileNames: `[name]-[hash].[ext]?v=${packageJSON.version}`
       }
     }
