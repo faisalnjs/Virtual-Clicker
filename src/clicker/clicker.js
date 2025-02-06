@@ -531,9 +531,30 @@ const resets = {
 // Show reset modal
 document.querySelectorAll("[data-reset]").forEach((button) => {
   button.addEventListener("click", (e) => {
-    resets[e.target.getAttribute("data-reset")]();
+    if (e.target.getAttribute("data-reset") === 'cache') {
+      var timestamp = new Date().getTime();
+      document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+        link.setAttribute("href", `${link.getAttribute("href")}?${timestamp}`);
+      });
+      document.querySelectorAll("script[src]").forEach(script => {
+        script.setAttribute("src", `${script.getAttribute("src")}?_=${timestamp}`);
+      });
+      storage.set("cacheBust", true);
+    } else {
+      resets[e.target.getAttribute("data-reset")]();
+    };
   });
 });
+
+if (storage.get("cacheBust")) {
+  var timestamp = new Date().getTime();
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+    link.setAttribute("href", `${link.getAttribute("href")}?${timestamp}`);
+  });
+  document.querySelectorAll("script[src]").forEach(script => {
+    script.setAttribute("src", `${script.getAttribute("src")}?_=${timestamp}`);
+  });
+}
 
 // Disable developer mode button
 if (storage.get("developer")) {
