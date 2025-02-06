@@ -532,20 +532,29 @@ const resets = {
 document.querySelectorAll("[data-reset]").forEach((button) => {
   button.addEventListener("click", (e) => {
     if (e.target.getAttribute("data-reset") === 'cache') {
-      const timestamp = new Date().getTime();
+      var timestamp = new Date().getTime();
       document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-          const originalHref = link.getAttribute('href');
-          link.setAttribute('href', `${originalHref}?${timestamp}`);
+        link.setAttribute("href", `${link.getAttribute("href")}?${timestamp}`);
       });
-      document.querySelectorAll('script[src]').forEach(script => {
-          const originalSrc = script.getAttribute('src');
-          script.setAttribute('src', `${originalSrc}?_=${timestamp}`);
+      document.querySelectorAll("script[src]").forEach(script => {
+        script.setAttribute("src", `${script.getAttribute("src")}?_=${timestamp}`);
       });
+      storage.set("cacheBust", true);
     } else {
       resets[e.target.getAttribute("data-reset")]();
     };
   });
 });
+
+if (storage.get("cacheBust")) {
+  var timestamp = new Date().getTime();
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+    link.setAttribute("href", `${link.getAttribute("href")}?${timestamp}`);
+  });
+  document.querySelectorAll("script[src]").forEach(script => {
+    script.setAttribute("src", `${script.getAttribute("src")}?_=${timestamp}`);
+  });
+}
 
 // Disable developer mode button
 if (storage.get("developer")) {
