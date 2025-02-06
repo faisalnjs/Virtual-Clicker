@@ -531,7 +531,19 @@ const resets = {
 // Show reset modal
 document.querySelectorAll("[data-reset]").forEach((button) => {
   button.addEventListener("click", (e) => {
-    resets[e.target.getAttribute("data-reset")]();
+    if (e.target.getAttribute("data-reset") === 'cache') {
+      const timestamp = new Date().getTime();
+      document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+          const originalHref = link.getAttribute('href');
+          link.setAttribute('href', `${originalHref}?${timestamp}`);
+      });
+      document.querySelectorAll('script[src]').forEach(script => {
+          const originalSrc = script.getAttribute('src');
+          script.setAttribute('src', `${originalSrc}?_=${timestamp}`);
+      });
+    } else {
+      resets[e.target.getAttribute("data-reset")]();
+    };
   });
 });
 
