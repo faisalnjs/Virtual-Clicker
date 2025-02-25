@@ -10,6 +10,8 @@ import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } fr
 const questionInput = document.getElementById("question-input");
 const answerInput = document.getElementById("answer-input");
 const mf = document.getElementById("math-input");
+const setInput = document.getElementById("set-input");
+var setInputs = document.querySelectorAll("[data-set-input]");
 
 let currentAnswerMode;
 let multipleChoice = null;
@@ -78,6 +80,13 @@ document.getElementById("submit-button").addEventListener("click", () => {
         return answerInput.value?.trim();
       } else if (mode === "math") {
         return convertLatexToAsciiMath(mf.value);
+      } else if (mode === "set") {
+        var values = [];
+        var setInputs = document.querySelectorAll('[data-set-input]');
+        setInputs.forEach(a => {
+          if ((a.value.length > 0) && (a.value != ' ')) values.push(a.value)
+        });
+        return JSON.stringify(values);
       }
     })();
   if (storage.get("code")) {
@@ -146,6 +155,9 @@ document.getElementById("submit-button").addEventListener("click", () => {
       } else if (mode === "math") {
         mf.classList.add("attention");
         mf.focus();
+      } else if (mode === "set") {
+        setInput.classList.add("attention");
+        setInput.focus();
       }
     }
     if (!question) {
@@ -159,6 +171,8 @@ document.getElementById("submit-button").addEventListener("click", () => {
     submitClick(storage.get("code"), question, answer);
     if (mode === "math" && !multipleChoice) {
       storeClick(storage.get("code"), question, mf.value, "latex");
+    } else if (mode === "set" && !multipleChoice) {
+      storeClick(storage.get("code"), question, answer, "array");
     } else {
       storeClick(storage.get("code"), question, answer, "text");
     }
@@ -193,6 +207,19 @@ function resetInputs() {
   questionInput.value = "";
   answerInput.value = "";
   mf.value = "";
+  setInputs = document.querySelectorAll('[data-set-input]');
+  if (setInputs.length > 1) {
+    var a = 0;
+    setInputs.forEach(s => {
+      if (a > 0) {
+        s.parentElement.remove();
+      } else {
+        s.value = '';
+      }
+      a++;
+    });
+  }
+  document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = 'nowrap';
   // Switch input mode (exit multiple choice)
   answerMode(mode);
   multipleChoice = null;
@@ -474,6 +501,17 @@ function updateHistory() {
           answerMode("math");
           ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "math");
           mf.value = item.answer;
+        } else if (array) {
+          answerMode("set");
+          ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "set");
+          resetSetInput();
+          var i = 0;
+          JSON.parse(item.answer).forEach(a => {
+            setInputs = document.querySelectorAll("[data-set-input]");
+            setInputs[i].value = a;
+            i++;
+            if (i < JSON.parse(item.answer).length) addSet();
+          });
         } else {
           const choice = item.answer.match(/^CHOICE ([A-E])$/);
           if (!choice) {
@@ -577,5 +615,61 @@ document.getElementById("answer-mode-selector").addEventListener("input", (e) =>
     answerLabel.setAttribute("for", "answer-input");
   } else if (mode === "math") {
     answerLabel.setAttribute("for", "math-input");
+  } else if (mode === "set") {
+    answerLabel.setAttribute("for", "set-input");
   }
 });
+
+setInputs = document.querySelectorAll('[data-set-input]');
+
+// Add set input
+if (document.querySelector("[data-add-set-input]")) {
+  document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
+}
+
+// Remove set input
+if (document.querySelector("[data-remove-set-input]")) {
+  document.querySelector("[data-remove-set-input]").addEventListener("click", (e) => {
+    setInputs = document.querySelectorAll('[data-set-input]');
+    if (setInputs.length > 1) {
+      let highestDataElement = null;
+      setInputs.forEach(element => {
+        if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
+      });
+      if (highestDataElement !== null) highestDataElement.parentElement.remove();
+    }
+    if (setInputs.length === 2) e.target.disabled = true;
+    document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
+  });
+}
+
+function addSet() {
+  setInputs = document.querySelectorAll('[data-set-input]');
+  let highestDataElement = null;
+  setInputs.forEach(element => {
+    if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
+  });
+  if (highestDataElement !== null) {
+    var newSetInput = document.createElement('div');
+    newSetInput.id = 'question-container';
+    var newSetInputInput = document.createElement('input');
+    newSetInputInput.setAttribute('type', 'text');
+    newSetInputInput.setAttribute('autocomplete', 'off');
+    newSetInputInput.setAttribute('data-set-input', Number(highestDataElement.getAttribute('data-set-input')) + 1);
+    newSetInput.appendChild(newSetInputInput);
+    const buttonGrid = document.querySelector('[data-answer-mode="set"] .button-grid');
+    const insertBeforePosition = buttonGrid.children.length - 2;
+    if (insertBeforePosition > 0) {
+      buttonGrid.insertBefore(newSetInput, buttonGrid.children[insertBeforePosition]);
+    } else {
+      buttonGrid.appendChild(newSetInput);
+    }
+    document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
+    newSetInputInput.focus();
+    document.querySelector("[data-remove-set-input]").disabled = false;
+  }
+}
+
+function resetSetInput() {
+  document.querySelector('[data-answer-mode="set"]').innerHTML = '<div class="button-grid"><div id="question-container"><input type="text" autocomplete="off" id="set-input" data-set-input="1" /></div><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button></div>';
+}
