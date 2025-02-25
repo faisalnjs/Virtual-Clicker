@@ -354,3 +354,54 @@ div.ML__keyboard {
   box-shadow: 0 0 0 0.125rem var(--error-color) inset;
   transition: box-shadow 100ms ease;
 }
+
+[square] {
+  width: 2.25em !important;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+@media screen and (max-width: 900px) {
+  .button-grid {
+    flex-wrap: wrap;
+  }
+
+  label {
+    width: unset !important;
+  }
+
+  .small,
+  .smedium,
+  .medium,
+  square {
+    max-width: unset !important;
+  }
+}
+
+#clicker button {
+  width: inherit;
+  min-width: 36px;
+}
+
+[data-answer-mode="set"] input {
+  text-align: center;
+}
+
+.small {
+  max-width: 75px;
+}
+
+.smedium {
+  max-width: 125px;
+}
+
+.medium {
+  max-width: 175px;
+}
+
+.fit {
+  width: fit-content;
+}
