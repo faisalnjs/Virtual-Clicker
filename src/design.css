@@ -45,13 +45,14 @@
 
 body {
   min-height: 100%;
-  padding: 1rem;
+  padding: 50px 10% 25px 10%;
   color: var(--text-color);
   background-color: var(--background-color);
   font:
     16px "Figtree",
     sans-serif;
   line-height: 1.5;
+  gap: 50px !important;
 }
 
 body.enable-transitions {
@@ -60,7 +61,6 @@ body.enable-transitions {
 
 h1 {
   font-size: 1.75rem;
-  line-height: 1.2;
 }
 
 h2,
@@ -79,9 +79,8 @@ button {
   border-radius: 0.5rem;
   background-color: var(--surface-color);
   font: inherit;
-  transition:
-    100ms color var(--easing),
-    100ms background-color var(--easing);
+  transition: 100ms var(--easing);
+  cursor: pointer;
 }
 
 button.icon {
@@ -120,6 +119,21 @@ select {
   border: none;
   border-radius: 0.5rem;
   background-color: var(--surface-color);
+  width: 100%;
+  cursor: pointer;
+}
+
+input:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  overflow: auto;
+  pointer-events: auto;
+}
+
+input.disabled:disabled,
+select.disabled:disabled {
+  opacity: 0.25;
 }
 
 textarea {
@@ -298,17 +312,19 @@ div.ML__keyboard {
 }
 
 [data-button-select] {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.125rem;
+  display: flex;
+  gap: 0.25rem;
   padding: 0.25rem;
   background-color: var(--surface-color);
   border-radius: 0.5rem;
+  width: fit-content;
 }
 
 [data-button-select] > button {
-  height: 1.75em;
+  height: unset;
   border-radius: 0.25rem;
+  padding: 5px 12.5px;
+  cursor: pointer;
 }
 
 [data-button-select] > button[aria-selected="true"] {
