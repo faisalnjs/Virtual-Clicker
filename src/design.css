@@ -45,14 +45,13 @@
 
 body {
   min-height: 100%;
-  padding: 50px 10% 25px 10%;
+  padding: 1rem;
   color: var(--text-color);
   background-color: var(--background-color);
   font:
     16px "Figtree",
     sans-serif;
   line-height: 1.5;
-  gap: 50px !important;
 }
 
 body.enable-transitions {
@@ -61,6 +60,7 @@ body.enable-transitions {
 
 h1 {
   font-size: 1.75rem;
+  line-height: 1.2;
 }
 
 h2,
@@ -323,7 +323,6 @@ div.ML__keyboard {
 [data-button-select] > button {
   height: unset;
   border-radius: 0.25rem;
-  padding: 5px 12.5px;
   cursor: pointer;
 }
 
