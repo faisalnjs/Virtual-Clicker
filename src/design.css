@@ -79,9 +79,8 @@ button {
   border-radius: 0.5rem;
   background-color: var(--surface-color);
   font: inherit;
-  transition:
-    100ms color var(--easing),
-    100ms background-color var(--easing);
+  transition: 100ms var(--easing);
+  cursor: pointer;
 }
 
 button.icon {
@@ -120,6 +119,21 @@ select {
   border: none;
   border-radius: 0.5rem;
   background-color: var(--surface-color);
+  width: 100%;
+  cursor: pointer;
+}
+
+input:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  overflow: auto;
+  pointer-events: auto;
+}
+
+input.disabled:disabled,
+select.disabled:disabled {
+  opacity: 0.25;
 }
 
 textarea {
@@ -298,17 +312,18 @@ div.ML__keyboard {
 }
 
 [data-button-select] {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.125rem;
+  display: flex;
+  gap: 0.25rem;
   padding: 0.25rem;
   background-color: var(--surface-color);
   border-radius: 0.5rem;
+  width: fit-content;
 }
 
 [data-button-select] > button {
-  height: 1.75em;
+  height: unset;
   border-radius: 0.25rem;
+  cursor: pointer;
 }
 
 [data-button-select] > button[aria-selected="true"] {
@@ -338,4 +353,55 @@ div.ML__keyboard {
   outline: none;
   box-shadow: 0 0 0 0.125rem var(--error-color) inset;
   transition: box-shadow 100ms ease;
+}
+
+[square] {
+  width: 2.25em !important;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+@media screen and (max-width: 900px) {
+  .button-grid {
+    flex-wrap: wrap;
+  }
+
+  label {
+    width: unset !important;
+  }
+
+  .small,
+  .smedium,
+  .medium,
+  square {
+    max-width: unset !important;
+  }
+}
+
+#clicker button {
+  width: inherit;
+  min-width: 36px;
+}
+
+[data-answer-mode="set"] input {
+  text-align: center;
+}
+
+.small {
+  max-width: 75px;
+}
+
+.smedium {
+  max-width: 125px;
+}
+
+.medium {
+  max-width: 175px;
+}
+
+.fit {
+  width: fit-content;
 }
