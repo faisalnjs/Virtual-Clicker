@@ -101,7 +101,7 @@ div.spacer {
   flex-direction: column;
   justify-content: center;
   width: min(100%, 800px);
-  gap: 12.5px;
+  gap: 5px;
 }
 
 #question-container {
@@ -125,7 +125,7 @@ div.spacer {
 
 [data-answer-mode="input"] {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 0.25rem;
 }
 
