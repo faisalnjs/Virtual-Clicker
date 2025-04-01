@@ -7,6 +7,25 @@ import "./festive/festive.js";
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 
+export function resetTheme() {
+  disableTransitions();
+  document.body.removeAttribute("data-theme");
+  removeCustomTheme();
+  document.getElementById("theme-preview").removeAttribute("data-theme");
+  enableTransitions();
+  storage.delete("theme");
+  storage.delete("custom-theme");
+}
+
+export function disableTransitions() {
+  document.body.classList.remove("enable-transitions");
+}
+
+export function enableTransitions() {
+  document.body.offsetHeight;
+  document.body.classList.add("enable-transitions");
+}
+
 try {
   let selectedTheme = "";
 
@@ -50,25 +69,6 @@ try {
   });
 
   document.getElementById("theme-reset").addEventListener("click", resetTheme);
-
-  export function resetTheme() {
-    disableTransitions();
-    document.body.removeAttribute("data-theme");
-    removeCustomTheme();
-    document.getElementById("theme-preview").removeAttribute("data-theme");
-    enableTransitions();
-    storage.delete("theme");
-    storage.delete("custom-theme");
-  }
-
-  export function disableTransitions() {
-    document.body.classList.remove("enable-transitions");
-  }
-
-  export function enableTransitions() {
-    document.body.offsetHeight;
-    document.body.classList.add("enable-transitions");
-  }
 
   // Editor
 
