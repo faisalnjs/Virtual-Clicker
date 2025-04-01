@@ -1,7 +1,7 @@
-try {
-  import "./ui.css";
-  import storage from "/src/modules/storage.js";
+import "./ui.css";
+import storage from "/src/modules/storage.js";
 
+try {
   export function alert(title, text, callback, blur) {
     return modal({
       title,

@@ -1,11 +1,11 @@
-try {
-  import "./butterfly.css";
-  import star0 from "./stars/star0.png";
-  import star1 from "./stars/star1.png";
-  import star2 from "./stars/star2.png";
-  import star3 from "./stars/star3.png";
-  import star4 from "./stars/star4.png";
+import "./butterfly.css";
+import star0 from "./stars/star0.png";
+import star1 from "./stars/star1.png";
+import star2 from "./stars/star2.png";
+import star3 from "./stars/star3.png";
+import star4 from "./stars/star4.png";
 
+try {
   const stars = [star0, star1, star2, star3, star4];
 
   setInterval(() => {

@@ -1,10 +1,10 @@
+import * as ui from "/src/modules/ui.js";
+
+import * as themes from "/src/themes/themes.js";
+
+import { insertFromIndex } from "/src/symbols/symbols.js";
+
 try {
-  import * as ui from "/src/modules/ui.js";
-
-  import * as themes from "/src/themes/themes.js";
-
-  import { insertFromIndex } from "/src/symbols/symbols.js";
-
   document.addEventListener("keydown", (e) => {
     const anyDialogOpen = Array.from(document.querySelectorAll("dialog")).some(
       (dialog) => dialog.open,

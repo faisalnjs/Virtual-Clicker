@@ -1,7 +1,7 @@
-try {
-  import * as ui from "/src/modules/ui.js";
-  import symbols from "./symbols.json";
+import * as ui from "/src/modules/ui.js";
+import symbols from "./symbols.json";
 
+try {
   class Autocomplete {
     #start = 0;
     #end = 0;

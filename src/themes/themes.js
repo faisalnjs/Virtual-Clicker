@@ -1,13 +1,13 @@
+import "./themes.css";
+import themes from "./themes.json";
+
+import "./butterfly/butterfly.js";
+import "./festive/festive.js";
+
+import * as ui from "/src/modules/ui.js";
+import storage from "/src/modules/storage.js";
+
 try {
-  import "./themes.css";
-  import themes from "./themes.json";
-
-  import "./butterfly/butterfly.js";
-  import "./festive/festive.js";
-
-  import * as ui from "/src/modules/ui.js";
-  import storage from "/src/modules/storage.js";
-
   let selectedTheme = "";
 
   themes.forEach((theme) => {
