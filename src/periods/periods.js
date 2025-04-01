@@ -1,7 +1,7 @@
-try {
-  import schedule from "./schedule.json";
-  import extendedSchedule from "./extendedSchedule.json";
+import schedule from "./schedule.json";
+import extendedSchedule from "./extendedSchedule.json";
 
+try {
   const timestamps = schedule.map((period) => {
     return [timeToMs(period[0]), timeToMs(period[1])];
   });

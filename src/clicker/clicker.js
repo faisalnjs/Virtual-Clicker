@@ -1,13 +1,13 @@
+import * as ui from "/src/modules/ui.js";
+import storage from "/src/modules/storage.js";
+
+import { autocomplete } from "/src/symbols/symbols.js";
+import { unixToTimeString } from "/src/modules/time.js";
+import { getExtendedPeriod } from "/src/periods/periods";
+import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
+``;
+
 try {
-  import * as ui from "/src/modules/ui.js";
-  import storage from "/src/modules/storage.js";
-
-  import { autocomplete } from "/src/symbols/symbols.js";
-  import { unixToTimeString } from "/src/modules/time.js";
-  import { getExtendedPeriod } from "/src/periods/periods";
-  import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
-  ``;
-
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
   const mf = document.getElementById("math-input");
