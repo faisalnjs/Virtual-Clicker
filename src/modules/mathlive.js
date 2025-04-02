@@ -5,7 +5,7 @@ try {
     MathfieldElement.soundsDirectory = null;
 } catch (error) {
     if (storage.get("developer")) {
-      alert('Error @ mathlive.js:', error.message);
+      alert(`Error @ mathlive.js: ${error.message}`);
     };
     throw error;
 };

@@ -41,7 +41,7 @@ try {
   }, 700);
 } catch (error) {
   if (storage.get("developer")) {
-    alert('Error @ butterfly.js:', error.message);
+    alert(`Error @ butterfly.js: ${error.message}`);
   };
   throw error;
 };
