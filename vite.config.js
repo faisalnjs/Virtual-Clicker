@@ -7,7 +7,7 @@ export default {
     rollupOptions: {
       input: {
         main: 'index.html',
-        cookieinfo: 'cookieinfo.html'
+        resetcookies: 'resetcookies.html'
       }
     }
   }
