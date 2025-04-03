@@ -42,7 +42,7 @@ try {
   });
 } catch (error) {
   if (storage.get("developer")) {
-    alert('Error @ main.js:', error.message);
+    alert(`Error @ main.js: ${error.message}`);
   };
   throw error;
 };

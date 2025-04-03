@@ -245,7 +245,7 @@ try {
   }
 } catch (error) {
   if (storage.get("developer")) {
-    alert('Error @ themes.js:', error.message);
+    alert(`Error @ themes.js: ${error.message}`);
   };
   throw error;
 };

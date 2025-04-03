@@ -36,7 +36,7 @@ try {
   });
 } catch (error) {
   if (storage.get("developer")) {
-    alert('Error @ keybinds.js:', error.message);
+    alert(`Error @ keybinds.js: ${error.message}`);
   };
   throw error;
 };
