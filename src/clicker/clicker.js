@@ -698,6 +698,10 @@ try {
   frqInput.addEventListener("change", (input) => {
     document.querySelector('[data-answer-mode="frq"] h1').innerText = input.target.value;
   });
+
+  frqInput.addEventListener("input", (input) => {
+    document.querySelector('[data-answer-mode="frq"] h1').innerText = input.target.value;
+  });
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ clicker.js: ${error.message}`);
