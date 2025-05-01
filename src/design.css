@@ -366,7 +366,7 @@ div.ML__keyboard {
 
 @media screen and (max-width: 900px) {
   .button-grid {
-    flex-wrap: wrap;
+    flex-wrap: wrap !important;
   }
 
   label {
@@ -388,6 +388,8 @@ div.ML__keyboard {
 
 [data-answer-mode="set"] input {
   text-align: center;
+  width: -webkit-fill-available;
+  min-width: 50px;
 }
 
 .small {

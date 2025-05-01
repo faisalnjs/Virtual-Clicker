@@ -641,7 +641,6 @@ try {
     });
     if (highestDataElement !== null) {
       var newSetInput = document.createElement('div');
-      newSetInput.id = 'question-container';
       var newSetInputInput = document.createElement('input');
       newSetInputInput.setAttribute('type', 'text');
       newSetInputInput.setAttribute('autocomplete', 'off');
@@ -679,7 +678,7 @@ try {
   }
 
   function resetSetInput() {
-    document.querySelector('[data-answer-mode="set"]').innerHTML = '<div class="button-grid"><div id="question-container"><input type="text" autocomplete="off" id="set-input" data-set-input="1" /></div><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button></div>';
+    document.querySelector('[data-answer-mode="set"]').innerHTML = '<div class="button-grid"><input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button></div>';
     if (document.querySelector("[data-add-set-input]")) {
       document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
     }
