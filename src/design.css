@@ -394,7 +394,7 @@ div.ML__keyboard {
 
 [data-answer-mode="frq"] h1 {
   text-align: center;
-  margin: 10px 0;
+  padding: 10px 0;
 }
 
 #frq-input {
