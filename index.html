@@ -44,6 +44,7 @@
         <button aria-selected="true" data-value="input">Text</button>
         <button aria-selected="false" data-value="math">Math</button>
         <button aria-selected="false" data-value="set">Set</button>
+        <button aria-selected="false" data-value="frq">FRQ</button>
       </div>
     </div>
     <label for="answer-input">Answer</label>
@@ -93,6 +94,10 @@
           <button square data-add-set-input><i class="bi bi-plus"></i></button>
           <button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>
         </div>
+      </div>
+      <div data-answer-mode="frq">
+        <input type="range" min="0" max="9" value="4" step="1" id="frq-input" />
+        <h1 id="frq-score">4</h1>
       </div>
     </div>
     <button class="pill space" id="submit-button">Submit</button>

@@ -13,6 +13,7 @@ try {
   const mf = document.getElementById("math-input");
   const setInput = document.getElementById("set-input");
   var setInputs = document.querySelectorAll("[data-set-input]");
+  const frqInput = document.getElementById("frq-input");
 
   let currentAnswerMode;
   let multipleChoice = null;
@@ -88,6 +89,8 @@ try {
             if ((a.value.length > 0) && (a.value != ' ')) values.push(a.value)
           });
           return JSON.stringify(values);
+        } else if (mode === "frq") {
+          return frqInput.value;
         }
       })();
     if (storage.get("code")) {
@@ -159,6 +162,9 @@ try {
         } else if (mode === "set") {
           setInput.classList.add("attention");
           setInput.focus();
+        } else if (mode === "frq") {
+          frqInput.classList.add("attention");
+          frqInput.focus();
         }
       }
       if (!question) {
@@ -221,6 +227,7 @@ try {
       });
     }
     document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = 'nowrap';
+    frqInput.value = 4;
     // Switch input mode (exit multiple choice)
     answerMode(mode);
     multipleChoice = null;
@@ -623,6 +630,8 @@ try {
       answerLabel.setAttribute("for", "math-input");
     } else if (mode === "set") {
       answerLabel.setAttribute("for", "set-input");
+    } else if (mode === "frq") {
+      answerLabel.setAttribute("for", "frq-input");
     }
   });
 
@@ -684,6 +693,11 @@ try {
       document.querySelector("[data-remove-set-input]").addEventListener("click", removeSet);
     }
   }
+
+  //Change FRQ choice
+  frqInput.addEventListener("change", (input) => {
+    document.querySelector('[data-answer-mode="frq"] h1').innerText = input.value;
+  });
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ clicker.js: ${error.message}`);
