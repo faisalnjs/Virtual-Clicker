@@ -696,7 +696,7 @@ try {
 
   //Change FRQ choice
   frqInput.addEventListener("change", (input) => {
-    document.querySelector('[data-answer-mode="frq"] h1').innerText = input.value;
+    document.querySelector('[data-answer-mode="frq"] h1').innerText = input.target.value;
   });
 } catch (error) {
   if (storage.get("developer")) {
