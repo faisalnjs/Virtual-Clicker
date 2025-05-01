@@ -213,7 +213,7 @@ try {
       var a = 0;
       setInputs.forEach(s => {
         if (a > 0) {
-          s.parentElement.remove();
+          s.remove();
         } else {
           s.value = '';
         }
@@ -669,7 +669,7 @@ try {
       setInputs.forEach(element => {
         if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
       });
-      if (highestDataElement !== null) highestDataElement.parentElement.remove();
+      if (highestDataElement !== null) highestDataElement.remove();
     }
     if (setInputs.length === 2) e.target.disabled = true;
     document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
