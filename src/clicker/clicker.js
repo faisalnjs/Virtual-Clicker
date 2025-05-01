@@ -180,6 +180,8 @@ try {
         storeClick(storage.get("code"), question, mf.value, "latex");
       } else if (mode === "set" && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "array");
+      } else if (mode === "frq" && !multipleChoice) {
+        storeClick(storage.get("code"), question, answer, "frq");
       } else {
         storeClick(storage.get("code"), question, answer, "text");
       }
@@ -495,9 +497,14 @@ try {
         const button = document.createElement("button");
         const latex = item.type === "latex";
         const array = item.type === "array";
+        const frq = item.type === "frq";
         if (!latex) {
           if (!array) {
-            button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
+            if (!frq) {
+              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
+            } else {
+              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}/9</p>`;
+            }
           } else {
             button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.split('[')[1].split(']')[0]}</p>`;
           }
@@ -525,11 +532,17 @@ try {
               i++;
               if (i < JSON.parse(item.answer).length) addSet();
             });
+          } else if (frq) {
+            answerMode("frq");
+            ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "frq");
+            frqInput.value = item.answer;
+            document.querySelector('[data-answer-mode="frq"] h1').innerText = item.answer;
+            frqInput.focus();
           } else {
+            answerMode("input");
             const choice = item.answer.match(/^CHOICE ([A-E])$/);
             if (!choice) {
               answerInput.value = item.answer;
-              answerMode("input");
             } else {
               document.querySelector(`[data-multiple-choice="${choice[1].toLowerCase()}"]`).click();
             }
