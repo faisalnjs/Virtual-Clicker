@@ -640,12 +640,10 @@ try {
       if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
     });
     if (highestDataElement !== null) {
-      var newSetInput = document.createElement('div');
-      var newSetInputInput = document.createElement('input');
-      newSetInputInput.setAttribute('type', 'text');
-      newSetInputInput.setAttribute('autocomplete', 'off');
-      newSetInputInput.setAttribute('data-set-input', Number(highestDataElement.getAttribute('data-set-input')) + 1);
-      newSetInput.appendChild(newSetInputInput);
+      var newSetInput = document.createElement('input');
+      newSetInput.setAttribute('type', 'text');
+      newSetInput.setAttribute('autocomplete', 'off');
+      newSetInput.setAttribute('data-set-input', Number(highestDataElement.getAttribute('data-set-input')) + 1);
       const buttonGrid = document.querySelector('[data-answer-mode="set"] .button-grid');
       const insertBeforePosition = buttonGrid.children.length - 2;
       if (insertBeforePosition > 0) {
@@ -654,7 +652,7 @@ try {
         buttonGrid.appendChild(newSetInput);
       }
       document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
-      newSetInputInput.focus();
+      newSetInput.focus();
       document.querySelector("[data-remove-set-input]").disabled = false;
     }
   }
