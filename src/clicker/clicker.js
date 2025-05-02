@@ -749,7 +749,7 @@ try {
     highestDataElement.querySelector('button').addEventListener("click", () => processClick(newPartLetter))
     highestDataElement.querySelector('input').focus();
     document.querySelector("[data-remove-frq-part]").disabled = false;
-    if (newPartLetter === 'z') document.querySelector("[data-add-frq-part]").disabled = false;
+    if (newPartLetter === 'z') document.querySelector("[data-add-frq-part]").disabled = true;
   }
 
   // Remove FRQ part
