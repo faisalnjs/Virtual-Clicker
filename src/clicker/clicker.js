@@ -14,6 +14,7 @@ try {
   const setInput = document.getElementById("set-input");
   var setInputs = document.querySelectorAll("[data-set-input]");
   const frqInput = document.getElementById("frq-input");
+  var frqParts = document.querySelectorAll('[data-frq-part]');
 
   let currentAnswerMode;
   let multipleChoice = null;
@@ -725,6 +726,51 @@ try {
   frqInput.addEventListener("input", (input) => {
     document.querySelector('[data-answer-mode="frq"] h1').innerText = input.target.value;
   });
+
+  // Add FRQ part
+  if (document.querySelector("[data-add-frq-part]")) {
+    document.querySelector("[data-add-frq-part]").addEventListener("click", addPart);
+  }
+
+  function addPart() {
+    frqParts = document.querySelectorAll('[data-frq-part]');
+    let highestDataElement = null;
+    frqParts.forEach(element => {
+      if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
+    });
+    if (highestDataElement !== null) {
+      var newSetInput = document.createElement('input');
+      newSetInput.setAttribute('type', 'text');
+      newSetInput.setAttribute('autocomplete', 'off');
+      newSetInput.setAttribute('data-frq-part', Number(highestDataElement.getAttribute('data-frq-part')) + 1);
+      const buttonGrid = document.querySelector('[data-answer-mode="frq"] .button-grid');
+      const insertBeforePosition = buttonGrid.children.length - 2;
+      if (insertBeforePosition > 0) {
+        buttonGrid.insertBefore(newSetInput, buttonGrid.children[insertBeforePosition]);
+      } else {
+        buttonGrid.appendChild(newSetInput);
+      }
+      newSetInput.focus();
+      document.querySelector("[data-remove-frq-part]").disabled = false;
+    }
+  }
+
+  // Remove FRQ part
+  if (document.querySelector("[data-remove-frq-part]")) {
+    document.querySelector("[data-remove-frq-part]").addEventListener("click", removePart);
+  }
+
+  function removePart() {
+    frqParts = document.querySelectorAll('[data-frq-part]');
+    if (frqParts.length > 4) {
+      let highestDataElement = null;
+      frqParts.forEach(element => {
+        if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
+      });
+      if (highestDataElement !== null) highestDataElement.remove();
+    }
+    if (frqParts.length === 5) e.target.disabled = true;
+  }
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ clicker.js: ${error.message}`);
