@@ -405,7 +405,7 @@ div.ML__keyboard {
   border-radius: 10px;
   background: var(--surface-color);
   outline: none;
-  padding-top: 10px;
+  margin-top: 25px;
 }
 
 #frq-input::-webkit-slider-thumb {

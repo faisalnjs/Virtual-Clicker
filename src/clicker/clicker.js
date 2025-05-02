@@ -223,7 +223,7 @@ try {
   function resetInputs() {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
     // Reset answer inputs
-    questionInput.value = "";
+    questionInput.value = (ui.getButtonSelectValue(document.getElementById("answer-mode-selector")) === 'frq') ? "1" : "";
     answerInput.value = "";
     mf.value = "";
     setInputs = document.querySelectorAll('[data-set-input]');

@@ -185,15 +185,27 @@ div.spacer {
 
 [data-answer-mode="frq"] .frq-parts .part {
   display: flex;
+  gap: .25rem;
   width: -webkit-fill-available;
+  position: relative;
+}
+
+[data-answer-mode="frq"] .frq-parts .part .prefix {
+  background-color: var(--accent-color);
+  position: absolute;
+  height: -webkit-fill-available;
+  margin: 5px;
+  padding: 2.5px 5px;
+  border-radius: 5px;
 }
 
 [data-answer-mode="frq"] .frq-parts .part input {
   width: -webkit-fill-available;
+  padding-left: 35px;
 }
 
 [data-answer-mode="frq"] .frq-parts .part button {
-  width: fit-content;
+  width: fit-content !important;
 }
 
 #insert-row {
