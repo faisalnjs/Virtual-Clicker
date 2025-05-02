@@ -177,6 +177,21 @@ div.spacer {
   width: 100%;
 }
 
+[data-answer-mode="frq"] .frq-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+[data-answer-mode="frq"] .frq-parts .part {
+  display: flex;
+  width: -webkit-fill-available;
+}
+
+[data-answer-mode="frq"] .frq-parts .part input {
+  width: -webkit-fill-available;
+}
+
 #insert-row {
   flex: 1;
   overflow: hidden;

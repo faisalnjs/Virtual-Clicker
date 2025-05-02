@@ -71,10 +71,10 @@ try {
     document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
   }
 
-  // Submit click
-  document.getElementById("submit-button").addEventListener("click", () => {
+  // Process click
+  function processClick(part) {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
-    const question = questionInput.value?.trim().replaceAll(' ', '');
+    const question = part || questionInput.value?.trim().replaceAll(' ', '');
     const answer =
       multipleChoice ||
       (() => {
@@ -90,7 +90,11 @@ try {
           });
           return JSON.stringify(values);
         } else if (mode === "frq") {
-          return frqInput.value;
+          if (part) {
+            return document.querySelector(`[data-frq-part="${part}"]`).value;
+          } else {
+            return frqInput.value;
+          };
         }
       })();
     if (storage.get("code")) {
@@ -188,8 +192,14 @@ try {
       resetInputs();
       // Show submit confirmation
       ui.modeless(`<i class="bi bi-check-lg"></i>`, storage.get("makeUpDate") ? "Submitted Makeup!" : "Submitted!");
-    }
-  });
+    };
+  };
+
+  // Submit click
+  document.getElementById("submit-button").addEventListener("click", processClick);
+
+  // Save click
+  document.querySelectorAll(".frq-parts .part button").addEventListener("click", (button) => processClick(button.target.getAttribute("data-save-part")));
 
   // Remove attention ring when user types in either input
   questionInput.addEventListener("input", (e) => {
