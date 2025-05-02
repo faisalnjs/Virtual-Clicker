@@ -75,7 +75,7 @@ try {
   }
 
   // Process click
-  function processClick(part) {
+  function processClick(part=null) {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
     const question = part || questionInput.value?.trim().replaceAll(' ', '');
     const answer =
@@ -93,7 +93,7 @@ try {
           });
           return JSON.stringify(values);
         } else if (mode === "frq") {
-          if (part) {
+          if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
             return document.querySelector(`[data-frq-part="${part}"]`).value;
           } else {
             return frqInput.value;
