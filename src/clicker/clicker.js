@@ -199,7 +199,7 @@ try {
   document.getElementById("submit-button").addEventListener("click", processClick);
 
   // Save click
-  document.querySelectorAll(".frq-parts .part button").addEventListener("click", (button) => processClick(button.target.getAttribute("data-save-part")));
+  document.querySelectorAll(".frq-parts .part button").forEach(button => button.addEventListener("click", () => processClick(button.getAttribute("data-save-part"))));
 
   // Remove attention ring when user types in either input
   questionInput.addEventListener("input", (e) => {
