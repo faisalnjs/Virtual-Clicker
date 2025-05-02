@@ -19,6 +19,7 @@ try {
 
   let currentAnswerMode;
   let multipleChoice = null;
+  let highestDataElement = null;
 
   let historyIndex = 0;
 
@@ -669,7 +670,7 @@ try {
 
   function addSet() {
     setInputs = document.querySelectorAll('[data-set-input]');
-    let highestDataElement = null;
+    highestDataElement = null;
     setInputs.forEach(element => {
       if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
     });
@@ -699,7 +700,7 @@ try {
   function removeSet() {
     setInputs = document.querySelectorAll('[data-set-input]');
     if (setInputs.length > 1) {
-      let highestDataElement = null;
+      highestDataElement = null;
       setInputs.forEach(element => {
         if (highestDataElement === null || parseInt(element.getAttribute('data-set-input'), 10) > parseInt(highestDataElement.getAttribute('data-set-input'), 10)) highestDataElement = element;
       });
@@ -735,7 +736,7 @@ try {
 
   function addPart() {
     frqPartInputs = document.querySelectorAll('.frq-parts .part input');
-    let highestDataElement = frqPartInputs[frqPartInputs.length - 1];
+    highestDataElement = frqPartInputs[frqPartInputs.length - 1];
     var newPartLetter = String.fromCharCode(highestDataElement.getAttribute('data-frq-part').charCodeAt(0) + 1);
     var newFRQPart = document.createElement('div');
     newFRQPart.classList = 'part';
@@ -744,7 +745,7 @@ try {
           <button data-save-part="${newPartLetter}">Save</button>`;
     document.querySelector('.frq-parts').insertBefore(newFRQPart, document.querySelector('.frq-parts').children[document.querySelector('.frq-parts').children.length - 1]);
     frqParts = document.querySelectorAll('.frq-parts .part');
-    let highestDataElement = frqParts[frqParts.length - 1];
+    highestDataElement = frqParts[frqParts.length - 1];
     highestDataElement.querySelector('button').addEventListener("click", () => processClick(newPartLetter))
     highestDataElement.querySelector('input').focus();
     document.querySelector("[data-remove-frq-part]").disabled = false;
@@ -757,15 +758,9 @@ try {
   }
 
   function removePart() {
-    // frqParts = document.querySelectorAll('[data-frq-part]');
-    // if (frqParts.length > 4) {
-    //   let highestDataElement = null;
-    //   frqParts.forEach(element => {
-    //     if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
-    //   });
-    //   if (highestDataElement !== null) highestDataElement.remove();
-    // }
-    // if (frqParts.length === 5) document.querySelector("[data-remove-frq-part]").disabled = true;
+    frqParts = document.querySelectorAll('.frq-parts .part');
+    if (frqParts.length > 4) frqParts[frqParts.length - 1].remove();
+    if (frqParts.length === 5) document.querySelector("[data-remove-frq-part]").disabled = true;
   }
 } catch (error) {
   if (storage.get("developer")) {
