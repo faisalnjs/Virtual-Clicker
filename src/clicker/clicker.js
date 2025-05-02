@@ -513,7 +513,7 @@ try {
             if (!frq) {
               button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
             } else {
-              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}/9</p>`;
+              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
             }
           } else {
             button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.split('[')[1].split(']')[0]}</p>`;

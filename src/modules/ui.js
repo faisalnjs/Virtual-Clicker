@@ -450,8 +450,10 @@ document.querySelectorAll("[data-button-select]").forEach((element) => {
       });
       // Select target element
       button.setAttribute("aria-selected", true);
-      // Dispatch event
+      // Prefill question
       const value = button.getAttribute("data-value");
+      if (value === 'frq') document.getElementById("question-input").value = '1';
+      // Dispatch event
       const event = new CustomEvent("input", { detail: value });
       element.dispatchEvent(event);
     });

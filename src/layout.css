@@ -192,6 +192,10 @@ div.spacer {
   width: -webkit-fill-available;
 }
 
+[data-answer-mode="frq"] .frq-parts .part button {
+  width: fit-content;
+}
+
 #insert-row {
   flex: 1;
   overflow: hidden;
