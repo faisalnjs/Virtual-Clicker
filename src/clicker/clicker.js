@@ -14,7 +14,8 @@ try {
   const setInput = document.getElementById("set-input");
   var setInputs = document.querySelectorAll("[data-set-input]");
   const frqInput = document.getElementById("frq-input");
-  var frqParts = document.querySelectorAll('[data-frq-part]');
+  var frqParts = document.querySelectorAll(".frq-parts .part");
+  var frqPartInputs = document.querySelectorAll(".frq-parts .part input");
 
   let currentAnswerMode;
   let multipleChoice = null;
@@ -733,26 +734,21 @@ try {
   }
 
   function addPart() {
-    frqParts = document.querySelectorAll('[data-frq-part]');
-    let highestDataElement = null;
-    frqParts.forEach(element => {
-      if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
-    });
-    if (highestDataElement !== null) {
-      var newSetInput = document.createElement('input');
-      newSetInput.setAttribute('type', 'text');
-      newSetInput.setAttribute('autocomplete', 'off');
-      newSetInput.setAttribute('data-frq-part', Number(highestDataElement.getAttribute('data-frq-part')) + 1);
-      const buttonGrid = document.querySelector('[data-answer-mode="frq"] .button-grid');
-      const insertBeforePosition = buttonGrid.children.length - 2;
-      if (insertBeforePosition > 0) {
-        buttonGrid.insertBefore(newSetInput, buttonGrid.children[insertBeforePosition]);
-      } else {
-        buttonGrid.appendChild(newSetInput);
-      }
-      newSetInput.focus();
-      document.querySelector("[data-remove-frq-part]").disabled = false;
-    }
+    frqPartInputs = document.querySelectorAll('.frq-parts .part input');
+    let highestDataElement = frqPartInputs[frqPartInputs.length - 1];
+    var newPartLetter = String.fromCharCode(highestDataElement.getAttribute('data-frq-part').charCodeAt(0) + 1);
+    var newFRQPart = document.createElement('div');
+    newFRQPart.classList = 'part';
+    newFRQPart.innerHTML = `<div class="prefix">${newPartLetter})</div>
+          <input type="text" autocomplete="off" data-frq-part="${newPartLetter}" />
+          <button data-save-part="${newPartLetter}">Save</button>`;
+    document.querySelector('.frq-parts').insertBefore(newFRQPart, document.querySelector('.frq-parts').children[document.querySelector('.frq-parts').children.length - 1]);
+    frqParts = document.querySelectorAll('.frq-parts .part');
+    let highestDataElement = frqParts[frqParts.length - 1];
+    highestDataElement.querySelector('button').addEventListener("click", () => processClick(newPartLetter))
+    highestDataElement.querySelector('input').focus();
+    document.querySelector("[data-remove-frq-part]").disabled = false;
+    if (newPartLetter === 'z') document.querySelector("[data-add-frq-part]").disabled = false;
   }
 
   // Remove FRQ part
@@ -761,15 +757,15 @@ try {
   }
 
   function removePart() {
-    frqParts = document.querySelectorAll('[data-frq-part]');
-    if (frqParts.length > 4) {
-      let highestDataElement = null;
-      frqParts.forEach(element => {
-        if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
-      });
-      if (highestDataElement !== null) highestDataElement.remove();
-    }
-    if (frqParts.length === 5) e.target.disabled = true;
+    // frqParts = document.querySelectorAll('[data-frq-part]');
+    // if (frqParts.length > 4) {
+    //   let highestDataElement = null;
+    //   frqParts.forEach(element => {
+    //     if (highestDataElement === null || parseInt(element.getAttribute('data-frq-part'), 10) > parseInt(highestDataElement.getAttribute('data-frq-part'), 10)) highestDataElement = element;
+    //   });
+    //   if (highestDataElement !== null) highestDataElement.remove();
+    // }
+    // if (frqParts.length === 5) document.querySelector("[data-remove-frq-part]").disabled = true;
   }
 } catch (error) {
   if (storage.get("developer")) {
