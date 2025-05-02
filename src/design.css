@@ -419,6 +419,7 @@ div.ML__keyboard {
   border-radius: 50%;
   background: var(--accent-color);
   cursor: grab;
+  box-shadow: 0px 0px 5px 5px var(--surface-color);
   transition: 0.25s;
 }
 
@@ -428,6 +429,7 @@ div.ML__keyboard {
   border-radius: 50%;
   background: var(--accent-color);
   cursor: grab;
+  box-shadow: 0px 0px 5px 5px var(--surface-color);
   transition: 0.25s;
 }
 
