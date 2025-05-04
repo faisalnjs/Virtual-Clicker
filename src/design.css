@@ -366,7 +366,7 @@ div.ML__keyboard {
 
 @media screen and (max-width: 900px) {
   .button-grid {
-    flex-wrap: wrap;
+    flex-wrap: wrap !important;
   }
 
   label {
@@ -388,6 +388,60 @@ div.ML__keyboard {
 
 [data-answer-mode="set"] input {
   text-align: center;
+  width: -webkit-fill-available;
+  min-width: 50px;
+}
+
+[data-answer-mode="frq"] h1 {
+  text-align: center;
+  padding: 10px 0;
+}
+
+#frq-input {
+  color: var(--accent-color);
+  -webkit-appearance: none;
+  width: -webkit-fill-available;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--surface-color);
+  outline: none;
+  margin-top: 20px;
+}
+
+#frq-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#frq-input::-webkit-slider-thumb {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  cursor: grab;
+  box-shadow: 0px 0px 5px 5px var(--surface-color);
+  transition: 0.25s;
+}
+
+#frq-input::-moz-range-thumb {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  cursor: grab;
+  box-shadow: 0px 0px 5px 5px var(--surface-color);
+  transition: 0.25s;
+}
+
+#frq-input::-webkit-slider-thumb:active {
+  width: 40px;
+  height: 40px;
+  cursor: grabbing;
+  transition: 0.25s;
+}
+
+#clicker:has([data-value="frq"][aria-selected="true"]) #answer-container {
+  overflow: visible !important;
 }
 
 .small {

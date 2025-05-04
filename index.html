@@ -44,6 +44,7 @@
         <button aria-selected="true" data-value="input">Text</button>
         <button aria-selected="false" data-value="math">Math</button>
         <button aria-selected="false" data-value="set">Set</button>
+        <button aria-selected="false" data-value="frq">FRQ</button>
       </div>
     </div>
     <label for="answer-input">Answer</label>
@@ -89,12 +90,40 @@
       </div>
       <div data-answer-mode="set">
         <div class="button-grid">
-          <div id="question-container">
-            <input type="text" autocomplete="off" id="set-input" data-set-input="1" />
-          </div>
+          <input type="text" autocomplete="off" id="set-input" data-set-input="1" />
           <button square data-add-set-input><i class="bi bi-plus"></i></button>
           <button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>
         </div>
+      </div>
+      <div data-answer-mode="frq">
+        <div class="frq-parts">
+          <div class="part">
+            <div class="prefix">a.</div>
+            <input type="text" autocomplete="off" data-frq-part="a" />
+            <button data-save-part="a">Save</button>
+          </div>
+          <div class="part">
+            <div class="prefix">b.</div>
+            <input type="text" autocomplete="off" data-frq-part="b" />
+            <button data-save-part="b">Save</button>
+          </div>
+          <div class="part">
+            <div class="prefix">c.</div>
+            <input type="text" autocomplete="off" data-frq-part="c" />
+            <button data-save-part="c">Save</button>
+          </div>
+          <div class="part">
+            <div class="prefix">d.</div>
+            <input type="text" autocomplete="off" data-frq-part="d" />
+            <button data-save-part="d">Save</button>
+          </div>
+          <div class="button-grid">
+            <button square data-add-frq-part><i class="bi bi-plus"></i></button>
+            <button square data-remove-frq-part disabled><i class="bi bi-dash"></i></button>
+          </div>
+        </div>
+        <input type="range" min="0" max="9" value="4" step="1" id="frq-input" />
+        <h1 id="frq-score">4</h1>
       </div>
     </div>
     <button class="pill space" id="submit-button">Submit</button>
