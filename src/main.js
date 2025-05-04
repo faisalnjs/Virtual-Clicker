@@ -20,7 +20,7 @@ try {
   function updateVersionString() {
     document.querySelectorAll("span.version").forEach((element) => {
       const DEVELOPER_MODE = storage.get("developer");
-      element.innerHTML = version + (DEVELOPER_MODE ? " <code>dev</code>" : "");
+      element.innerHTML = "v" + version + (DEVELOPER_MODE ? " <code>dev</code>" : "");
     });
   }
   document.querySelectorAll("span.hostname").forEach((element) => {
