@@ -192,6 +192,7 @@ div.spacer {
 
 [data-answer-mode="frq"] .frq-parts .part .prefix {
   background-color: var(--accent-color);
+  color: var(--accent-text-color);
   position: absolute;
   height: -webkit-fill-available;
   margin: 5px;
