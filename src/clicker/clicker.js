@@ -740,7 +740,7 @@ try {
     var newPartLetter = String.fromCharCode(highestDataElement.getAttribute('data-frq-part').charCodeAt(0) + 1);
     var newFRQPart = document.createElement('div');
     newFRQPart.classList = 'part';
-    newFRQPart.innerHTML = `<div class="prefix">${newPartLetter})</div>
+    newFRQPart.innerHTML = `<div class="prefix">${newPartLetter}.</div>
           <input type="text" autocomplete="off" data-frq-part="${newPartLetter}" />
           <button data-save-part="${newPartLetter}">Save</button>`;
     document.querySelector('.frq-parts').insertBefore(newFRQPart, document.querySelector('.frq-parts').children[document.querySelector('.frq-parts').children.length - 1]);
