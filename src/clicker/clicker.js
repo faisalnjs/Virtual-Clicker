@@ -199,7 +199,7 @@ try {
   };
 
   // Submit click
-  document.getElementById("submit-button").addEventListener("click", processClick);
+  document.getElementById("submit-button").addEventListener("click", () => processClick());
 
   // Save click
   document.querySelectorAll(".frq-parts .part button").forEach(button => button.addEventListener("click", () => processClick(button.getAttribute("data-save-part"))));
@@ -548,9 +548,23 @@ try {
           } else if (frq) {
             answerMode("frq");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "frq");
-            frqInput.value = item.answer;
-            document.querySelector('[data-answer-mode="frq"] h1').innerText = item.answer;
-            frqInput.focus();
+            questionInput.value = '1';
+            if (item.question === '1') {
+              frqInput.value = item.answer;
+              document.querySelector('[data-answer-mode="frq"] h1').innerText = item.answer;
+              frqInput.focus();
+            } else {
+              if (document.querySelector(`[data-frq-part="${item.question}"]`)) {
+                document.querySelector(`[data-frq-part="${item.question}"]`).value = item.answer;
+                document.querySelector(`[data-frq-part="${item.question}"]`).focus();
+              } else {
+                while (!document.querySelector(`[data-frq-part="${item.question}"]`)) {
+                  addPart();
+                };
+                document.querySelector(`[data-frq-part="${item.question}"]`).value = item.answer;
+                document.querySelector(`[data-frq-part="${item.question}"]`).focus();
+              };
+            };
           } else {
             answerMode("input");
             const choice = item.answer.match(/^CHOICE ([A-E])$/);
