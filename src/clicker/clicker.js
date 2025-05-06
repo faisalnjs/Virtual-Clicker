@@ -171,7 +171,7 @@ try {
           setInput.focus();
         } else if (mode === "frq") {
           if (part) {
-            if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.includes('part'))) {
+            if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.contains('part'))) {
               document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').classList.add("attention");
               document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').focus();
             } else {
@@ -204,7 +204,7 @@ try {
       }
       if (mode === "frq") {
         if (part) {
-          if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.includes('part'))) {
+          if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.contains('part'))) {
             document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').focus();
           } else {
             document.querySelector(`[data-frq-part="${part}"]`).focus();
