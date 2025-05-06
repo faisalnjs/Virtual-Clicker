@@ -200,7 +200,7 @@ try {
       } else {
         storeClick(storage.get("code"), question, answer, "text");
       }
-      resetInputs();
+      if (mode !== "frq") resetInputs();
       // Show submit confirmation
       ui.modeless(`<i class="bi bi-check-lg"></i>`, storage.get("makeUpDate") ? "Submitted Makeup!" : "Submitted!");
     };
