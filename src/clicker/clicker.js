@@ -170,8 +170,16 @@ try {
           setInput.classList.add("attention");
           setInput.focus();
         } else if (mode === "frq") {
-          frqInput.classList.add("attention");
-          frqInput.focus();
+          if (part) {
+            if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.includes('part'))) {
+              document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').focus();
+            } else {
+              document.querySelector(`[data-frq-part="${part}"]`).focus();
+            };
+          } else {
+            frqInput.classList.add("attention");
+            frqInput.focus();
+          };
         }
       }
       if (!question) {
