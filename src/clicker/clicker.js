@@ -172,8 +172,10 @@ try {
         } else if (mode === "frq") {
           if (part) {
             if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.includes('part'))) {
+              document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').classList.add("attention");
               document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').focus();
             } else {
+              document.querySelector(`[data-frq-part="${part}"]`).classList.add("attention");
               document.querySelector(`[data-frq-part="${part}"]`).focus();
             };
           } else {
@@ -200,7 +202,19 @@ try {
       } else {
         storeClick(storage.get("code"), question, answer, "text");
       }
-      if (mode !== "frq") resetInputs();
+      if (mode === "frq") {
+        if (part) {
+          if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.includes('part'))) {
+            document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.querySelector('input').focus();
+          } else {
+            document.querySelector(`[data-frq-part="${part}"]`).focus();
+          };
+        } else {
+          frqInput.focus();
+        };
+      } else {
+        resetInputs();
+      };
       // Show submit confirmation
       ui.modeless(`<i class="bi bi-check-lg"></i>`, storage.get("makeUpDate") ? "Submitted Makeup!" : "Submitted!");
     };
