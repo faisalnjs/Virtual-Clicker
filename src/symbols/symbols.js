@@ -83,7 +83,7 @@ export const autocomplete = new Autocomplete(
 let lastFocusedInput = null;
 let currentFocusedInput = null;
 document.addEventListener('focusin', (event) => {
-  if (event.target.tagName.toLowerCase() === 'input') {
+  if ((event.target.tagName.toLowerCase() === 'input') && event.target.getAttribute("type") && (event.target.getAttribute("type") === "text")) {
     lastFocusedInput = currentFocusedInput;
     currentFocusedInput = event.target;
   };
