@@ -81,8 +81,10 @@ export const autocomplete = new Autocomplete(
 
 // Track input focus
 let lastFocusedElement = null;
+let currentFocusedElement = null;
 document.addEventListener('focusin', (event) => {
-  lastFocusedElement = event.target;
+  lastFocusedElement = currentFocusedElement;
+  currentFocusedElement = event.target;
 });
 
 // Insert symbol by index
