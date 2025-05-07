@@ -91,6 +91,7 @@ document.querySelectorAll("[data-insert-symbol]").forEach((button) => {
   const symbol = Object.values(symbols)[index];
   button.innerHTML = symbol;
   button.addEventListener("click", () => {
+    console.log(lastFocusedElement);
     if (lastFocusedElement && (lastFocusedElement.tagName.toLowerCase() === 'input')) {
       insert(symbol, lastFocusedElement);
     } else if (button.getAttribute("data-target-input") && document.getElementById(button.getAttribute("data-target-input"))) {
