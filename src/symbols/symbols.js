@@ -79,13 +79,25 @@ export const autocomplete = new Autocomplete(
   document.getElementById("answer-suggestion"),
 );
 
+// Track input focus
+let lastFocusedElement = null;
+document.addEventListener('focusin', (event) => {
+  lastFocusedElement = event.target;
+});
+
 // Insert symbol by index
 document.querySelectorAll("[data-insert-symbol]").forEach((button) => {
   const index = button.getAttribute("data-insert-symbol");
   const symbol = Object.values(symbols)[index];
   button.innerHTML = symbol;
   button.addEventListener("click", () => {
-    insert(symbol);
+    if (lastFocusedElement && (lastFocusedElement.tagName.toLowerCase() === 'input')) {
+      insert(symbol, lastFocusedElement);
+    } else if (button.getAttribute("data-target-input") && document.getElementById(button.getAttribute("data-target-input"))) {
+      insert(symbol, document.getElementById(button.getAttribute("data-target-input")));
+    } else {
+      insert(symbol);
+    };
   });
 });
 
@@ -118,9 +130,14 @@ for (let i = 0; i < emptySpaces; i++) {
 }
 
 // Insert symbol at cursor position
-function insert(symbol) {
-  answerInput.setRangeText(symbol, answerInput.selectionStart, answerInput.selectionEnd, "end");
-  answerInput.focus();
+function insert(symbol, customInput) {
+  if (customInput) {
+    customInput.setRangeText(symbol, customInput.selectionStart, customInput.selectionEnd, "end");
+    customInput.focus();
+  } else {
+    answerInput.setRangeText(symbol, answerInput.selectionStart, answerInput.selectionEnd, "end");
+    answerInput.focus();
+  };
   autocomplete.update();
 }
 
