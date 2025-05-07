@@ -96,7 +96,10 @@ document.querySelectorAll("[data-insert-symbol]").forEach((button) => {
   button.innerHTML = symbol;
   button.addEventListener("click", () => {
     console.log(lastFocusedInput, currentFocusedInput);
-    if (lastFocusedInput && document.querySelector(`[data-answer-mode="${currentAnswerMode}"]`).contains(lastFocusedInput)) {
+    var answerMode = document.querySelector('#answer-mode-selector [aria-selected="true"]').getAttribute("data-value");
+    if (currentFocusedInput && document.querySelector(`[data-answer-mode="${answerMode}"]`).contains(currentFocusedInput)) {
+      insert(symbol, currentFocusedInput);
+    } else if (lastFocusedInput && document.querySelector(`[data-answer-mode="${answerMode}"]`).contains(lastFocusedInput)) {
       insert(symbol, lastFocusedInput);
     } else if (button.getAttribute("data-target-input") && document.getElementById(button.getAttribute("data-target-input"))) {
       insert(symbol, document.getElementById(button.getAttribute("data-target-input")));
