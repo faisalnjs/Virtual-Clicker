@@ -263,7 +263,7 @@ try {
         a++;
       });
     }
-    document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = 'nowrap';
+    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = 'nowrap';
     frqInput.value = 4;
     // Switch input mode (exit multiple choice)
     answerMode(mode);
@@ -715,14 +715,14 @@ try {
       newSetInput.setAttribute('type', 'text');
       newSetInput.setAttribute('autocomplete', 'off');
       newSetInput.setAttribute('data-set-input', Number(highestDataElement.getAttribute('data-set-input')) + 1);
-      const buttonGrid = document.querySelector('[data-answer-mode="set"] .button-grid');
+      const buttonGrid = document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1];
       const insertBeforePosition = buttonGrid.children.length - 2;
       if (insertBeforePosition > 0) {
         buttonGrid.insertBefore(newSetInput, buttonGrid.children[insertBeforePosition]);
       } else {
         buttonGrid.appendChild(newSetInput);
       }
-      document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
+      document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
       newSetInput.focus();
       document.querySelector("[data-remove-set-input]").disabled = false;
     }
@@ -743,11 +743,11 @@ try {
       if (highestDataElement !== null) highestDataElement.remove();
     }
     if (setInputs.length === 2) e.target.disabled = true;
-    document.querySelector('[data-answer-mode="set"] .button-grid').style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
+    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
   }
 
   function resetSetInput() {
-    document.querySelector('[data-answer-mode="set"]').innerHTML = '<div class="button-grid"><input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button></div>';
+    document.querySelector('[data-answer-mode="set"] .button-grid').innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
     if (document.querySelector("[data-add-set-input]")) {
       document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
     }
