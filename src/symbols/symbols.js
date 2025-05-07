@@ -80,11 +80,13 @@ export const autocomplete = new Autocomplete(
 );
 
 // Track input focus
-let lastFocusedElement = null;
-let currentFocusedElement = null;
+let lastFocusedInput = null;
+let currentFocusedInput = null;
 document.addEventListener('focusin', (event) => {
-  lastFocusedElement = currentFocusedElement;
-  currentFocusedElement = event.target;
+  if (event.target.tagName.toLowerCase() === 'input') {
+    lastFocusedInput = currentFocusedInput;
+    currentFocusedInput = event.target;
+  };
 });
 
 // Insert symbol by index
@@ -93,9 +95,9 @@ document.querySelectorAll("[data-insert-symbol]").forEach((button) => {
   const symbol = Object.values(symbols)[index];
   button.innerHTML = symbol;
   button.addEventListener("click", () => {
-    console.log(lastFocusedElement);
-    if (lastFocusedElement && (lastFocusedElement.tagName.toLowerCase() === 'input')) {
-      insert(symbol, lastFocusedElement);
+    console.log(lastFocusedInput, currentFocusedInput);
+    if (lastFocusedInput && document.querySelector(`[data-answer-mode="${currentAnswerMode}"]`).contains(lastFocusedInput)) {
+      insert(symbol, lastFocusedInput);
     } else if (button.getAttribute("data-target-input") && document.getElementById(button.getAttribute("data-target-input"))) {
       insert(symbol, document.getElementById(button.getAttribute("data-target-input")));
     } else {
