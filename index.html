@@ -89,6 +89,23 @@
         <math-field id="math-input"></math-field>
       </div>
       <div data-answer-mode="set">
+        <div class="row">
+          <div class="button-grid" id="insert-row">
+            <button data-insert-symbol="0" data-target-input="set-input"></button>
+            <button data-insert-symbol="1" data-target-input="set-input"></button>
+            <button data-insert-symbol="2" data-target-input="set-input"></button>
+            <button data-insert-symbol="3" data-target-input="set-input"></button>
+            <button data-insert-symbol="4" data-target-input="set-input"></button>
+            <button data-insert-symbol="5" data-target-input="set-input"></button>
+            <button data-insert-symbol="6" data-target-input="set-input"></button>
+            <button data-insert-symbol="7" data-target-input="set-input"></button>
+            <button data-insert-symbol="8" data-target-input="set-input"></button>
+            <button data-insert-symbol="9" data-target-input="set-input"></button>
+          </div>
+          <button class="icon" data-modal-view="symbols">
+            <i class="bi bi-three-dots"></i>
+          </button>
+        </div>
         <div class="button-grid">
           <input type="text" autocomplete="off" id="set-input" data-set-input="1" />
           <button square data-add-set-input><i class="bi bi-plus"></i></button>
@@ -96,10 +113,27 @@
         </div>
       </div>
       <div data-answer-mode="frq">
+        <div class="row">
+          <div class="button-grid" id="insert-row">
+            <button data-insert-symbol="0" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="1" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="2" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="3" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="4" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="5" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="6" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="7" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="8" data-target-input="default-frq-part-symbols"></button>
+            <button data-insert-symbol="9" data-target-input="default-frq-part-symbols"></button>
+          </div>
+          <button class="icon" data-modal-view="symbols">
+            <i class="bi bi-three-dots"></i>
+          </button>
+        </div>
         <div class="frq-parts">
           <div class="part">
             <div class="prefix">a.</div>
-            <input type="text" autocomplete="off" data-frq-part="a" />
+            <input type="text" autocomplete="off" data-frq-part="a" id="default-frq-part-symbols" />
             <button data-save-part="a">Save</button>
           </div>
           <div class="part">

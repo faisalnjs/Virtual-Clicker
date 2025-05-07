@@ -123,10 +123,14 @@ div.spacer {
   border-radius: 0.5rem;
 }
 
-[data-answer-mode="input"] {
+[data-answer-mode] {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 0.25rem;
+}
+
+[data-answer-mode="input"] {
+  flex-direction: column-reverse !important;
 }
 
 #answer-textarea-container {

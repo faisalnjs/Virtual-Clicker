@@ -394,7 +394,7 @@ div.ML__keyboard {
 
 [data-answer-mode="frq"] h1 {
   text-align: center;
-  padding: 10px 0;
+  padding-bottom: 10px;
 }
 
 #frq-input {
@@ -405,7 +405,7 @@ div.ML__keyboard {
   border-radius: 10px;
   background: var(--surface-color);
   outline: none;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
 #frq-input::-webkit-slider-thumb {
