@@ -8,6 +8,7 @@ import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } fr
 ``;
 
 try {
+  var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
   const mf = document.getElementById("math-input");
@@ -56,7 +57,7 @@ try {
     // Populate seat code finder grid
     for (let col = 1; col <= 5; col++) {
       for (let row = 6; row > 0; row--) {
-        const period = document.getElementById("period-input").value;
+        period = document.getElementById("period-input").value;
         const code = period + row.toString() + col.toString();
         const button = new ui.Element("button", "", {
           click: () => {
@@ -68,6 +69,23 @@ try {
         ui.addTooltip(button, code);
       }
     }
+    document.getElementById("period-input").addEventListener("change", (e) => {
+      document.getElementById("seat-grid").innerHTML = "";
+      for (let col = 1; col <= 5; col++) {
+        for (let row = 6; row > 0; row--) {
+          period = document.getElementById("period-input").value;
+          const code = period + row.toString() + col.toString();
+          const button = new ui.Element("button", "", {
+            click: () => {
+              document.getElementById("code-input").value = code;
+              ui.view("settings/code");
+            },
+          }).element;
+          document.getElementById("seat-grid").append(button);
+          ui.addTooltip(button, code);
+        }
+      }
+    });
     // Update history feed
     updateHistory();
     // Focus answer input
