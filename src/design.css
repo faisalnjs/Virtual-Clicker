@@ -169,6 +169,7 @@ code {
   height: 1.5em;
   padding: 0 0.25rem;
   border-radius: 0.25rem;
+  color: var(--accent-text-color);
   background-color: var(--surface-color);
 }
 
