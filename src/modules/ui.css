@@ -21,6 +21,27 @@ dialog:modal {
   max-height: calc(100vh - 2rem);
 }
 
+dialog img {
+  border-radius: 0.5rem;
+}
+
+dialog #version-string {
+  margin-top: -37px;
+  margin-bottom: 9px;
+  margin-left: 5px;
+  padding: 3px 10px 1px 10px;
+  background-color: var(--text-color);
+  backdrop-filter: blur(5px);
+  width: fit-content;
+  color: var(--background-color);
+  border-radius: 0.25rem;
+  z-index: 1;
+}
+
+dialog #version-string span {
+  background: transparent;
+}
+
 div[data-modal-page] {
   display: flex;
   flex-direction: column;
