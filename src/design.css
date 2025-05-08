@@ -46,6 +46,7 @@
 body {
   min-height: 100%;
   padding: 1rem;
+  padding-bottom: 25px;
   color: var(--text-color);
   background-color: var(--background-color);
   font:
