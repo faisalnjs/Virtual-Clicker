@@ -82,6 +82,7 @@ button {
   font: inherit;
   transition: 100ms var(--easing);
   cursor: pointer;
+  min-width: fit-content;
 }
 
 button.icon {

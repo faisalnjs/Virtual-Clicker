@@ -51,4 +51,4 @@ Files are transferred to the host using the GitHub Action automation workflow at
 ## Credits
 
 - [khui0](https://github.com/khui0) - Commits before 5/21/2024 including original design and development, logo image
-- [faisalnjs](https://github.com/faisalnjs) - Commits after 5/21/2024 including set and FRQ input modes, make-up mode, banner image
+- [faisalnjs](https://github.com/faisalnjs) - Commits after 5/21/2024 including set and FRQ input modes, make-up mode, banner images
