@@ -46,6 +46,7 @@
 body {
   min-height: 100%;
   padding: 1rem;
+  padding-bottom: 25px;
   color: var(--text-color);
   background-color: var(--background-color);
   font:
@@ -81,6 +82,7 @@ button {
   font: inherit;
   transition: 100ms var(--easing);
   cursor: pointer;
+  min-width: fit-content;
 }
 
 button.icon {
@@ -169,6 +171,7 @@ code {
   height: 1.5em;
   padding: 0 0.25rem;
   border-radius: 0.25rem;
+  color: var(--accent-text-color);
   background-color: var(--surface-color);
 }
 
