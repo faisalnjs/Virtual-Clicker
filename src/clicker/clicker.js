@@ -19,6 +19,7 @@ try {
   var frqPartInputs = document.querySelectorAll(".frq-parts .part input");
 
   let currentAnswerMode;
+  let currentSetType = "brackets";
   let multipleChoice = null;
   let highestDataElement = null;
 
@@ -109,7 +110,18 @@ try {
           setInputs.forEach(a => {
             if ((a.value.length > 0) && (a.value != ' ')) values.push(a.value)
           });
-          return JSON.stringify(values);
+          var array = JSON.stringify(values);
+          switch (currentSetType) {
+            case "brackets":
+              array = `{${array.slice(1, -1)}}`;
+              break;
+            case "vector":
+              array = `<${array.slice(1, -1)}>`;
+              break;
+            default:
+              break;
+          };
+          return array;
         } else if (mode === "frq") {
           if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
             return document.querySelector(`[data-frq-part="${part}"]`).value;
@@ -559,7 +571,7 @@ try {
               button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
             }
           } else {
-            button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.split('[')[1].split(']')[0]}</p>`;
+            button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.slice(1, -1)}</p>`;
           }
         } else {
           button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n${convertLatexToMarkup(item.answer)}\n<p class="hint">(Equation may not display properly)</p>`;
@@ -713,6 +725,14 @@ try {
     } else if (mode === "frq") {
       answerLabel.setAttribute("for", "frq-input");
     }
+  });
+
+  const setTypeLabel = document.querySelector(`label[for="answer-input"]`);
+
+  // Select set type
+  document.getElementById("set-type-selector").addEventListener("input", (e) => {
+    const mode = e.detail;
+    currentSetType = mode;
   });
 
   setInputs = document.querySelectorAll('[data-set-input]');
