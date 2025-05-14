@@ -118,6 +118,12 @@ try {
             case "vector":
               array = `<${array.slice(1, -1)}>`;
               break;
+            case "coordinates":
+              array = `<${array.slice(1, -1)}>`;
+              break;
+            case "vector":
+              array = `<${array.slice(1, -1)}>`;
+              break;
             default:
               break;
           };
