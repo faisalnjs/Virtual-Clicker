@@ -103,12 +103,12 @@ try {
         if (mode === "input") {
           return answerInput.value?.trim();
         } else if (mode === "math") {
-          return convertLatexToAsciiMath(mf.value);
+          return convertLatexToAsciiMath(mf.value?.trim());
         } else if (mode === "set") {
           var values = "";
           var setInputs = document.querySelectorAll('[data-set-input]');
           setInputs.forEach(a => {
-            if ((a.value.length > 0) && (a.value != ' ')) values += a.value.replaceAll(',', '') + ", ";
+            if ((a.value.length > 0) && (a.value != ' ')) values += a.value.replaceAll(',', '').trim() + ", ";
           });
           values = values.slice(0, -2);
           switch (currentSetType) {
@@ -133,7 +133,7 @@ try {
           return values;
         } else if (mode === "frq") {
           if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
-            return document.querySelector(`[data-frq-part="${part}"]`).value;
+            return document.querySelector(`[data-frq-part="${part}"]`).value?.trim();
           } else {
             return frqInput.value;
           };
