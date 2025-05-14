@@ -237,3 +237,8 @@ body[data-theme="dune-2"] #atreides-logo {
 body[data-theme="dune-2"] #header > .virtual-clicker-logo {
   display: none;
 }
+
+body[data-theme="stealth"] dialog img,
+body[data-theme="slytherin"] dialog img {
+  box-shadow: inset 0 0 0px 1000px var(--surface-color);
+}
