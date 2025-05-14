@@ -105,29 +105,32 @@ try {
         } else if (mode === "math") {
           return convertLatexToAsciiMath(mf.value);
         } else if (mode === "set") {
-          var values = [];
+          var values = "";
           var setInputs = document.querySelectorAll('[data-set-input]');
           setInputs.forEach(a => {
-            if ((a.value.length > 0) && (a.value != ' ')) values.push(a.value)
+            if ((a.value.length > 0) && (a.value != ' ')) values += a.value.replaceAll(',', '') + ", ";
           });
-          var array = JSON.stringify(values);
+          values = values.slice(0, -2);
           switch (currentSetType) {
             case "brackets":
-              array = `{${array.slice(1, -1)}}`;
+              values = `{${values}}`;
               break;
             case "vector":
-              array = `<${array.slice(1, -1)}>`;
+              values = `<${values}>`;
               break;
-            case "coordinates":
-              array = `<${array.slice(1, -1)}>`;
+            case "array":
+              values = `[${values}]`;
               break;
-            case "vector":
-              array = `<${array.slice(1, -1)}>`;
+            case "coordinate":
+              values = `(${values})`;
+              break;
+            case "inner":
+              values = `⟨${values}⟩`;
               break;
             default:
               break;
           };
-          return array;
+          return values;
         } else if (mode === "frq") {
           if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
             return document.querySelector(`[data-frq-part="${part}"]`).value;
@@ -597,11 +600,11 @@ try {
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "set");
             resetSetInput();
             var i = 0;
-            JSON.parse(`[${item.answer.slice(1, -1)}]`).forEach(a => {
+            item.answer.slice(1, -1).split(', ').forEach(a => {
               setInputs = document.querySelectorAll("[data-set-input]");
               setInputs[i].value = a;
               i++;
-              if (i < JSON.parse(`[${item.answer.slice(1, -1)}]`).length) addSet();
+              if (i < item.answer.slice(1, -1).split(', ').length) addSet();
             });
           } else if (frq) {
             answerMode("frq");
