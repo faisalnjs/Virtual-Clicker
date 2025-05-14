@@ -591,11 +591,11 @@ try {
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "set");
             resetSetInput();
             var i = 0;
-            JSON.parse(item.answer).forEach(a => {
+            JSON.parse(`[${item.answer.slice(1, -1)}]`).forEach(a => {
               setInputs = document.querySelectorAll("[data-set-input]");
               setInputs[i].value = a;
               i++;
-              if (i < JSON.parse(item.answer).length) addSet();
+              if (i < JSON.parse(`[${item.answer.slice(1, -1)}]`).length) addSet();
             });
           } else if (frq) {
             answerMode("frq");
@@ -785,7 +785,7 @@ try {
   }
 
   function resetSetInput() {
-    document.querySelector('[data-answer-mode="set"] .button-grid').innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
+    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
     if (document.querySelector("[data-add-set-input]")) {
       document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
     }
