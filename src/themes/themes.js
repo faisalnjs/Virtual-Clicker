@@ -243,6 +243,32 @@ try {
     const css = `[data-theme="custom"] {\n  ${properties.join("\n  ")}\n}`;
     navigator.clipboard.writeText(css);
   }
+
+  // Seasonal themes
+
+  var seasonalTheme = "";
+  var seasonalEmoji = "";
+
+  if ((Date.now() < new Date(`${new Date().getFullYear()}-10-31`).getTime()) && (Date.now() > new Date(`${new Date().getFullYear()}-10-23`).getTime())) {
+    seasonalTheme = "halloween";
+    seasonalEmoji = "🎃";
+  } else if ((Date.now() < new Date(`${new Date().getFullYear()}-12-25`).getTime()) && (Date.now() > new Date(`${new Date().getFullYear()}-12-01`).getTime())) {
+    seasonalTheme = "festive";
+    seasonalEmoji = "🎄";
+  }
+
+  if ((seasonalTheme != "") && (seasonalEmoji != "")) {
+    var seasonalThemeButton = document.createElement("button");
+    seasonalThemeButton.className = "icon";
+    seasonalThemeButton.onclick = function () {
+      disableTransitions();
+      document.body.setAttribute("data-theme", seasonalTheme);
+      enableTransitions();
+      storage.set("theme", seasonalTheme);
+    };
+    seasonalThemeButton.innerHTML = seasonalEmoji;
+    document.getElementById("controls-container").appendChild(seasonalThemeButton);
+  }
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ themes.js: ${error.message}`);

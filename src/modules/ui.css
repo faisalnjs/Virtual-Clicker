@@ -27,20 +27,27 @@ dialog img {
 }
 
 dialog #version-string {
-  margin-top: -37px;
-  margin-bottom: 9px;
-  margin-left: 5px;
-  padding: 3px 10px 1px 10px;
-  background-color: var(--text-color);
-  backdrop-filter: blur(5px);
+  margin: -55px auto 20px auto;
   width: fit-content;
-  color: var(--background-color);
-  border-radius: 0.25rem;
   z-index: 1;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
-dialog #version-string span {
-  background: transparent;
+dialog #version-string p {
+  font-size: 25px;
+  font-weight: 600;
+  background: linear-gradient(0, white 50%, transparent);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+dialog #version-string code {
+  font-size: 15px;
+  color: var(--text-color) !important;
 }
 
 div[data-modal-page] {

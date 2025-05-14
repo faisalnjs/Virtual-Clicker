@@ -18,12 +18,12 @@ try {
 
   updateVersionString();
   function updateVersionString() {
-    document.querySelectorAll("span.version").forEach((element) => {
+    document.querySelectorAll(".version").forEach((element) => {
       const DEVELOPER_MODE = storage.get("developer");
-      element.innerHTML = "v" + version + (DEVELOPER_MODE ? " <code>dev</code>" : "");
+      element.innerHTML = "<p>v" + version + "</p>" + (DEVELOPER_MODE ? " <code>dev</code>" : "");
     });
   }
-  document.querySelectorAll("span.hostname").forEach((element) => {
+  document.querySelectorAll(".hostname").forEach((element) => {
     element.innerHTML = window.location.hostname;
   });
 
