@@ -125,7 +125,7 @@ try {
             case "coordinate":
               values = `(${values})`;
               break;
-            case "inner":
+            case "product":
               values = `⟨${values}⟩`;
               break;
             default:
@@ -612,7 +612,7 @@ try {
                 restoredSetType = "coordinate";
                 break;
               case "⟨":
-                restoredSetType = "inner";
+                restoredSetType = "product";
                 break;
               default:
                 break;
