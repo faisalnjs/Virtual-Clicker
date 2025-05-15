@@ -22,6 +22,7 @@ try {
   let currentSetType = "brackets";
   let multipleChoice = null;
   let highestDataElement = null;
+  let restoredSetType = "";
 
   let historyIndex = 0;
 
@@ -124,7 +125,7 @@ try {
             case "coordinate":
               values = `(${values})`;
               break;
-            case "inner":
+            case "product":
               values = `⟨${values}⟩`;
               break;
             default:
@@ -599,6 +600,24 @@ try {
             answerMode("set");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "set");
             resetSetInput();
+            restoredSetType = "brackets";
+            switch (item.answer.slice(0, 1)) {
+              case "<":
+                restoredSetType = "vector";
+                break;
+              case "[":
+                restoredSetType = "array";
+                break;
+              case "(":
+                restoredSetType = "coordinate";
+                break;
+              case "⟨":
+                restoredSetType = "product";
+                break;
+              default:
+                break;
+            };
+            ui.setButtonSelectValue(document.getElementById("set-type-selector"), restoredSetType);
             var i = 0;
             item.answer.slice(1, -1).split(', ').forEach(a => {
               setInputs = document.querySelectorAll("[data-set-input]");
@@ -736,8 +755,6 @@ try {
     }
   });
 
-  const setTypeLabel = document.querySelector(`label[for="answer-input"]`);
-
   // Select set type
   document.getElementById("set-type-selector").addEventListener("input", (e) => {
     const mode = e.detail;
@@ -794,6 +811,7 @@ try {
   }
 
   function resetSetInput() {
+    ui.setButtonSelectValue(document.getElementById("set-type-selector"), "brackets");
     document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
     if (document.querySelector("[data-add-set-input]")) {
       document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
