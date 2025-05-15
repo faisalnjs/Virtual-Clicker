@@ -600,7 +600,7 @@ try {
             answerMode("set");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "set");
             resetSetInput();
-            restoredSetType = "bracket";
+            restoredSetType = "brackets";
             switch (item.answer.slice(0, 1)) {
               case "<":
                 restoredSetType = "vector";
