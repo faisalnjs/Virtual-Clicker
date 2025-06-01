@@ -92,6 +92,8 @@ try {
     updateHistory();
     // Focus answer input
     document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
+    // Stop custom page loader
+    ui.stopLoader();
   }
 
   // Process click
