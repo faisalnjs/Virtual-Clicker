@@ -1,5 +1,4 @@
 import "./ui.css";
-import storage from "/src/modules/storage.js";
 
 export function alert(title, text, callback, blur) {
   return modal({
@@ -26,17 +25,107 @@ export function prompt(title, text, buttons, blur) {
 }
 
 export function modal(options) {
-  // Create dialog element
   const dialog = document.createElement("dialog");
-  dialog.innerHTML = options.body;
-  // Append dialog element to DOM
+
+  if (options.title) {
+    const title = document.createElement("h2");
+    title.innerText = options.title;
+    dialog.append(title);
+  }
+
+  if (options.body) {
+    dialog.innerHTML += options.body;
+  }
+
+  if (options.input) {
+    const input = document.createElement("input");
+    input.type = options.input.type || "text";
+    input.placeholder = options.input.placeholder || "";
+    input.value = options.input.defaultValue || "";
+    input.className = "dialog-input";
+    dialog.appendChild(input);
+  }
+
   document.body.append(dialog);
-  // Show modal
-  show(dialog, options.title, null, options.buttons, options.blur);
-  // Remove dialog element on close
-  dialog.addEventListener("close", () => {
-    dialog.remove();
+
+  options.buttons.forEach(button => {
+    const btnElement = new Element("button", button.text, {
+      click: () => {
+        if (button.onclick) {
+          const inputValue = dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null;
+          button.onclick(inputValue);
+        }
+        if (button.close) {
+          closeModal();
+        }
+      },
+    }, button.class).element;
+    dialog.appendChild(btnElement);
   });
+
+  animate(
+    dialog,
+    {
+      scale: "0.9",
+      opacity: "0",
+    },
+    {
+      scale: "1",
+      opacity: "1",
+    },
+    250,
+  );
+
+  dialog.showModal();
+
+  dialog.addEventListener("close", () => {
+    animate(
+      dialog,
+      {
+        scale: "1",
+        opacity: "1",
+      },
+      {
+        scale: "0.9",
+        opacity: "0",
+      },
+      250,
+    );
+    setTimeout(() => {
+      dialog.remove();
+    }, 250);
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (!dialog.contains(e.target)) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeModal();
+    }
+  });
+
+  function closeModal() {
+    animate(
+      dialog,
+      {
+        scale: "1",
+        opacity: "1",
+      },
+      {
+        scale: "0.9",
+        opacity: "0",
+      },
+      250,
+    );
+    setTimeout(() => {
+      dialog.close();
+    }, 250);
+  }
+
   return dialog;
 }
 
@@ -171,6 +260,7 @@ export function view(path) {
   }
   const pages = path.split("/");
   const target = document.querySelector(`[data-modal-page="${pages[pages.length - 1]}"]`);
+  if (!target) return;
   const title = target.getAttribute("data-page-title") || path;
   for (let i = 0; i < pages.length; i++) {
     const query = pages
@@ -191,7 +281,7 @@ export function view(path) {
       });
   }
   const previous = pages.slice(0, pages.length - 1).join("/");
-  const buttons = [
+  const buttons = (title === 'API Offline') ? [] : [
     {
       text: `<i class="bi bi-x-lg"></i>`,
       class: "icon",
@@ -211,54 +301,20 @@ export function view(path) {
     });
   }
   show(document.querySelector(`[data-modal-page="${pages[0]}"]`), title, buttons);
+  if (path === "api-fail") startLoader();
   const event = new Event("view");
   target.dispatchEvent(event);
-  if (path.includes('makeup')) {
-    document.getElementById("dismiss-makeup-button").innerText = storage.get("makeUpDate") ? "Turn Off Makeup Mode" : "Dismiss";
-    const makeupClickButton = document.getElementById("makeup-click-button");
-    const newMakeupClickButton = makeupClickButton.cloneNode(true);
-    makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
-    newMakeupClickButton.addEventListener("click", () => {
-      if (document.getElementById("date-input").value != '') {
-        document.getElementById("date-input").classList.remove("attention");
-        let dateParts = document.getElementById("date-input").value.split("-");
-        let now = new Date();
-        let hours = now.getHours();
-        let ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
-        view("");
-      } else {
-        storage.set("makeUpDate", null);
-        document.getElementById("date-input").classList.add("attention");
-        document.getElementById("date-input").focus();
-      }
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-      });
-      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-    });
-    const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
-    const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
-    dismissMmakeupClickButton.parentNode.replaceChild(newDismissMmakeupClickButton, dismissMmakeupClickButton);
-    newDismissMmakeupClickButton.addEventListener("click", () => {
-      storage.set("makeUpDate", null);
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-      });
-      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-      view("");
-    });
-  }
 }
 
-export function modeless(icon, message) {
+export function modeless(icon, message, description = null) {
   document.querySelector("div.modeless")?.remove();
   const element = document.createElement("div");
   const keyframes = [{ opacity: 0 }, { opacity: 1 }];
   element.className = "modeless";
   element.append(new Element("h2", icon).element, new Element("p", message).element);
+  if (description) {
+    element.append(new Element("p", description).element);
+  }
   element.animate(keyframes, {
     duration: 100,
     fill: "forwards",
@@ -272,7 +328,7 @@ export function modeless(icon, message) {
     setTimeout(() => {
       element.remove();
     }, 100);
-  }, 2400);
+  }, description ? 5000 : 2400);
   document.body.append(element);
 }
 
@@ -366,7 +422,7 @@ export class Element {
 (() => {
   document.addEventListener("pointerdown", (e) => {
     const dialog = document.querySelector("dialog[open]");
-    if (dialog?.hasAttribute("data-open") && !dialog?.contains(e.target)) {
+    if ((dialog?.querySelector('h2').innerText != 'API Offline') && dialog?.hasAttribute("data-open") && !dialog?.contains(e.target)) {
       document.addEventListener(
         "pointerup",
         () => {
@@ -450,10 +506,8 @@ document.querySelectorAll("[data-button-select]").forEach((element) => {
       });
       // Select target element
       button.setAttribute("aria-selected", true);
-      // Prefill question
-      const value = button.getAttribute("data-value");
-      if (value === 'frq') document.getElementById("question-input").value = '1';
       // Dispatch event
+      const value = button.getAttribute("data-value");
       const event = new CustomEvent("input", { detail: value });
       element.dispatchEvent(event);
     });
@@ -475,4 +529,45 @@ export function setButtonSelectValue(element, value) {
     // Select target element
     element.querySelector(`button[data-value="${value}"]`).setAttribute("aria-selected", true);
   }
+}
+
+export function toast(message, duration = 3000, type = "info", icon = null) {
+  const toastContainer = document.querySelector(".toast-container") || createToastContainer();
+  const toastElement = new Element("div", message, null, `toast ${type}`).element;
+  if (icon) {
+    const iconElement = document.createElement("i");
+    iconElement.className = icon;
+    toastElement.prepend(iconElement);
+  }
+  const progressBar = document.createElement("div");
+  progressBar.className = "toast-progress-bar";
+  toastElement.appendChild(progressBar);
+  toastContainer.appendChild(toastElement);
+  animate(toastElement, { transform: "translateX(100%)", opacity: "0" }, { transform: "translateX(0)", opacity: "1" }, 250);
+  progressBar.style.transition = `width ${duration}ms linear`;
+  setTimeout(() => {
+    progressBar.style.width = "100%";
+  }, 10);
+  setTimeout(() => {
+    animate(toastElement, { transform: "translateX(0)", opacity: "1" }, { transform: "translateX(100%)", opacity: "0" }, 250);
+    setTimeout(() => {
+      toastElement.remove();
+    }, 250);
+  }, duration);
+  function createToastContainer() {
+    const container = document.createElement("div");
+    container.className = "toast-container";
+    document.body.appendChild(container);
+    return container;
+  }
+}
+
+export function startLoader() {
+  const loader = document.getElementById("loader");
+  if (loader) loader.classList.add("active");
+}
+
+export function stopLoader() {
+  const loader = document.getElementById("loader");
+  if (loader) loader.classList.remove("active");
 }
