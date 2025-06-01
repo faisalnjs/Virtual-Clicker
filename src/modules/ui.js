@@ -1,4 +1,5 @@
 import "./ui.css";
+import storage from "/src/modules/storage.js";
 
 export function alert(title, text, callback, blur) {
   return modal({
@@ -302,6 +303,44 @@ export function view(path) {
   }
   show(document.querySelector(`[data-modal-page="${pages[0]}"]`), title, buttons);
   if (path === "api-fail") startLoader();
+  if (path.includes('makeup')) {
+    document.getElementById("dismiss-makeup-button").innerText = storage.get("makeUpDate") ? "Turn Off Makeup Mode" : "Dismiss";
+    const makeupClickButton = document.getElementById("makeup-click-button");
+    const newMakeupClickButton = makeupClickButton.cloneNode(true);
+    makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
+    newMakeupClickButton.addEventListener("click", () => {
+      if (document.getElementById("date-input").value != '') {
+        document.getElementById("date-input").classList.remove("attention");
+        let dateParts = document.getElementById("date-input").value.split("-");
+        let now = new Date();
+        let hours = now.getHours();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
+        view("");
+      } else {
+        storage.set("makeUpDate", null);
+        document.getElementById("date-input").classList.add("attention");
+        document.getElementById("date-input").focus();
+      }
+      document.querySelectorAll("span.code").forEach((element) => {
+        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+      });
+      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+    });
+    const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
+    const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
+    dismissMmakeupClickButton.parentNode.replaceChild(newDismissMmakeupClickButton, dismissMmakeupClickButton);
+    newDismissMmakeupClickButton.addEventListener("click", () => {
+      storage.set("makeUpDate", null);
+      document.querySelectorAll("span.code").forEach((element) => {
+        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
+      });
+      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+      view("");
+    });
+  }
   const event = new Event("view");
   target.dispatchEvent(event);
 }
