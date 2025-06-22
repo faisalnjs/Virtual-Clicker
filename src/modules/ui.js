@@ -101,11 +101,12 @@ export function modal(options) {
       var btnElement = new Element("button", button.text, {
         click: () => {
           if (button.onclick) {
-            var hasEmptyRequiredInput = false;
+            var hasEmptyRequiredInput = false
             dialog.querySelectorAll(".dialog-input").forEach(dialogInput => {
               if (dialogInput.required && !dialogInput.value) {
-                hasEmptyRequiredInput = true;
                 dialogInput.classList.add("attention");
+                if (!hasEmptyRequiredInput) dialogInput.focus();
+                hasEmptyRequiredInput = true;
               } else {
                 dialogInput.classList.remove("attention");
               }
