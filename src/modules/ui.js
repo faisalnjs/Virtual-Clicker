@@ -147,10 +147,11 @@ export function modal(options) {
     var buttonsContainerElement = document.createElement("div");
     buttonsContainerElement.className = "button-grid";
     options.buttons.forEach(button => {
+      if (button.icon) button.text = + `<i class="bi ${button.icon}"></i> `;
       var btnElement = new Element("button", button.text, {
         click: () => {
           if (button.onclick) {
-            var hasEmptyRequiredInput = false
+            var hasEmptyRequiredInput = false;
             dialog.querySelectorAll(".dialog-input").forEach(dialogInput => {
               if (dialogInput.required && !dialogInput.value) {
                 dialogInput.classList.add("attention");
@@ -162,7 +163,7 @@ export function modal(options) {
             });
             if (hasEmptyRequiredInput) return;
             const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
-              return dialogInput.value;
+              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(e => Number(e.value)) : dialogInput.value;
             }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null);
             button.onclick(inputValue);
           }
@@ -366,7 +367,7 @@ export function show(dialog, title, buttons, actions, blur, effects = true) {
   blur && menu.querySelectorAll("[data-modal-buttons]>button").forEach((button) => button.blur());
 }
 
-export function view(path) {
+export function view(path = "") {
   if (!path) {
     const event = new Event("triggerclose");
     document.querySelector("dialog[open]")?.dispatchEvent(event);
