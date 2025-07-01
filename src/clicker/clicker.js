@@ -150,7 +150,7 @@ try {
             });
             matrix.push(matrixRow);
           });
-          var matrixString = JSON.stringify(matrix);
+          var matrixString = JSON.stringify(matrix).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']');
           return matrixString;
         } else if (mode === "frq") {
           if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
