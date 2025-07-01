@@ -612,7 +612,7 @@ try {
                 button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
               }
             } else {
-              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${JSON.stringify(JSON.parse(item.answer).map(innerArray => innerArray.map(numString => Number(numString))))}</p>`;
+              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${JSON.stringify(JSON.parse(item.answer).map(innerArray => innerArray.map(numString => String(numString)))).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']')}</p>`;
             }
           } else {
             button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.slice(1, -1)}</p>`;
@@ -668,7 +668,7 @@ try {
               if (rows.length === 1) {
                 removeRow();
               } else {
-                for (let i = 0; i < rows.length - 3; i++) {
+                for (let i = 0; i < rows.length - 2; i++) {
                   addRow();
                 }
               }
@@ -678,7 +678,7 @@ try {
               if (columns === 1) {
                 removeColumn();
               } else {
-                for (let i = 0; i < columns - 3; i++) {
+                for (let i = 0; i < columns - 2; i++) {
                   addColumn();
                 }
               }
@@ -689,6 +689,7 @@ try {
                 matrixRows[i].querySelectorAll('[data-matrix-column]')[j].value = rows[i][j];
               }
             }
+            matrixRows[matrixRows.length - 1].lastChild.focus();
           } else if (frq) {
             answerMode("frq");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "frq");
@@ -943,11 +944,9 @@ try {
       row.appendChild(newColumn);
     });
     rows[0].lastElementChild.focus();
-    ui.setUnsavedChanges(true);
     var columns = document.querySelectorAll('#matrix [data-matrix-row]:first-child [data-matrix-column]');
     if (columns.length === 10) document.querySelector("[data-add-matrix-column]").disabled = true;
     document.querySelector("[data-remove-matrix-column]").disabled = false;
-    ui.reloadUnsavedInputs();
   }
 
   // Remove matrix column
@@ -980,11 +979,9 @@ try {
     });
     document.getElementById('matrix').appendChild(newRow);
     newRow.firstElementChild.focus();
-    ui.setUnsavedChanges(true);
     var rows = document.querySelectorAll('[data-matrix-row]');
     if (rows.length === 10) document.querySelector("[data-add-matrix-row]").disabled = true;
     document.querySelector("[data-remove-matrix-row]").disabled = false;
-    ui.reloadUnsavedInputs();
   }
 
   // Remove matrix row
