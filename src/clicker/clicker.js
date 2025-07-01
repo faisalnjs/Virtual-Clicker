@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 
@@ -134,6 +135,23 @@ try {
               break;
           };
           return values;
+        } else if (mode === "matrix") {
+          var matrix = [];
+          var matrixRows = document.querySelectorAll('#matrix [data-matrix-row]');
+          matrixRows.forEach(row => {
+            var matrixRow = [];
+            row.querySelectorAll('[data-matrix-column]').forEach(input => {
+              var value = input.value?.trim();
+              if (value.length > 0) {
+                matrixRow.push(value);
+              } else {
+                matrixRow.push("");
+              }
+            });
+            matrix.push(matrixRow);
+          });
+          var matrixString = JSON.stringify(matrix).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']');
+          return matrixString;
         } else if (mode === "frq") {
           if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
             return document.querySelector(`[data-frq-part="${part}"]`).value?.trim();
@@ -211,6 +229,12 @@ try {
         } else if (mode === "set") {
           setInput.classList.add("attention");
           setInput.focus();
+        } else if (mode === "matrix") {
+          document.querySelector('#matrix [data-matrix-row]:first-child [data-matrix-column]').classList.add("attention");
+          document.querySelector('#matrix [data-matrix-row]:first-child [data-matrix-column]').focus();
+          setTimeout(() => {
+            document.getElementById("submit-button").disabled = false;
+          }, 3000);
         } else if (mode === "frq") {
           if (part) {
             if (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling && (document.querySelector(`[data-frq-part="${part}"]`).parentElement.nextElementSibling.classList.contains('part'))) {
@@ -239,6 +263,8 @@ try {
         storeClick(storage.get("code"), question, mf.value, "latex");
       } else if (mode === "set" && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "array");
+      } else if (mode === "matrix" && !multipleChoice) {
+        storeClick(storage.get("code"), question, answer, "matrix");
       } else if (mode === "frq" && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "frq");
       } else {
@@ -306,6 +332,7 @@ try {
       });
     }
     document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = 'nowrap';
+    resetMatrix();
     frqInput.value = 4;
     // Switch input mode (exit multiple choice)
     answerMode(mode);
@@ -574,13 +601,18 @@ try {
         const button = document.createElement("button");
         const latex = item.type === "latex";
         const array = item.type === "array";
+        const matrix = item.type === "matrix";
         const frq = item.type === "frq";
         if (!latex) {
           if (!array) {
-            if (!frq) {
-              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
+            if (!matrix) {
+              if (!frq) {
+                button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
+              } else {
+                button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
+              }
             } else {
-              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
+              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${JSON.stringify(JSON.parse(item.answer).map(innerArray => innerArray.map(numString => String(numString)))).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']')}</p>`;
             }
           } else {
             button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.slice(1, -1)}</p>`;
@@ -627,6 +659,37 @@ try {
               i++;
               if (i < item.answer.slice(1, -1).split(', ').length) addSet();
             });
+          } else if (matrix) {
+            answerMode("matrix");
+            ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "matrix");
+            resetMatrix();
+            var rows = JSON.parse(item.answer);
+            if (rows.length != 2) {
+              if (rows.length === 1) {
+                removeRow();
+              } else {
+                for (let i = 0; i < rows.length - 2; i++) {
+                  addRow();
+                }
+              }
+            }
+            var columns = rows[0].length;
+            if (columns != 2) {
+              if (columns === 1) {
+                removeColumn();
+              } else {
+                for (let i = 0; i < columns - 2; i++) {
+                  addColumn();
+                }
+              }
+            }
+            var matrixRows = document.querySelectorAll('#matrix [data-matrix-row]');
+            for (let i = 0; i < rows.length; i++) {
+              for (let j = 0; j < rows[i].length; j++) {
+                matrixRows[i].querySelectorAll('[data-matrix-column]')[j].value = rows[i][j];
+              }
+            }
+            matrixRows[matrixRows.length - 1].lastChild.focus();
           } else if (frq) {
             answerMode("frq");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "frq");
@@ -752,6 +815,8 @@ try {
       answerLabel.setAttribute("for", "math-input");
     } else if (mode === "set") {
       answerLabel.setAttribute("for", "set-input");
+    } else if (mode === "matrix") {
+      answerLabel.setAttribute("for", "matrix");
     } else if (mode === "frq") {
       answerLabel.setAttribute("for", "frq-input");
     }
@@ -864,6 +929,83 @@ try {
     frqParts = document.querySelectorAll('.frq-parts .part');
     if (frqParts.length > 4) frqParts[frqParts.length - 1].remove();
     if (frqParts.length === 5) document.querySelector("[data-remove-frq-part]").disabled = true;
+  }
+
+  // Add matrix column
+  if (document.querySelector("[data-add-matrix-column]")) document.querySelector("[data-add-matrix-column]").addEventListener("click", addColumn);
+
+  function addColumn() {
+    var rows = [...document.getElementById('matrix').children];
+    rows.forEach(row => {
+      var newColumn = document.createElement('input');
+      newColumn.setAttribute('type', 'text');
+      newColumn.setAttribute('autocomplete', 'off');
+      newColumn.setAttribute('data-matrix-column', row.children.length + 1);
+      row.appendChild(newColumn);
+    });
+    rows[0].lastElementChild.focus();
+    var columns = document.querySelectorAll('#matrix [data-matrix-row]:first-child [data-matrix-column]');
+    if (columns.length === 10) document.querySelector("[data-add-matrix-column]").disabled = true;
+    document.querySelector("[data-remove-matrix-column]").disabled = false;
+  }
+
+  // Remove matrix column
+  if (document.querySelector("[data-remove-matrix-column]")) document.querySelector("[data-remove-matrix-column]").addEventListener("click", removeColumn);
+
+  function removeColumn() {
+    var rows = [...document.getElementById('matrix').children];
+    rows.forEach(row => {
+      var lastColumn = row.lastElementChild;
+      if (lastColumn) lastColumn.remove();
+    });
+    if (rows[0].children.length < 10) document.querySelector("[data-add-matrix-column]").disabled = false;
+    if (rows[0].children.length === 1) document.querySelector("[data-remove-matrix-column]").disabled = true;
+  }
+
+  // Add matrix row
+  if (document.querySelector("[data-add-matrix-row]")) document.querySelector("[data-add-matrix-row]").addEventListener("click", addRow);
+
+  function addRow() {
+    var newRow = document.createElement('div');
+    newRow.classList.add('row');
+    newRow.setAttribute('data-matrix-row', document.querySelectorAll('[data-matrix-row]').length + 1);
+    var columns = document.querySelectorAll('[data-matrix-row]:first-child [data-matrix-column]');
+    columns.forEach(column => {
+      var newColumn = document.createElement('input');
+      newColumn.setAttribute('type', 'text');
+      newColumn.setAttribute('autocomplete', 'off');
+      newColumn.setAttribute('data-matrix-column', column.getAttribute('data-matrix-column'));
+      newRow.appendChild(newColumn);
+    });
+    document.getElementById('matrix').appendChild(newRow);
+    newRow.firstElementChild.focus();
+    var rows = document.querySelectorAll('[data-matrix-row]');
+    if (rows.length === 10) document.querySelector("[data-add-matrix-row]").disabled = true;
+    document.querySelector("[data-remove-matrix-row]").disabled = false;
+  }
+
+  // Remove matrix row
+  if (document.querySelector("[data-remove-matrix-row]")) document.querySelector("[data-remove-matrix-row]").addEventListener("click", removeRow);
+
+  function removeRow() {
+    var rows = document.querySelectorAll('[data-matrix-row]');
+    if (rows.length > 1) {
+      var lastRow = rows[rows.length - 1];
+      lastRow.remove();
+      if (rows.length < 10) document.querySelector("[data-add-matrix-row]").disabled = false;
+      if (rows.length === 2) document.querySelector("[data-remove-matrix-row]").disabled = true;
+    }
+  }
+
+  function resetMatrix() {
+    var matrix = document.getElementById('matrix');
+    matrix.innerHTML = '<div class="row" data-matrix-row="1"><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="2" /></div><div class="row" data-matrix-row="2"><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="2" /></div>';
+    document.querySelectorAll('[data-answer-mode="matrix"] .button-grid')[1].innerHTML = '<button square data-add-matrix-column tooltip="Add Matrix Column"><i class="bi bi-arrow-90deg-left rotate-right"></i></button><button square data-remove-matrix-column tooltip="Remove Matrix Column"><i class="bi bi-x"></i></button>';
+    document.querySelectorAll('[data-answer-mode="matrix"] .button-grid')[2].innerHTML = '<button square data-add-matrix-row tooltip="Add Matrix Row"><i class="bi bi-arrow-return-left"></i></button><button square data-remove-matrix-row tooltip="Remove Matrix Row"><i class="bi bi-x"></i></button>';
+    if (document.querySelector("[data-add-matrix-column]")) document.querySelector("[data-add-matrix-column]").addEventListener("click", addColumn);
+    if (document.querySelector("[data-remove-matrix-column]")) document.querySelector("[data-remove-matrix-column]").addEventListener("click", removeColumn);
+    if (document.querySelector("[data-add-matrix-row]")) document.querySelector("[data-add-matrix-row]").addEventListener("click", addRow);
+    if (document.querySelector("[data-remove-matrix-row]")) document.querySelector("[data-remove-matrix-row]").addEventListener("click", removeRow);
   }
 } catch (error) {
   if (storage.get("developer")) {

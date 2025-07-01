@@ -39,30 +39,144 @@ export function modal(options) {
   }
 
   if (options.input) {
-    const input = document.createElement("input");
-    input.type = options.input.type || "text";
+    if (options.input.label) {
+      const label = document.createElement("label");
+      label.innerHTML = options.input.label;
+      dialog.appendChild(label);
+    }
+    const input = document.createElement((options.input.type === "select") ? "select" : "input");
+    if (options.input.type !== "select") input.type = options.input.type || "text";
+    if ((options.input.type === "select") && options.input.multiple) input.multiple = options.input.multiple;
+    if ((options.input.type === "select") && options.input.options) {
+      options.input.options.forEach(option => {
+        const optionElement = document.createElement("option");
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        if (option.selected) optionElement.selected = true;
+        input.appendChild(optionElement);
+      });
+    }
     input.placeholder = options.input.placeholder || "";
-    input.value = options.input.defaultValue || "";
+    if (options.input.defaultValue) input.value = options.input.defaultValue || "";
     input.className = "dialog-input";
+    input.min = options.input.min || "";
+    input.max = options.input.max || "";
+    if (options.input.required) input.required = options.input.required;
+    if (options.input.innerHTML) input.innerHTML = options.input.innerHTML;
     dialog.appendChild(input);
+  }
+
+  if (options.inputs) {
+    options.inputs.forEach(input => {
+      if (input.label) {
+        const label = document.createElement("label");
+        label.innerHTML = input.label;
+        dialog.appendChild(label);
+      }
+      const inputElement = document.createElement((input.type === "select") ? "select" : "input");
+      if (input.type !== "select") inputElement.type = input.type || "text";
+      if ((input.type === "select") && input.multiple) inputElement.multiple = input.multiple;
+      if ((input.type === "select") && input.options) {
+        input.options.forEach(option => {
+          const optionElement = document.createElement("option");
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          if (option.selected) optionElement.selected = true;
+          inputElement.appendChild(optionElement);
+        });
+      }
+      inputElement.placeholder = input.placeholder || "";
+      if (input.defaultValue) inputElement.value = input.defaultValue || "";
+      inputElement.className = "dialog-input";
+      inputElement.min = input.min || "";
+      inputElement.max = input.max || "";
+      if (input.required) inputElement.required = input.required;
+      if (input.innerHTML) inputElement.innerHTML = input.innerHTML;
+      dialog.appendChild(inputElement);
+    });
   }
 
   document.body.append(dialog);
 
-  options.buttons.forEach(button => {
-    const btnElement = new Element("button", button.text, {
-      click: () => {
-        if (button.onclick) {
-          const inputValue = dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null;
-          button.onclick(inputValue);
-        }
-        if (button.close) {
-          closeModal();
-        }
-      },
-    }, button.class).element;
-    dialog.appendChild(btnElement);
-  });
+  if (options.buttonGroups && options.buttonGroups.length > 0) {
+    options.buttonGroups.forEach(buttonGroup => {
+      var buttonGroupsContainerElement = document.createElement("div");
+      if (buttonGroup.label) {
+        var buttonGroupLabelElement = document.createElement("label");
+        if (buttonGroup.icon) buttonGroup.label = `<i class="bi ${buttonGroup.icon}"></i> ${buttonGroup.label}`;
+        buttonGroupLabelElement.innerHTML = buttonGroup.label;
+        dialog.appendChild(buttonGroupLabelElement);
+      }
+      var buttonGroupContainerElement = document.createElement("div");
+      buttonGroupContainerElement.className = "button-grid";
+      buttonGroup.buttons.forEach(button => {
+        if (button.icon) button.text = `<i class="bi ${button.icon}"></i> ${button.text}`;
+        var btnElement = new Element("button", button.text, {
+          click: () => {
+            if (button.onclick) {
+              var hasEmptyRequiredInput = false;
+              dialog.querySelectorAll(".dialog-input").forEach(dialogInput => {
+                if (dialogInput.required && !dialogInput.value) {
+                  dialogInput.classList.add("attention");
+                  if (!hasEmptyRequiredInput) dialogInput.focus();
+                  hasEmptyRequiredInput = true;
+                } else {
+                  dialogInput.classList.remove("attention");
+                }
+              });
+              if (hasEmptyRequiredInput) return;
+              const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
+                return dialogInput.multiple ? [...dialogInput.selectedOptions].map(e => Number(e.value)) : dialogInput.value;
+              }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null);
+              button.onclick(inputValue);
+            }
+            if (button.close) {
+              closeModal();
+            }
+          },
+        }, button.class).element;
+        btnElement.style.width = "-webkit-fill-available";
+        buttonGroupContainerElement.appendChild(btnElement);
+      });
+      buttonGroupsContainerElement.appendChild(buttonGroupContainerElement);
+      dialog.appendChild(buttonGroupsContainerElement);
+    });
+  }
+
+  if (options.buttons && options.buttons.length > 0) {
+    var buttonsContainerElement = document.createElement("div");
+    buttonsContainerElement.className = "button-grid";
+    options.buttons.forEach(button => {
+      if (button.icon) button.text = + `<i class="bi ${button.icon}"></i> `;
+      var btnElement = new Element("button", button.text, {
+        click: () => {
+          if (button.onclick) {
+            var hasEmptyRequiredInput = false;
+            dialog.querySelectorAll(".dialog-input").forEach(dialogInput => {
+              if (dialogInput.required && !dialogInput.value) {
+                dialogInput.classList.add("attention");
+                if (!hasEmptyRequiredInput) dialogInput.focus();
+                hasEmptyRequiredInput = true;
+              } else {
+                dialogInput.classList.remove("attention");
+              }
+            });
+            if (hasEmptyRequiredInput) return;
+            const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
+              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(e => Number(e.value)) : dialogInput.value;
+            }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null);
+            button.onclick(inputValue);
+          }
+          if (button.close) {
+            closeModal();
+          }
+        },
+      }, button.class).element;
+      btnElement.style.width = "-webkit-fill-available";
+      buttonsContainerElement.appendChild(btnElement);
+    });
+    dialog.appendChild(buttonsContainerElement);
+  }
 
   animate(
     dialog,
@@ -253,7 +367,7 @@ export function show(dialog, title, buttons, actions, blur, effects = true) {
   blur && menu.querySelectorAll("[data-modal-buttons]>button").forEach((button) => button.blur());
 }
 
-export function view(path) {
+export function view(path = "") {
   if (!path) {
     const event = new Event("triggerclose");
     document.querySelector("dialog[open]")?.dispatchEvent(event);
