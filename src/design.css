@@ -399,6 +399,34 @@ div.ML__keyboard {
   min-width: 36px;
 }
 
+[data-multiple-choice="a"]:hover::before {
+  content: "Agree | ";
+}
+
+[data-multiple-choice="a"]:hover::after {
+  content: " | True";
+}
+
+[data-multiple-choice="b"]:hover::before {
+  content: "Disagree | ";
+}
+
+[data-multiple-choice="b"]:hover::after {
+  content: " | False";
+}
+
+[data-multiple-choice="c"]:hover::after {
+  content: " | Both";
+}
+
+[data-multiple-choice="d"]:hover::after {
+  content: " | Neither";
+}
+
+[data-multiple-choice="e"]:hover::after {
+  content: " | Nonexistent";
+}
+
 [data-answer-mode="set"] input {
   text-align: center;
   width: -webkit-fill-available;
