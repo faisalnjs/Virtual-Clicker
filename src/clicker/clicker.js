@@ -456,7 +456,7 @@ try {
       "b": ["Disagree", "False", "No"],
       "c": ["Both", "Always"],
       "d": ["Neither", "Never"],
-      "e": ["Sometimes", "Cannot be determined"],
+      "e": ["Sometimes", "Cannot be determined", "Does not exist"],
     };
     button.addEventListener("click", (e) => {
       const choice = e.target.getAttribute("data-multiple-choice");
