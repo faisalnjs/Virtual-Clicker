@@ -29,7 +29,7 @@ try {
 
   let developerTimeout;
   let developerClicks = 0;
-  document.getElementById("version-string").addEventListener("click", () => {
+  document.getElementById("version-string")?.addEventListener("click", () => {
     developerClicks++;
     clearTimeout(developerTimeout);
     developerTimeout = setTimeout(() => {
