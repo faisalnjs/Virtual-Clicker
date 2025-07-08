@@ -501,11 +501,11 @@ div.ML__keyboard {
   width: fit-content;
 }
 
-#clicker:not(:has(input)) {
+#clicker:not(:has(input)):not(:has(select)) {
   align-items: center;
 }
 
-#clicker:not(:has(input)) *:not(ul):not(ol):not(li) {
+#clicker:not(:has(input)):not(:has(select)) *:not(ul):not(ol):not(li) {
   text-align: center;
 }
 
