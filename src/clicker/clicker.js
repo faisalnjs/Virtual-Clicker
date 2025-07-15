@@ -509,6 +509,8 @@ try {
       false,
     );
 
+    target?.querySelector('input, textarea, math-field')?.focus();
+
     currentAnswerMode = mode;
   }
 
