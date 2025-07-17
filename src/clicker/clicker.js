@@ -509,6 +509,8 @@ try {
       false,
     );
 
+    target?.querySelector('input, textarea, math-field')?.focus();
+
     currentAnswerMode = mode;
   }
 
@@ -528,22 +530,22 @@ try {
     updateHistory();
   }
 
-  document.getElementById("history-first").addEventListener("click", () => {
+  document.getElementById("history-first")?.addEventListener("click", () => {
     historyIndex = getHistoryDates().length - 1;
     updateHistory();
   });
 
-  document.getElementById("history-backward").addEventListener("click", () => {
+  document.getElementById("history-backward")?.addEventListener("click", () => {
     historyIndex++;
     updateHistory();
   });
 
-  document.getElementById("history-forward").addEventListener("click", () => {
+  document.getElementById("history-forward")?.addEventListener("click", () => {
     historyIndex--;
     updateHistory();
   });
 
-  document.getElementById("history-last").addEventListener("click", () => {
+  document.getElementById("history-last")?.addEventListener("click", () => {
     historyIndex = 0;
     updateHistory();
   });

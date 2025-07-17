@@ -171,7 +171,7 @@ code {
   height: 1.5em;
   padding: 0 0.25rem;
   border-radius: 0.25rem;
-  color: var(--accent-text-color);
+  color: var(--text-color);
   background-color: var(--surface-color);
 }
 
@@ -499,6 +499,14 @@ div.ML__keyboard {
 
 .fit {
   width: fit-content;
+}
+
+#clicker:not(:has(.section)):not(:has(#submit-button)) {
+  align-items: center;
+}
+
+#clicker:not(:has(.section)):not(:has(#submit-button)) *:not(ul):not(ol):not(li) {
+  text-align: center;
 }
 
 .rotate-right {
