@@ -1,7 +1,6 @@
 import * as ui from "/src/modules/ui.js";
-
+import storage from "/src/modules/storage.js";
 import * as themes from "/src/themes/themes.js";
-
 import { insertFromIndex } from "/src/symbols/symbols.js";
 
 try {
@@ -11,18 +10,10 @@ try {
     );
     const isTyping = document.activeElement.matches("input, textarea");
     if (e.ctrlKey) {
-      if (e.key == "Enter" && !anyDialogOpen) {
-        document.getElementById("submit-button").click();
-      }
-      if (e.key == "," && !anyDialogOpen) {
-        ui.view("settings");
-      }
-      if (e.key == "." && !anyDialogOpen) {
-        ui.view("history");
-      }
-      if (e.key == "/" && !anyDialogOpen) {
-        ui.view("settings/keybinds");
-      }
+      if (e.key == "Enter" && !anyDialogOpen) document.getElementById("submit-button").click();
+      if (e.key == "," && !anyDialogOpen) ui.view("settings");
+      if (e.key == "." && !anyDialogOpen) ui.view("history");
+      if (e.key == "/" && !anyDialogOpen) ui.view("settings/keybinds");
     } else if (e.altKey) {
       if (/[1-9]/.test(e.key)) {
         e.preventDefault();
@@ -32,6 +23,8 @@ try {
       if (e.key == "R" && !anyDialogOpen && !isTyping) {
         themes.resetTheme();
       }
+    } else if (e.key == "Enter" && anyDialogOpen) {
+      document.querySelector('dialog[open] .submit-button')?.click();
     }
   });
 } catch (error) {

@@ -1,14 +1,16 @@
 /* eslint-disable no-inner-declarations */
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
+import * as auth from "/src/modules/auth.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
-import { getExtendedPeriod } from "/src/periods/periods";
+import { getExtendedPeriod, getExtendedPeriodRange } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 ``;
 
 try {
+  const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.click.vssfalcons.com' : `http://${document.domain}:5000`;
   var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
@@ -24,39 +26,15 @@ try {
   let multipleChoice = null;
   let highestDataElement = null;
   let restoredSetType = "";
+  var history = [];
 
   let historyIndex = 0;
 
   if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 
   // Initialization
-  {
-    // Get URL parameters
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    // Test for valid seat code
-    const regex = /^[1-9][1-6][1-5]$/;
-    if (regex.test(code)) {
-      // Update seat code
-      storage.set("code", code);
-      updateCode();
-    }
-    // Show seat code modal if no saved code exists
-    if (storage.get("code")) {
-      updateCode();
-    } else {
-      ui.view("settings/code");
-    }
-    // Show clear data fix guide
-    // if (storage.get("created")) {
-    //   document.querySelector(`[data-modal-view="clear-data-fix"]`).remove();
-    // } else {
-    //   storage.set("created", Date.now());
-    // }
-    // Focus question input
-    questionInput.focus();
-    // Set default answer mode
-    answerMode("input");
+  async function init() {
+    ui.startLoader();
     // Populate seat code finder grid
     for (let col = 1; col <= 5; col++) {
       for (let row = 6; row > 0; row--) {
@@ -89,16 +67,33 @@ try {
         }
       }
     });
-    // Update history feed
-    updateHistory();
-    // Focus answer input
-    document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
-    // Stop custom page loader
-    ui.stopLoader();
+    if (document.querySelector('[data-logout]')) document.querySelector('[data-logout]').addEventListener('click', () => auth.logout(init));
+    document.getElementById("code-input").value = '';
+    document.querySelectorAll("span.code").forEach((element) => {
+      element.innerHTML = '';
+    });
+    document.title = 'Virtual Clicker';
+    // Get URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    // Test for valid seat code
+    const regex = /^[1-9][1-6][1-5]$/;
+    if (regex.test(code)) {
+      // Update seat code
+      storage.set("code", code);
+    }
+    // Show seat code modal if no saved code exists
+    if (!storage.get("code")) {
+      ui.view("settings/code");
+      return;
+    }
+    await auth.sync(false, updateCode);
   }
 
+  init();
+
   // Process click
-  function processClick(part=null) {
+  function processClick(part = null) {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
     const question = part || questionInput.value?.trim().replaceAll(' ', '');
     const answer =
@@ -201,10 +196,8 @@ try {
                 close: true,
                 onclick: () => {
                   storage.set("makeUpDate", null);
-                  document.querySelectorAll("span.code").forEach((element) => {
-                    element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-                  });
-                  document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+                  auth.syncPush("makeUpDate");
+                  ui.updateTitles();
                   ui.view("");
                 },
               },
@@ -345,6 +338,7 @@ try {
   // Cancel make up button
   document.getElementById("dismiss-makeup-button").addEventListener("click", () => {
     storage.set("makeUpDate", null);
+    auth.syncPush("makeUpDate");
     ui.view("");
   });
 
@@ -388,64 +382,84 @@ try {
     // Tests for valid seat code
     const regex = /^[1-9][1-6][1-5]$/;
     if (regex.test(input)) {
-      storage.set("code", input);
-      updateCode();
       // Close all modals
       ui.view("");
+      storage.set("code", input);
+      init();
       // Update URL parameters with seat code
       const params = new URLSearchParams(window.location.search);
       params.set("code", input);
-      history.replaceState({}, "", "?" + params.toString());
     } else {
       ui.alert("Error", "Seat code isn't possible");
     }
   }
 
   // Update elements with new seat code
-  function updateCode() {
-    if (storage.get("code")) {
-      document.getElementById("code-input").value = storage.get("code");
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + (storage.get("makeUpDate") ? '*' : '');
+  async function updateCode() {
+    ui.updateTitles();
+    try {
+      const bulkLoadResponse = await fetch(`${domain}/bulk_load`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usr: storage.get("code"),
+          pwd: storage.get("password"),
+        }),
       });
-      document.title = `Virtual Clicker (${storage.get("code")}${storage.get("makeUpDate") ? '*' : ''})`;
-      const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-      if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
-        ui.view("settings/makeup");
-      } else if (!matchesCurrentPeriod) {
-        ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
-          {
-            text: "Change Code",
-            close: true,
-            onclick: () => {
-              ui.view("settings/code");
-            },
+      const bulkLoad = await bulkLoadResponse.json();
+      history = bulkLoad.history;
+    } catch (error) {
+      console.error(error);
+      ui.view("api-fail");
+    }
+    // Update history feed
+    updateHistory();
+    // Show clear data fix guide
+    // if (storage.get("created")) {
+    //   document.querySelector(`[data-modal-view="clear-data-fix"]`).remove();
+    // } else {
+    //   storage.set("created", Date.now());
+    // }
+    // Focus question input
+    if (questionInput) questionInput.focus();
+    // Set default answer mode
+    answerMode("input");
+    // Focus answer input
+    document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
+    const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
+    if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
+      ui.view("settings/makeup");
+    } else if (!matchesCurrentPeriod) {
+      ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
+        {
+          text: "Change Code",
+          close: true,
+          onclick: () => {
+            ui.view("settings/code");
           },
-          {
-            text: "Continue Anyway",
-            close: true,
+        },
+        {
+          text: "Continue Anyway",
+          close: true,
+        },
+      ]);
+    } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
+      ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+        {
+          text: "Do Not Make Up Clicks",
+          close: true,
+          onclick: () => {
+            storage.set("makeUpDate", null);
+            auth.syncPush("makeUpDate");
+            ui.updateTitles();
+            ui.view("");
           },
-        ]);
-      } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
-        ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
-          {
-            text: "Do Not Make Up Clicks",
-            close: true,
-            onclick: () => {
-              storage.set("makeUpDate", null);
-              document.querySelectorAll("span.code").forEach((element) => {
-                element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-              });
-              document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-              ui.view("");
-            },
-          },
-          {
-            text: "Continue Anyway",
-            close: true,
-          },
-        ]);
-      }
+        },
+        {
+          text: "Continue Anyway",
+          close: true,
+        },
+      ]);
     }
   }
 
