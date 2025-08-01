@@ -10,7 +10,7 @@ import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } fr
 ``;
 
 try {
-  const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.click.vssfalcons.com' : `http://${document.domain}:5000`;
+  const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.check.vssfalcons.com' : `http://${document.domain}:5000`;
   var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
