@@ -62,7 +62,6 @@ export async function sync(hideWelcome = true, returnFunction = null) {
         continueWithoutAPIButton.addEventListener("click", () => {
             ui.view();
             returnFunction();
-            ui.stopLoader();
             const newContinueWithoutAPIButton = continueWithoutAPIButton.cloneNode(true);
             continueWithoutAPIButton.parentNode.replaceChild(newContinueWithoutAPIButton, continueWithoutAPIButton);
         });

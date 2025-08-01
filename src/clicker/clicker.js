@@ -342,6 +342,7 @@ try {
     storage.set("makeUpDate", null);
     auth.syncPush("makeUpDate");
     ui.view("");
+    ui.stopLoader();
   });
 
   // Submit to Google Forms
@@ -440,6 +441,7 @@ try {
         {
           text: "Continue Anyway",
           close: true,
+          onclick: ui.stopLoader,
         },
       ]);
     } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
@@ -452,11 +454,13 @@ try {
             auth.syncPush("makeUpDate");
             ui.updateTitles();
             ui.view("");
+            ui.stopLoader();
           },
         },
         {
           text: "Continue Anyway",
           close: true,
+          onclick: ui.stopLoader,
         },
       ]);
     }
@@ -557,7 +561,6 @@ try {
       });
     } catch (error) {
       console.error(error);
-      ui.view("api-fail");
     }
   }
 

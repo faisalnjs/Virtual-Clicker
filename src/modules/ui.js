@@ -397,11 +397,12 @@ export function view(path = "") {
       });
   }
   const previous = pages.slice(0, pages.length - 1).join("/");
-  const buttons = (title === 'API Offline') ? [] : [
+  const buttons = (path === "api-fail") ? [] : [
     {
       text: `<i class="bi bi-x-lg"></i>`,
       class: "icon",
       close: true,
+      onclick: stopLoader,
     },
   ];
   if (previous) {
@@ -442,6 +443,7 @@ export function view(path = "") {
         document.getElementById("date-input").focus();
       }
       updateTitles();
+      stopLoader();
     });
     const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
     const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
@@ -451,6 +453,7 @@ export function view(path = "") {
       auth.syncPush("makeUpDate");
       updateTitles();
       view("");
+      stopLoader();
     });
   }
   const event = new Event("view");
