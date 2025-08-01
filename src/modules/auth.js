@@ -44,22 +44,30 @@ export async function sync(hideWelcome = true, returnFunction = null) {
         ui.stopLoader();
         return;
     }
-    await fetch(domain + '/password', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            "seatCode": storage.get("code"),
-        })
-    })
-        .then(r => {
-            hasPassword = r.ok ? true : false;
-        })
-        .catch((e) => {
-            console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+    try {
+        var userPassword = await fetch(domain + '/password', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "seatCode": storage.get("code"),
+            })
         });
+        hasPassword = userPassword.ok ? true : false;
+    } catch (e) {
+        console.error(e);
+        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+        const continueWithoutAPIButton = document.getElementById("continue-without-api");
+        continueWithoutAPIButton.addEventListener("click", () => {
+            ui.view();
+            returnFunction();
+            ui.stopLoader();
+            const newContinueWithoutAPIButton = continueWithoutAPIButton.cloneNode(true);
+            continueWithoutAPIButton.parentNode.replaceChild(newContinueWithoutAPIButton, continueWithoutAPIButton);
+        });
+        return;
+    }
     if (hasPassword && !storage.get("password")) {
         ui.view();
         ui.modal({
@@ -258,22 +266,21 @@ export async function sync(hideWelcome = true, returnFunction = null) {
 
 export async function syncPush(key = null) {
     if (!key || !storage.get("code")) return;
-    await fetch(domain + '/password', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            "seatCode": storage.get("code"),
-        })
-    })
-        .then(r => {
-            hasPassword = r.ok ? true : false;
-        })
-        .catch((e) => {
-            console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+    try {
+        var userPassword = await fetch(domain + '/password', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "seatCode": storage.get("code"),
+            })
         });
+        hasPassword = userPassword.ok ? true : false;
+    } catch (e) {
+        console.error(e);
+        return;
+    }
     if (!hasPassword || !storage.get("password")) {
         window.location.reload();
         return;

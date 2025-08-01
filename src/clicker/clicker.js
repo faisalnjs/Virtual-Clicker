@@ -68,6 +68,8 @@ try {
       }
     });
     if (document.querySelector('[data-logout]')) document.querySelector('[data-logout]').addEventListener('click', () => auth.logout(init));
+    // Set default answer mode
+    answerMode("input");
     document.getElementById("code-input").value = '';
     document.querySelectorAll("span.code").forEach((element) => {
       element.innerHTML = '';
@@ -410,7 +412,6 @@ try {
       history = bulkLoad.history || [];
     } catch (error) {
       console.error(error);
-      ui.view("api-fail");
     }
     // Update history feed
     updateHistory();
@@ -422,8 +423,6 @@ try {
     // }
     // Focus question input
     if (questionInput) questionInput.focus();
-    // Set default answer mode
-    answerMode("input");
     // Focus answer input
     document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
