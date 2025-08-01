@@ -372,7 +372,7 @@
       <p><kbd>Shift</kbd> + <kbd>R</kbd> Reset theme</p>
     </div>
     <div data-modal-page="reset" data-page-title="Reset">
-      <button data-reset="history">Clear History</button>
+      <button data-reset="history">Clear Local History</button>
       <button data-reset="all">Reset All Settings</button>
       <button data-reset="cache">Force Reset Cache</button>
       <button onclick="window.open('/resetcookies')">How To Reset Cookies</button>
@@ -410,6 +410,21 @@
         Add <code><span class="hostname"></span></code>
       </li>
     </ol>
+  </dialog>
+  <dialog data-modal-page="api-fail" data-page-title="API Offline">
+    <p>
+      The Virtual Clicker API is currently offline. Please try again later, check for <a
+        href="https://status.dangoweb.com/">server maintenance</a>, or contact support below.
+    </p>
+    <div class="row center" style="gap: 7.5px; margin-top: 5px;">
+      <a href="https://github.com/faisalnjs/virtual-checker/issues" class="icon" tooltip="GitHub Issues"><i
+          class="bi bi-github"></i></a>
+      <a href="https://faisaln.com/discord" class="icon" tooltip="Discord Server"><i class="bi bi-discord"></i></a>
+      <a href="mailto:contact@faisaln.com" class="icon" tooltip="Email"><i class="bi bi-envelope-fill"></i></a>
+    </div>
+    <div data-modal-actions>
+      <button class="cancel-button" id="dismiss-makeup-button">Continue without API</button>
+    </div>
   </dialog>
   <div id="loader" class="active">
     <svg xmlns="http://www.w3.org/2000/svg" height="2.5rem" viewBox="0 0 1024 1024" class="virtual-clicker-logo">
