@@ -1,5 +1,6 @@
 import "./ui.css";
 import storage from "/src/modules/storage.js";
+import * as auth from "/src/modules/auth.js";
 
 export function alert(title, text, callback, blur) {
   return modal({
@@ -396,11 +397,12 @@ export function view(path = "") {
       });
   }
   const previous = pages.slice(0, pages.length - 1).join("/");
-  const buttons = (title === 'API Offline') ? [] : [
+  const buttons = (path === "api-fail") ? [] : [
     {
       text: `<i class="bi bi-x-lg"></i>`,
       class: "icon",
       close: true,
+      onclick: stopLoader,
     },
   ];
   if (previous) {
@@ -432,27 +434,26 @@ export function view(path = "") {
         hours = hours % 12;
         hours = hours ? hours : 12;
         storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
+        auth.syncPush("makeUpDate");
         view("");
       } else {
         storage.set("makeUpDate", null);
+        auth.syncPush("makeUpDate");
         document.getElementById("date-input").classList.add("attention");
         document.getElementById("date-input").focus();
       }
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-      });
-      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+      updateTitles();
+      stopLoader();
     });
     const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
     const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
     dismissMmakeupClickButton.parentNode.replaceChild(newDismissMmakeupClickButton, dismissMmakeupClickButton);
     newDismissMmakeupClickButton.addEventListener("click", () => {
       storage.set("makeUpDate", null);
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-      });
-      document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+      auth.syncPush("makeUpDate");
+      updateTitles();
       view("");
+      stopLoader();
     });
   }
   const event = new Event("view");
@@ -723,4 +724,12 @@ export function startLoader() {
 export function stopLoader() {
   const loader = document.getElementById("loader");
   if (loader) loader.classList.remove("active");
+}
+
+export function updateTitles() {
+  document.getElementById("code-input").value = storage.get("code");
+  document.querySelectorAll("span.code").forEach((element) => {
+    element.innerHTML = storage.get("code") + (storage.get("makeUpDate") ? '*' : '');
+  });
+  document.title = `Virtual Clicker (${storage.get("code")}${storage.get("makeUpDate") ? '*' : ''})`;
 }

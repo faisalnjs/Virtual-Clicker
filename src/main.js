@@ -17,11 +17,21 @@ try {
   const version = import.meta.env.PACKAGE_VERSION;
 
   updateVersionString();
-  function updateVersionString() {
+  function updateVersionString(beta = false) {
+    const DEVELOPER_MODE = storage.get("developer");
     document.querySelectorAll(".version").forEach((element) => {
-      const DEVELOPER_MODE = storage.get("developer");
       element.innerHTML = "<p>v" + version + "</p>" + (DEVELOPER_MODE ? " <code>dev</code>" : "");
     });
+    if (DEVELOPER_MODE) {
+      if (document.querySelector('.topbar')) {
+        document.querySelector('.topbar').innerHTML = `<span><i class="bi bi-cone-striped"></i>&nbsp;${beta ? "Beta Version" : "Developer Mode"} - v${version}</span>`;
+      } else {
+        var topbar = document.createElement("div");
+        topbar.className = "topbar";
+        topbar.innerHTML = `<span><i class="bi bi-cone-striped"></i>&nbsp;${beta ? "Beta Version" : "Developer Mode"} - v${version}</span>`;
+        document.body.prepend(topbar);
+      }
+    }
   }
   document.querySelectorAll(".hostname").forEach((element) => {
     element.innerHTML = window.location.hostname;
@@ -40,6 +50,11 @@ try {
       updateVersionString();
     }
   });
+
+  if (window.location.hostname.includes('beta')) {
+    storage.set("developer", true);
+    updateVersionString(true);
+  }
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ main.js: ${error.message}`);

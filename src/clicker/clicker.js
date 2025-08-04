@@ -1,14 +1,17 @@
 /* eslint-disable no-inner-declarations */
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
+import * as auth from "/src/modules/auth.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
+import extendedSchedule from "/src/periods/extendedSchedule.json";
 ``;
 
 try {
+  const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.check.vssfalcons.com' : `http://${document.domain}:5000`;
   var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
@@ -24,39 +27,15 @@ try {
   let multipleChoice = null;
   let highestDataElement = null;
   let restoredSetType = "";
+  var history = [];
 
   let historyIndex = 0;
 
   if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 
   // Initialization
-  {
-    // Get URL parameters
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    // Test for valid seat code
-    const regex = /^[1-9][1-6][1-5]$/;
-    if (regex.test(code)) {
-      // Update seat code
-      storage.set("code", code);
-      updateCode();
-    }
-    // Show seat code modal if no saved code exists
-    if (storage.get("code")) {
-      updateCode();
-    } else {
-      ui.view("settings/code");
-    }
-    // Show clear data fix guide
-    // if (storage.get("created")) {
-    //   document.querySelector(`[data-modal-view="clear-data-fix"]`).remove();
-    // } else {
-    //   storage.set("created", Date.now());
-    // }
-    // Focus question input
-    questionInput.focus();
-    // Set default answer mode
-    answerMode("input");
+  async function init() {
+    ui.startLoader();
     // Populate seat code finder grid
     for (let col = 1; col <= 5; col++) {
       for (let row = 6; row > 0; row--) {
@@ -89,16 +68,35 @@ try {
         }
       }
     });
-    // Update history feed
-    updateHistory();
-    // Focus answer input
-    document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
-    // Stop custom page loader
-    ui.stopLoader();
+    if (document.querySelector('[data-logout]')) document.querySelector('[data-logout]').addEventListener('click', () => auth.logout(init));
+    // Set default answer mode
+    answerMode("input");
+    document.getElementById("code-input").value = '';
+    document.querySelectorAll("span.code").forEach((element) => {
+      element.innerHTML = '';
+    });
+    document.title = 'Virtual Clicker';
+    // Get URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    // Test for valid seat code
+    const regex = /^[1-9][1-6][1-5]$/;
+    if (regex.test(code)) {
+      // Update seat code
+      storage.set("code", code);
+    }
+    // Show seat code modal if no saved code exists
+    if (!storage.get("code")) {
+      ui.view("settings/code");
+      return;
+    }
+    await auth.sync(false, updateCode);
   }
 
+  init();
+
   // Process click
-  function processClick(part=null) {
+  function processClick(part = null) {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
     const question = part || questionInput.value?.trim().replaceAll(' ', '');
     const answer =
@@ -201,10 +199,8 @@ try {
                 close: true,
                 onclick: () => {
                   storage.set("makeUpDate", null);
-                  document.querySelectorAll("span.code").forEach((element) => {
-                    element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-                  });
-                  document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
+                  auth.syncPush("makeUpDate");
+                  ui.updateTitles();
                   ui.view("");
                 },
               },
@@ -345,7 +341,9 @@ try {
   // Cancel make up button
   document.getElementById("dismiss-makeup-button").addEventListener("click", () => {
     storage.set("makeUpDate", null);
+    auth.syncPush("makeUpDate");
     ui.view("");
+    ui.stopLoader();
   });
 
   // Submit to Google Forms
@@ -388,64 +386,117 @@ try {
     // Tests for valid seat code
     const regex = /^[1-9][1-6][1-5]$/;
     if (regex.test(input)) {
-      storage.set("code", input);
-      updateCode();
       // Close all modals
       ui.view("");
+      storage.set("code", input);
+      init();
       // Update URL parameters with seat code
       const params = new URLSearchParams(window.location.search);
       params.set("code", input);
-      history.replaceState({}, "", "?" + params.toString());
     } else {
       ui.alert("Error", "Seat code isn't possible");
     }
   }
 
   // Update elements with new seat code
-  function updateCode() {
-    if (storage.get("code")) {
-      document.getElementById("code-input").value = storage.get("code");
-      document.querySelectorAll("span.code").forEach((element) => {
-        element.innerHTML = storage.get("code") + (storage.get("makeUpDate") ? '*' : '');
+  async function updateCode() {
+    ui.updateTitles();
+    try {
+      const bulkLoadResponse = await fetch(`${domain}/bulk_load`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usr: storage.get("code"),
+          pwd: storage.get("password"),
+        }),
       });
-      document.title = `Virtual Clicker (${storage.get("code")}${storage.get("makeUpDate") ? '*' : ''})`;
-      const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-      if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
-        ui.view("settings/makeup");
-      } else if (!matchesCurrentPeriod) {
-        ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
-          {
-            text: "Change Code",
-            close: true,
-            onclick: () => {
-              ui.view("settings/code");
-            },
-          },
-          {
-            text: "Continue Anyway",
-            close: true,
-          },
-        ]);
-      } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
-        ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
-          {
-            text: "Do Not Make Up Clicks",
-            close: true,
-            onclick: () => {
-              storage.set("makeUpDate", null);
-              document.querySelectorAll("span.code").forEach((element) => {
-                element.innerHTML = storage.get("code") + ((storage.get("makeUpDate")) ? '*' : '');
-              });
-              document.title = `Virtual Clicker (${storage.get("code")}${(storage.get("makeUpDate")) ? '*' : ''})`;
-              ui.view("");
-            },
-          },
-          {
-            text: "Continue Anyway",
-            close: true,
-          },
-        ]);
+      const bulkLoad = await bulkLoadResponse.json();
+      history = bulkLoad.history || [];
+      var course = bulkLoad.course || {};
+      if (document.querySelector('.alert')) {
+        var clicker_announcement = JSON.parse(course.clicker_announcement || '{}');
+        if ((clicker_announcement.image || clicker_announcement.title || clicker_announcement.content || clicker_announcement.link) && (clicker_announcement.expires ? new Date(`${clicker_announcement.expires}T${extendedSchedule[parseInt(storage.get("code").slice(0, 1))][1]}:00`) > new Date() : true)) {
+          document.querySelector('.alert').removeAttribute('hidden');
+          document.querySelector('.alert').classList = `alert ${clicker_announcement.layout || ''}`;
+          if (clicker_announcement.image) {
+            document.querySelector('.alert img').removeAttribute('hidden');
+            document.querySelector('.alert img').src = clicker_announcement.image;
+          } else {
+            document.querySelector('.alert img').setAttribute('hidden', '');
+          }
+          document.querySelector('.alert h3').innerText = clicker_announcement.title || 'Announcement';
+          if (clicker_announcement.content) {
+            document.querySelector('.alert p').removeAttribute('hidden');
+            document.querySelector('.alert p').innerText = clicker_announcement.content;
+          } else {
+            document.querySelector('.alert p').setAttribute('hidden', '');
+          }
+          if (clicker_announcement.link) {
+            document.querySelector('.alert button').removeAttribute('hidden');
+            document.querySelector('.alert button').innerHTML = `${clicker_announcement.linkTitle || 'Go'} <i class="bi bi-arrow-right-short"></i>`;
+            document.querySelector('.alert button').addEventListener('click', () => {
+              window.open(clicker_announcement.link, '_blank');
+            });
+          } else {
+            document.querySelector('.alert button').setAttribute('hidden', '');
+            document.querySelector('.alert button').removeEventListener('click', () => { });
+          }
+        } else {
+          document.querySelector('.alert').setAttribute('hidden', '');
+        }
       }
+    } catch (error) {
+      console.error(error);
+    }
+    // Update history feed
+    updateHistory();
+    // Show clear data fix guide
+    // if (storage.get("created")) {
+    //   document.querySelector(`[data-modal-view="clear-data-fix"]`).remove();
+    // } else {
+    //   storage.set("created", Date.now());
+    // }
+    // Focus question input
+    if (questionInput) questionInput.focus();
+    // Focus answer input
+    document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
+    const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
+    if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
+      ui.view("settings/makeup");
+    } else if (!matchesCurrentPeriod) {
+      ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
+        {
+          text: "Change Code",
+          close: true,
+          onclick: () => {
+            ui.view("settings/code");
+          },
+        },
+        {
+          text: "Continue Anyway",
+          close: true,
+          onclick: ui.stopLoader,
+        },
+      ]);
+    } else if (matchesCurrentPeriod && storage.get("makeUpDate")) {
+      ui.prompt("Currently in class", "You are making up clicks for the class you are currently in. Are you sure you want to continue making up clicks instead of returning to usual clicking?", [
+        {
+          text: "Do Not Make Up Clicks",
+          close: true,
+          onclick: () => {
+            storage.set("makeUpDate", null);
+            auth.syncPush("makeUpDate");
+            ui.updateTitles();
+            ui.view("");
+            ui.stopLoader();
+          },
+        },
+        {
+          text: "Continue Anyway",
+          close: true,
+          onclick: ui.stopLoader,
+        },
+      ]);
     }
   }
 
@@ -516,9 +567,9 @@ try {
 
   // Store click to storage and history
   function storeClick(code, question, answer, type) {
-    const history = storage.get("history") || [];
+    const storageHistory = storage.get("history") || [];
     const timestamp = Date.now();
-    history.push({
+    storageHistory.push({
       "code": code,
       "question": question,
       "answer": answer,
@@ -526,8 +577,25 @@ try {
       "type": type || "text",
       "makeup": storage.get("makeUpDate"),
     });
-    storage.set("history", history);
+    storage.set("history", storageHistory);
     updateHistory();
+    try {
+      fetch(`${domain}/record_click`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usr: storage.get("code"),
+          pwd: storage.get("password"),
+          question,
+          answer,
+          timestamp,
+          type: type || "text",
+          makeup: storage.get("makeUpDate"),
+        }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   document.getElementById("history-first")?.addEventListener("click", () => {
@@ -552,25 +620,52 @@ try {
 
   // Count number of unique days
   function getHistoryDates() {
-    const data = (storage.get("history") || []).map((entry) => {
-      const day = entry.timestamp;
-      const date = new Date(entry.timestamp).toISOString().split("T")[0];
-      return { ...entry, day: day, date: date };
-    });
-    const unique = data
-      .map((entry) => entry.date)
-      .filter((value, i, array) => {
-        return array.indexOf(value) === i;
-      })
-      .reverse();
+    const combinedHistory = [
+      ...history.map(a => ({
+        "code": String(a.code),
+        "question": a.question,
+        "answer": a.answer,
+        "timestamp": Number(a.timestamp) || a.timestamp,
+        "type": a.type,
+        "makeup": a.makeup,
+      })),
+      ...(storage.get("history") || []).map(a => ({
+        "code": String(a.code),
+        "question": a.question,
+        "answer": a.answer,
+        "timestamp": Number(a.timestamp) || a.timestamp,
+        "type": a.type,
+        "makeup": a.makeup,
+      }))
+    ].filter((item, index, self) => index === self.findIndex(other => other.code === item.code && other.question === item.question && other.answer === item.answer && other.timestamp === item.timestamp && other.type === item.type && other.makeup === item.makeup)).sort((a, b) => a.timestamp - b.timestamp);
+    const dates = combinedHistory.map((entry) => new Date(entry.timestamp).toISOString().split("T")[0]);
+    const unique = [...new Set(dates)].reverse();
     return unique;
   }
 
   // Filter history by date
   function filterHistory() {
-    const data = (storage.get("history") || []).map((entry) => {
-      const day = entry.timestamp;
-      const date = new Date(entry.timestamp).toISOString().split("T")[0];
+    const combinedHistory = [
+      ...history.map(a => ({
+        "code": String(a.code),
+        "question": a.question,
+        "answer": a.answer,
+        "timestamp": Number(a.timestamp) || a.timestamp,
+        "type": a.type,
+        "makeup": a.makeup,
+      })),
+      ...(storage.get("history") || []).map(a => ({
+        "code": String(a.code),
+        "question": a.question,
+        "answer": a.answer,
+        "timestamp": Number(a.timestamp) || a.timestamp,
+        "type": a.type,
+        "makeup": a.makeup,
+      }))
+    ].filter((item, index, self) => index === self.findIndex(other => other.code === item.code && other.question === item.question && other.answer === item.answer && other.timestamp === item.timestamp && other.type === item.type && other.makeup === item.makeup)).sort((a, b) => a.timestamp - b.timestamp);
+    var data = combinedHistory.map((entry) => {
+      const day = new Date(entry.timestamp);
+      const date = day.toISOString().split("T")[0];
       return { ...entry, day: day, date: date };
     });
     return data.filter((entry) => entry.date === getHistoryDates()[historyIndex]);
@@ -578,15 +673,15 @@ try {
 
   // Update history feed
   function updateHistory() {
-    const history = filterHistory();
+    const combinedHistory = filterHistory();
     const date =
-      history[0] &&
+      combinedHistory[0] &&
       new Intl.DateTimeFormat("en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
-      }).format(history[0]?.day);
+      }).format(combinedHistory[0]?.day);
 
     // Update history navigation
     document.getElementById("history-first").disabled = historyIndex === getHistoryDates().length - 1;
@@ -597,9 +692,9 @@ try {
     document.getElementById("history-date").textContent = date;
 
     const feed = document.getElementById("history-feed");
-    if (history.length != 0) {
+    if (combinedHistory.length != 0) {
       feed.innerHTML = "";
-      history.forEach((item) => {
+      combinedHistory.forEach((item) => {
         const button = document.createElement("button");
         const latex = item.type === "latex";
         const array = item.type === "array";
@@ -733,7 +828,7 @@ try {
   // Reset modals
   const resets = {
     "history": () => {
-      ui.prompt("Clear history?", "This action cannot be reversed!", [
+      ui.prompt("Clear local history?", "This action cannot be reversed!", [
         {
           text: "Cancel",
           close: true,
