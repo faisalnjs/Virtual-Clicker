@@ -5,8 +5,9 @@ import * as auth from "/src/modules/auth.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
-import { getExtendedPeriod, getExtendedPeriodRange } from "/src/periods/periods";
+import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
+import extendedSchedule from "/src/periods/extendedSchedule.json";
 ``;
 
 try {
@@ -411,6 +412,39 @@ try {
       });
       const bulkLoad = await bulkLoadResponse.json();
       history = bulkLoad.history || [];
+      var course = bulkLoad.course || {};
+      if (document.querySelector('.alert')) {
+        var clicker_announcement = JSON.parse(course.clicker_announcement || '{}');
+        if ((clicker_announcement.image || clicker_announcement.title || clicker_announcement.content || clicker_announcement.link) && (clicker_announcement.expires ? new Date(`${clicker_announcement.expires}T${extendedSchedule[parseInt(storage.get("code").slice(0, 1))][1]}:00`) > new Date() : true)) {
+          document.querySelector('.alert').removeAttribute('hidden');
+          document.querySelector('.alert').classList = `alert ${clicker_announcement.layout || ''}`;
+          if (clicker_announcement.image) {
+            document.querySelector('.alert img').removeAttribute('hidden');
+            document.querySelector('.alert img').src = clicker_announcement.image;
+          } else {
+            document.querySelector('.alert img').setAttribute('hidden', '');
+          }
+          document.querySelector('.alert h3').innerText = clicker_announcement.title || 'Announcement';
+          if (clicker_announcement.content) {
+            document.querySelector('.alert p').removeAttribute('hidden');
+            document.querySelector('.alert p').innerText = clicker_announcement.content;
+          } else {
+            document.querySelector('.alert p').setAttribute('hidden', '');
+          }
+          if (clicker_announcement.link) {
+            document.querySelector('.alert button').removeAttribute('hidden');
+            document.querySelector('.alert button').innerHTML = `${clicker_announcement.linkTitle || 'Go'} <i class="bi bi-arrow-right-short"></i>`;
+            document.querySelector('.alert button').addEventListener('click', () => {
+              window.open(clicker_announcement.link, '_blank');
+            });
+          } else {
+            document.querySelector('.alert button').setAttribute('hidden', '');
+            document.querySelector('.alert button').removeEventListener('click', () => { });
+          }
+        } else {
+          document.querySelector('.alert').setAttribute('hidden', '');
+        }
+      }
     } catch (error) {
       console.error(error);
     }

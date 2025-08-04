@@ -408,6 +408,7 @@ div.ML__keyboard {
 
   .rsmall,
   .small,
+  .vsmedium,
   .smedium,
   .medium,
   .mediuml,
@@ -562,7 +563,7 @@ div.ML__keyboard {
 hidden,
 [hidden],
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .toast-container {
