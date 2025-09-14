@@ -38,6 +38,7 @@ try {
   async function init() {
     ui.startLoader();
     // Populate seat code finder grid
+    document.getElementById("seat-grid").innerHTML = "";
     for (let col = 1; col <= 5; col++) {
       for (let row = 6; row > 0; row--) {
         period = document.getElementById("period-input").value;
@@ -91,7 +92,7 @@ try {
       ui.view("settings/code");
       return;
     }
-    await auth.sync(false, updateCode);
+    await auth.sync(true, updateCode);
   }
 
   init();
@@ -447,6 +448,7 @@ try {
         }),
       });
       const bulkLoad = await bulkLoadResponse.json();
+      ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
       history = bulkLoad.history || [];
       var course = bulkLoad.course || {};
       if (document.querySelector('.alert')) {
