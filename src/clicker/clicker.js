@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-semi */
 /* eslint-disable no-inner-declarations */
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
@@ -51,7 +52,7 @@ try {
         ui.addTooltip(button, code);
       }
     }
-    document.getElementById("period-input").addEventListener("change", (e) => {
+    document.getElementById("period-input").addEventListener("change", () => {
       document.getElementById("seat-grid").innerHTML = "";
       for (let col = 1; col <= 5; col++) {
         for (let row = 6; row > 0; row--) {
@@ -80,7 +81,7 @@ try {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     // Test for valid seat code
-    const regex = /^[1-9][1-6][1-5]$/;
+    const regex = /^[1-9][0-6][0-5]$/;
     if (regex.test(code)) {
       // Update seat code
       storage.set("code", code);
@@ -373,7 +374,9 @@ try {
   document.getElementById("code-input").addEventListener("keydown", (e) => {
     if (e.key == "Enter") {
       e.preventDefault();
-      saveCode();
+      setTimeout(() => {
+        saveCode();
+      }, 100);
     }
   });
 
@@ -384,15 +387,48 @@ try {
   function saveCode() {
     const input = document.getElementById("code-input").value;
     // Tests for valid seat code
-    const regex = /^[1-9][1-6][1-5]$/;
+    const regex = /^[1-9][0-6][0-5]$/;
     if (regex.test(input)) {
-      // Close all modals
-      ui.view("");
-      storage.set("code", input);
-      init();
-      // Update URL parameters with seat code
-      const params = new URLSearchParams(window.location.search);
-      params.set("code", input);
+      if (input.includes('0')) {
+        ui.view("");
+        ui.modal({
+          title: 'Reserved Seat Code',
+          body: '<p>An invalid seat code was entered. Are you sure you want to use this code?</p>',
+          buttons: [
+            {
+              text: 'Back',
+              class: 'cancel-button',
+              onclick: () => {
+                ui.view("");
+                ui.view("settings/code");
+                document.getElementById("code-input").focus();
+              }
+            },
+            {
+              text: `Use ${input}`,
+              class: 'submit-button',
+              onclick: () => {
+                storage.set("code", input);
+                init();
+                // Close all modals
+                ui.view("");
+                // Update URL parameters with seat code
+                const params = new URLSearchParams(window.location.search);
+                params.set("code", input);
+              },
+              close: true,
+            },
+          ],
+        });
+      } else {
+        // Close all modals
+        ui.view("");
+        storage.set("code", input);
+        init();
+        // Update URL parameters with seat code
+        const params = new URLSearchParams(window.location.search);
+        params.set("code", input);
+      }
     } else {
       ui.alert("Error", "Seat code isn't possible");
     }
@@ -970,7 +1006,7 @@ try {
       });
       if (highestDataElement !== null) highestDataElement.remove();
     }
-    if (setInputs.length === 2) e.target.disabled = true;
+    if (setInputs.length === 2) document.querySelector("[data-remove-set-input]").disabled = true;
     document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
   }
 
