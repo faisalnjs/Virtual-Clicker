@@ -441,11 +441,10 @@ try {
     try {
       const bulkLoadResponse = await fetch(`${domain}/bulk_load`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usr: storage.get("code"),
-          pwd: storage.get("password"),
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fields: ["courses", "segments", "questions", "settings", "history"] }),
       });
       const bulkLoad = await bulkLoadResponse.json();
       ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
