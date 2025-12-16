@@ -319,6 +319,8 @@ export function show(dialog, title, buttons, actions, blur, effects = true) {
 
   dialog.showModal();
 
+  dialog.querySelector('input')?.select();
+
   effects &&
     animate(
       dialog,
