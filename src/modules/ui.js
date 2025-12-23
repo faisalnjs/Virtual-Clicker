@@ -429,6 +429,7 @@ export function view(path = "") {
     const newMakeupClickButton = makeupClickButton.cloneNode(true);
     makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
     newMakeupClickButton.addEventListener("click", () => {
+      var syncPushMakeUpDate = ((document.getElementById("date-input").value || null) !== storage.get("makeUpDate")) ? true : false;
       if (document.getElementById("date-input").value != '') {
         document.getElementById("date-input").classList.remove("attention");
         let dateParts = document.getElementById("date-input").value.split("-");
@@ -438,14 +439,13 @@ export function view(path = "") {
         hours = hours % 12;
         hours = hours ? hours : 12;
         storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
-        auth.syncPush("makeUpDate");
         view("");
       } else {
         storage.set("makeUpDate", null);
-        auth.syncPush("makeUpDate");
         document.getElementById("date-input").classList.add("attention");
         document.getElementById("date-input").focus();
       }
+      if (syncPushMakeUpDate) auth.syncPush("makeUpDate");
       updateTitles();
       stopLoader();
     });
@@ -453,8 +453,9 @@ export function view(path = "") {
     const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);
     dismissMmakeupClickButton.parentNode.replaceChild(newDismissMmakeupClickButton, dismissMmakeupClickButton);
     newDismissMmakeupClickButton.addEventListener("click", () => {
+      var syncPushMakeUpDate = ((document.getElementById("date-input").value || null) !== storage.get("makeUpDate")) ? true : false;
       storage.set("makeUpDate", null);
-      auth.syncPush("makeUpDate");
+      if (syncPushMakeUpDate) auth.syncPush("makeUpDate");
       updateTitles();
       view("");
       stopLoader();
