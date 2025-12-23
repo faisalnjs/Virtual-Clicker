@@ -11,6 +11,23 @@ import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } fr
 import extendedSchedule from "/src/periods/extendedSchedule.json";
 ``;
 
+function safeParseJSON(str) {
+  if (!str || typeof str !== 'string') return null;
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    try {
+      const normalized = str.replace(/(^|[^0-9.])(-?)\.(\d+)/g, function (match, p1, p2, p3) {
+        return p1 + (p2 || '') + '0.' + p3;
+      });
+      return JSON.parse(normalized);
+    } catch (e2) {
+      console.error('safeParseJSON failed for', str, e2);
+      return null;
+    }
+  }
+}
+
 try {
   const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.check.vssfalcons.com' : `http://${document.domain}:5000`;
   var period = document.getElementById("period-input").value;
@@ -487,7 +504,11 @@ try {
       console.error(error);
     }
     // Update history feed
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
     // Show clear data fix guide
     // if (storage.get("created")) {
     //   document.querySelector(`[data-modal-view="clear-data-fix"]`).remove();
@@ -613,10 +634,14 @@ try {
       "answer": answer,
       "timestamp": timestamp,
       "type": type || "text",
-      "makeup": storage.get("makeUpDate"),
+      "makeup": storage.get("makeUpDate") || null,
     });
     storage.set("history", storageHistory);
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
     try {
       fetch(`${domain}/record_click`, {
         method: "POST",
@@ -628,7 +653,7 @@ try {
           answer,
           timestamp,
           type: type || "text",
-          makeup: storage.get("makeUpDate"),
+          makeup: storage.get("makeUpDate") || null,
         }),
       });
     } catch (error) {
@@ -638,22 +663,38 @@ try {
 
   document.getElementById("history-first")?.addEventListener("click", () => {
     historyIndex = getHistoryDates().length - 1;
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   document.getElementById("history-backward")?.addEventListener("click", () => {
     historyIndex++;
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   document.getElementById("history-forward")?.addEventListener("click", () => {
     historyIndex--;
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   document.getElementById("history-last")?.addEventListener("click", () => {
     historyIndex = 0;
-    updateHistory();
+    try {
+      updateHistory();
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   // Count number of unique days
@@ -738,22 +779,16 @@ try {
         const array = item.type === "array";
         const matrix = item.type === "matrix";
         const frq = item.type === "frq";
-        if (!latex) {
-          if (!array) {
-            if (!matrix) {
-              if (!frq) {
-                button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
-              } else {
-                button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
-              }
-            } else {
-              button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${JSON.stringify(JSON.parse(item.answer).map(innerArray => innerArray.map(numString => String(numString)))).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']')}</p>`;
-            }
-          } else {
-            button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.slice(1, -1)}</p>`;
-          }
-        } else {
+        if (latex) {
           button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n${convertLatexToMarkup(item.answer)}\n<p class="hint">(Equation may not display properly)</p>`;
+        } else if (array) {
+          button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer.slice(1, -1)}</p>`;
+        } else if (matrix) {
+          button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${JSON.stringify((safeParseJSON(item.answer) || []).map(innerArray => innerArray.map(numString => String(numString)))).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']')}</p>`;
+        } else if (frq) {
+          button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}${(item.question === '1') ? '/9' : ''}</p>`;
+        } else {
+          button.innerHTML = `<p><b>${item.question}.</b> ${unixToTimeString(item.timestamp)} (${item.code})${item.makeup ? ` (Makeup for ${item.makeup.split(' ')[0]})` : ''}</p>\n<p>${item.answer}</p>`;
         }
         feed.prepend(button);
         renderMathInElement(button);
@@ -798,7 +833,7 @@ try {
             answerMode("matrix");
             ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "matrix");
             resetMatrix();
-            var rows = JSON.parse(item.answer);
+            var rows = safeParseJSON(item.answer) || [];
             if (rows.length != 2) {
               if (rows.length === 1) {
                 removeRow();
