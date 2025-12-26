@@ -211,7 +211,7 @@ try {
           const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
           if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
             ui.view("settings/makeup");
-          } else if (!matchesCurrentPeriod) {
+          } else if (!matchesCurrentPeriod && !storage.get("makeUpDate")) {
             ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
               {
                 text: "Change Code",
