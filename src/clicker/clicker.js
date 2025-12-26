@@ -118,65 +118,64 @@ try {
   function processClick(part = null) {
     const mode = ui.getButtonSelectValue(document.getElementById("answer-mode-selector"));
     const question = part || questionInput.value?.trim().replaceAll(' ', '');
-    const answer =
-      multipleChoice ||
-      (() => {
-        if (mode === "input") {
-          return answerInput.value?.trim();
-        } else if (mode === "math") {
-          return convertLatexToAsciiMath(mf.value?.trim());
-        } else if (mode === "set") {
-          var values = "";
-          var setInputs = document.querySelectorAll('[data-set-input]');
-          setInputs.forEach(a => {
-            if ((a.value.length > 0) && (a.value != ' ')) values += a.value.replaceAll(',', '').trim() + ", ";
-          });
-          values = values.slice(0, -2);
-          switch (currentSetType) {
-            case "brackets":
-              values = `{${values}}`;
-              break;
-            case "vector":
-              values = `<${values}>`;
-              break;
-            case "array":
-              values = `[${values}]`;
-              break;
-            case "coordinate":
-              values = `(${values})`;
-              break;
-            case "product":
-              values = `⟨${values}⟩`;
-              break;
-            default:
-              break;
-          };
-          return values;
-        } else if (mode === "matrix") {
-          var matrix = [];
-          var matrixRows = document.querySelectorAll('#matrix [data-matrix-row]');
-          matrixRows.forEach(row => {
-            var matrixRow = [];
-            row.querySelectorAll('[data-matrix-column]').forEach(input => {
-              var value = input.value?.trim();
-              if (value.length > 0) {
-                matrixRow.push(value);
-              } else {
-                matrixRow.push("");
-              }
+    const [prettyAnswer, answer] =
+      multipleChoice ? [multipleChoice, multipleChoice] :
+        (() => {
+          if (mode === "input") {
+            return [answerInput.value?.trim(), answerInput.value?.trim()];
+          } else if (mode === "math") {
+            return [convertLatexToAsciiMath(mf.value?.trim()), convertLatexToAsciiMath(mf.value?.trim())];
+          } else if (mode === "set") {
+            var values = "";
+            var setInputs = document.querySelectorAll('[data-set-input]');
+            setInputs.forEach(a => {
+              if ((a.value.length > 0) && (a.value != ' ')) values += a.value.replaceAll(',', '').trim() + ", ";
             });
-            matrix.push(matrixRow);
-          });
-          var matrixString = JSON.stringify(matrix).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']');
-          return matrixString;
-        } else if (mode === "frq") {
-          if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
-            return document.querySelector(`[data-frq-part="${part}"]`).value?.trim();
-          } else {
-            return frqInput.value;
-          };
-        }
-      })();
+            values = values.slice(0, -2);
+            switch (currentSetType) {
+              case "brackets":
+                values = `{${values}}`;
+                break;
+              case "vector":
+                values = `<${values}>`;
+                break;
+              case "array":
+                values = `[${values}]`;
+                break;
+              case "coordinate":
+                values = `(${values})`;
+                break;
+              case "product":
+                values = `⟨${values}⟩`;
+                break;
+              default:
+                break;
+            };
+            return [values, values];
+          } else if (mode === "matrix") {
+            var matrix = [];
+            var matrixRows = document.querySelectorAll('#matrix [data-matrix-row]');
+            matrixRows.forEach(row => {
+              var matrixRow = [];
+              row.querySelectorAll('[data-matrix-column]').forEach(input => {
+                var value = input.value?.trim();
+                if (value.length > 0) {
+                  matrixRow.push(value);
+                } else {
+                  matrixRow.push("");
+                }
+              });
+              matrix.push(matrixRow);
+            });
+            return [JSON.stringify(matrix).replaceAll('["', '[').replaceAll('","', ', ').replaceAll('"]', ']'), JSON.stringify(matrix)];
+          } else if (mode === "frq") {
+            if (part && document.querySelector(`[data-frq-part="${part}"]`)) {
+              return [document.querySelector(`[data-frq-part="${part}"]`).value?.trim(), document.querySelector(`[data-frq-part="${part}"]`).value?.trim()];
+            } else {
+              return [frqInput.value, frqInput.value];
+            };
+          }
+        })();
     if (storage.get("code")) {
       if (question && answer) {
         const promptSubmit = (message, callback) => {
@@ -209,9 +208,9 @@ try {
         };
         validateQuestion(() => {
           const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
-          if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
+          if (((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) && !storage.get("makeUpDate")) {
             ui.view("settings/makeup");
-          } else if (!matchesCurrentPeriod) {
+          } else if (!matchesCurrentPeriod && !storage.get("makeUpDate")) {
             ui.prompt("Mismatched seat code", `Your current seat code does not match the class period you are currently in (${(getExtendedPeriod() != -1) ? (getExtendedPeriod() + 1) : 'none'}). Responses may not be recorded correctly. Are you sure you would like to continue? To make up clicks, navigate to <b>Settings > Make Up Clicks</b>.`, [
               {
                 text: "Change Code",
@@ -288,7 +287,7 @@ try {
       ui.view("settings/code");
     }
     function submit() {
-      submitClick(storage.get("code"), question, answer);
+      submitClick(storage.get("code"), question, prettyAnswer);
       if (mode === "math" && !multipleChoice) {
         storeClick(storage.get("code"), question, mf.value, "latex");
       } else if (mode === "set" && !multipleChoice) {
