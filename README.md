@@ -14,8 +14,8 @@ Next generation clicking: fixed, upgraded, and cloud hosted ☁️🚀
 - Many More Features
 
 [![Wakatime](https://wakatime.com/badge/user/074621a8-639e-4f3e-b6d9-f23b6bb481a9/project/db7c4936-fbf0-463d-a191-cbc2481a5402.svg)](https://faisaln.com/portfolio/virtual-clicker)
-[![Github Issues](https://img.shields.io/github/issues/faisalnjs/virtual-clicker?style=flat&logo=github&label=GitHub%20Issues&color=mediumseagreen)](https://wakatime.com/@faisalnjs/projects/jsltfbfvue)
-[![License](https://img.shields.io/github/license/faisalnjs/virtual-clicker?label=License)](https://github.com/faisalnjs/Virtual-Clicker/blob/main/LICENSE)
+[![Github Issues](https://img.shields.io/github/issues/faisalnjs/Virtual-Clicker?style=flat&logo=github&label=GitHub%20Issues&color=mediumseagreen)](https://wakatime.com/@faisalnjs/projects/jsltfbfvue)
+[![License](https://img.shields.io/github/license/faisalnjs/Virtual-Clicker?label=License)](https://github.com/faisalnjs/Virtual-Clicker/blob/main/LICENSE)
 
 ## Development
 
@@ -30,23 +30,25 @@ Vite will start a development server at `localhost:5173`
 
 Serve the files that are generated in `/dist`
 
-[![Build](https://img.shields.io/github/actions/workflow/status/faisalnjs/virtual-clicker/deploy.yml?logo=github&label=Build&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/faisalnjs/Virtual-Clicker/deploy.yml?logo=github&label=Build&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy.yml)
 
 ## Beta
 
-A beta version of this project is hosted on [Dango Web Solutions](https://dangoweb.com/?from=virtual-clicker) cloud hosting. The beta version is updated with the latest changes from the [`beta`](https://github.com/faisalnjs/Virtual-Clicker/tree/beta) branch, and is used for testing new features and bug fixes before they are deployed to production. The beta version is not guaranteed to be stable and may contain bugs or unfinished features.
+The beta version is updated with the latest changes from the [`beta`](https://github.com/faisalnjs/Virtual-Clicker/tree/beta) branch, and is used for testing new features and bug fixes before they are deployed to production. The beta version is not guaranteed to be stable and may contain bugs or unfinished features.
 
 Files are transferred to the host using the GitHub Action automation workflow at [.github\workflows\deploy-beta.yml](https://github.com/faisalnjs/Virtual-Clicker/tree/main/.github/workflows/deploy-beta.yml).
 
-[![GitHub Actions - Deploy to Dango Web Solutions (Beta)](https://img.shields.io/github/actions/workflow/status/faisalnjs/virtual-clicker/deploy-beta.yml?logo=github&label=GitHub%20Actions%20-%20Deploy%20to%20Dango%20Web%20Solutions%20(Beta)&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy-beta.yml)
+[![GitHub Actions - Deploy to Dango Web Solutions (Beta)](https://img.shields.io/github/actions/workflow/status/faisalnjs/Virtual-Clicker/deploy-beta.yml?logo=github&label=GitHub%20Actions%20-%20Deploy%20to%20Dango%20Web%20Solutions%20(Beta)&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy-beta.yml)
 
 ## Production
 
-This project is hosted on [Dango Web Solutions](https://dangoweb.com/?from=virtual-clicker) cloud hosting - free web hosting for Education.
-
 Files are transferred to the host using the GitHub Action automation workflow at [.github\workflows\deploy.yml](https://github.com/faisalnjs/Virtual-Clicker/tree/main/.github/workflows/deploy.yml).
 
-[![GitHub Actions - Deploy to Dango Web Solutions](https://img.shields.io/github/actions/workflow/status/faisalnjs/virtual-clicker/deploy.yml?logo=github&label=GitHub%20Actions%20-%20Deploy%20to%20Dango%20Web%20Solutions&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy.yml)
+[![GitHub Actions - Deploy to Dango Web Solutions](https://img.shields.io/github/actions/workflow/status/faisalnjs/Virtual-Clicker/deploy.yml?logo=github&label=GitHub%20Actions%20-%20Deploy%20to%20Dango%20Web%20Solutions&color=mediumseagreen)](https://github.com/faisalnjs/Virtual-Clicker/actions/workflows/deploy.yml)
+
+## API
+
+The API is **recommended** to run this project, and must be hosted on the same server as where you are hosting this project. The private API repository can be found at [faisalnjs/Homework-Checker](https://github.com/faisalnjs/Homework-Checker).
 
 ## Credits
 
