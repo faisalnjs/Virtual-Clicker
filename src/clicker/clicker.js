@@ -476,7 +476,7 @@ try {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fields: ["courses", "segments", "questions", "settings", "history"] }),
+        body: JSON.stringify({ fields: ["history"] }),
       });
       const bulkLoad = await bulkLoadResponse.json();
       ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
