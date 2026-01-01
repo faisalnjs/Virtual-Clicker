@@ -473,7 +473,8 @@ try {
     ui.updateTitles();
     try {
       await auth.bulkLoad(["history"], storage.get("code"), storage.get("password"));
-      const bulkLoad = storage.get("cache") || {};
+      await storage.idbReady;
+      const bulkLoad = (await storage.idbGet('cache')) || storage.get("cache") || {};
       ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
       history = bulkLoad.history || [];
       var course = bulkLoad.course || {};
