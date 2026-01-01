@@ -22,6 +22,9 @@ try {
     } else if (e.shiftKey) {
       if (e.key == "R" && !anyDialogOpen && !isTyping) {
         themes.resetTheme();
+        storage.delete("cache");
+        storage.delete("lastBulkLoad");
+        location.reload();
       }
     } else if (e.key == "Enter" && anyDialogOpen) {
       document.querySelector('dialog[open] .submit-button')?.click();
