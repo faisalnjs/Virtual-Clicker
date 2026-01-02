@@ -4,7 +4,7 @@ import * as themes from "/src/themes/themes.js";
 import { insertFromIndex } from "/src/symbols/symbols.js";
 
 try {
-  document.addEventListener("keydown", (e) => {
+  document.addEventListener("keydown", async (e) => {
     const anyDialogOpen = Array.from(document.querySelectorAll("dialog")).some(
       (dialog) => dialog.open,
     );
@@ -22,6 +22,10 @@ try {
     } else if (e.shiftKey) {
       if (e.key == "R" && !anyDialogOpen && !isTyping) {
         themes.resetTheme();
+        await storage.idbReady;
+        storage.idbDelete("cache").catch((e) => console.error('IDB delete failed', e));
+        storage.delete("lastBulkLoad");
+        location.reload();
       }
     } else if (e.key == "Enter" && anyDialogOpen) {
       document.querySelector('dialog[open] .submit-button')?.click();

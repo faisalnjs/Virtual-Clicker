@@ -471,14 +471,9 @@ try {
   async function updateCode() {
     ui.updateTitles();
     try {
-      const bulkLoadResponse = await fetch(`${domain}/bulk_load`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fields: ["courses", "segments", "questions", "settings", "history"] }),
-      });
-      const bulkLoad = await bulkLoadResponse.json();
+      await auth.bulkLoad(["history"], storage.get("code"), storage.get("password"));
+      await storage.idbReady;
+      const bulkLoad = (await storage.idbGet('cache')) || storage.get("cache") || {};
       ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
       history = bulkLoad.history || [];
       var course = bulkLoad.course || {};
