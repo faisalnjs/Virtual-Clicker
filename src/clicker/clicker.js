@@ -110,7 +110,6 @@ try {
       return;
     }
     await auth.sync(true, updateCode);
-    ui.stopLoader();
   }
 
   init();
