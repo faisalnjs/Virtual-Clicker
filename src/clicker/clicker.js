@@ -471,7 +471,7 @@ try {
   async function updateCode() {
     ui.updateTitles();
     try {
-      await auth.bulkLoad(["history"], storage.get("code"), storage.get("password"));
+      if (!(await auth.bulkLoad(["history"], storage.get("code"), storage.get("password")))) return;
       await storage.idbReady;
       const bulkLoad = (await storage.idbGet('cache')) || storage.get("cache") || {};
       ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");

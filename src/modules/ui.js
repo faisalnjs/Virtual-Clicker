@@ -401,7 +401,7 @@ export function view(path = "") {
       });
   }
   const previous = pages.slice(0, pages.length - 1).join("/");
-  const buttons = (path === "api-fail") ? [] : [
+  const buttons = ((path === 'api-fail') || (path === 'maintenance-mode')) ? [] : [
     {
       text: `<i class="bi bi-x-lg"></i>`,
       class: "icon",
