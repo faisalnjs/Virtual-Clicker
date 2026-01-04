@@ -10,11 +10,30 @@ try {
     );
     const isTyping = document.activeElement.matches("input, textarea");
     if (e.ctrlKey) {
-      if (e.key == "Enter" && !anyDialogOpen) document.getElementById("submit-button").click();
-      if (e.key == "," && !anyDialogOpen) ui.view("settings");
-      if (e.key == "." && !anyDialogOpen) ui.view("history");
-      if (e.key == "/" && !anyDialogOpen) ui.view("settings/keybinds");
-      if (e.key == "b") ui.reportBugModal();
+      if (e.key == "Enter" && !anyDialogOpen) {
+        e.preventDefault();
+        document.getElementById("submit-button").click();
+      }
+      if (e.key == "," && !anyDialogOpen) {
+        e.preventDefault();
+        ui.view("settings");
+      }
+      if (e.key == "." && !anyDialogOpen) {
+        e.preventDefault();
+        ui.view("history");
+      }
+      if (e.key == "/" && !anyDialogOpen) {
+        e.preventDefault();
+        ui.view("settings/keybinds");
+      }
+      if (e.key == "b") {
+        e.preventDefault();
+        ui.reportBugModal();
+      }
+      if (e.key == "s" && !anyDialogOpen) {
+        e.preventDefault();
+        ui.suggestionsModal();
+      }
     } else if (e.altKey) {
       if (/[1-9]/.test(e.key)) {
         e.preventDefault();
@@ -22,6 +41,7 @@ try {
       }
     } else if (e.shiftKey) {
       if (e.key == "R" && !anyDialogOpen && !isTyping) {
+        e.preventDefault();
         themes.resetTheme();
         await storage.idbReady;
         storage.idbDelete("cache").catch((e) => console.error('IDB delete failed', e));
@@ -29,6 +49,7 @@ try {
         location.reload();
       }
     } else if (e.key == "Enter" && anyDialogOpen) {
+      e.preventDefault();
       document.querySelector('dialog[open] .submit-button')?.click();
     }
   });
