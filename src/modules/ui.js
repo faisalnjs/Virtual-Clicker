@@ -45,7 +45,7 @@ export function modal(options) {
       label.innerHTML = options.input.label;
       dialog.appendChild(label);
     }
-    const input = document.createElement((options.input.type === "select") ? "select" : "input");
+    const input = document.createElement((options.input.type === "select") ? "select" : ((options.input.type === "textarea") ? "textarea" : "input"));
     if (options.input.type !== "select") input.type = options.input.type || "text";
     if ((options.input.type === "select") && options.input.multiple) input.multiple = options.input.multiple;
     if ((options.input.type === "select") && options.input.options) {
@@ -59,6 +59,7 @@ export function modal(options) {
     }
     input.placeholder = options.input.placeholder || "";
     if (options.input.defaultValue) input.value = options.input.defaultValue || "";
+    if (options.input.disabled) input.disabled = true;
     input.className = `dialog-input${options.input.selectAll ? " selectAll" : ""}`;
     input.min = options.input.min || "";
     input.max = options.input.max || "";
@@ -74,8 +75,8 @@ export function modal(options) {
         label.innerHTML = input.label;
         dialog.appendChild(label);
       }
-      const inputElement = document.createElement((input.type === "select") ? "select" : "input");
-      if (input.type !== "select") inputElement.type = input.type || "text";
+      const inputElement = document.createElement((input.type === "select") ? "select" : ((input.type === "textarea") ? "textarea" : "input"));
+      if (input.type === "input") inputElement.type = input.type || "text";
       if ((input.type === "select") && input.multiple) inputElement.multiple = input.multiple;
       if ((input.type === "select") && input.options) {
         input.options.forEach(option => {
@@ -88,6 +89,7 @@ export function modal(options) {
       }
       inputElement.placeholder = input.placeholder || "";
       if (input.defaultValue) inputElement.value = input.defaultValue || "";
+      if (input.disabled) inputElement.disabled = true;
       inputElement.className = `dialog-input${input.selectAll ? " selectAll" : ""}`;
       inputElement.min = input.min || "";
       inputElement.max = input.max || "";
@@ -113,8 +115,7 @@ export function modal(options) {
       var buttonGroupContainerElement = document.createElement("div");
       buttonGroupContainerElement.className = "button-grid";
       buttonGroup.buttons.forEach(button => {
-        if (button.icon) button.text = `<i class="bi ${button.icon}"></i> ${button.text}`;
-        var btnElement = new Element("button", button.text, {
+        var btnElement = new Element("button", `${button.icon ? `<i class="bi ${button.icon}"></i> ` : ''}${button.text}`, {
           click: () => {
             if (button.onclick) {
               var hasEmptyRequiredInput = false;
@@ -150,8 +151,7 @@ export function modal(options) {
     var buttonsContainerElement = document.createElement("div");
     buttonsContainerElement.className = "button-grid";
     options.buttons.forEach(button => {
-      if (button.icon) button.text = + `<i class="bi ${button.icon}"></i> `;
-      var btnElement = new Element("button", button.text, {
+      var btnElement = new Element("button", `${button.icon ? `<i class="bi ${button.icon}"></i> ` : ''}${button.text}`, {
         click: () => {
           if (button.onclick) {
             var hasEmptyRequiredInput = false;
