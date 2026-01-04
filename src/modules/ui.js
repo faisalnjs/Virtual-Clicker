@@ -57,6 +57,7 @@ export function modal(options) {
         input.appendChild(optionElement);
       });
     }
+    if (options.input.type === "textarea") input.rows = options.input.rows || 3;
     input.placeholder = options.input.placeholder || "";
     if (options.input.defaultValue) input.value = options.input.defaultValue || "";
     if (options.input.disabled) input.disabled = true;
@@ -87,6 +88,7 @@ export function modal(options) {
           inputElement.appendChild(optionElement);
         });
       }
+      if (input.type === "textarea") inputElement.rows = input.rows || 3;
       inputElement.placeholder = input.placeholder || "";
       if (input.defaultValue) inputElement.value = input.defaultValue || "";
       if (input.disabled) inputElement.disabled = true;
