@@ -14,6 +14,7 @@ try {
       if (e.key == "," && !anyDialogOpen) ui.view("settings");
       if (e.key == "." && !anyDialogOpen) ui.view("history");
       if (e.key == "/" && !anyDialogOpen) ui.view("settings/keybinds");
+      if (e.key == "b") ui.reportBugModal();
     } else if (e.altKey) {
       if (/[1-9]/.test(e.key)) {
         e.preventDefault();
