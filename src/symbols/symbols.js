@@ -154,7 +154,7 @@ if (document.querySelector("#symbols-grid")) {
   }
 
   // Add suggest symbols button
-  const suggestButton = new Element("button", "Suggest Symbol", {
+  const suggestButton = new ui.Element("button", "Suggest Symbol", {
     click: () => {
       ui.suggestionsModal();
     },
