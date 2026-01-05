@@ -642,4 +642,5 @@ export async function clearBulkLoad() {
     storage.delete("lastBulkLoad");
     await storage.idbDelete("adminCache").catch((e) => console.error('IDB delete failed', e));
     storage.delete("lastAdminBulkLoad");
+    console.log('🟢 Bulk load cleared');
 }
