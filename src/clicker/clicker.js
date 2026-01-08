@@ -3,6 +3,7 @@
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
+import * as themes from "/src/themes/themes.js";
 
 import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
@@ -568,6 +569,8 @@ try {
         },
       ]);
     }
+    // Render Theme Store
+    themes.renderStore();
   }
 
   // Show multiple choice card
