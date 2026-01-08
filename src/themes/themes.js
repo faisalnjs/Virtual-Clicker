@@ -30,7 +30,7 @@ export function resetTheme() {
   removeCustomTheme();
   document.getElementById("theme-preview").removeAttribute("data-theme");
   enableTransitions();
-  storage.delete("theme");
+  storage.set("theme", "default");
   storage.delete("custom-theme");
 }
 
