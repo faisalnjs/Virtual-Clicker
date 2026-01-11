@@ -5,7 +5,7 @@ import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
 import * as themes from "/src/themes/themes.js";
 
-import { autocomplete } from "/src/symbols/symbols.js";
+import { autocomplete, insertFromIndex } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
