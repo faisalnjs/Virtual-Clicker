@@ -98,6 +98,16 @@ button.icon {
   border-radius: 50%;
 }
 
+button.fill {
+  background: var(--accent-color) !important;
+  color: var(--accent-text-color) !important;
+}
+
+button.fill:hover {
+  background: var(--text-color) !important;
+  color: var(--surface-color) !important;
+}
+
 button:disabled {
   opacity: 0.75;
   pointer-events: none;
