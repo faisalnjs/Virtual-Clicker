@@ -277,6 +277,10 @@ div.spacer {
   display: none;
 }
 
+#history-navigation {
+  margin-top: 10px;
+}
+
 #history-feed {
   overflow-y: auto;
   height: 400px;

@@ -5,7 +5,7 @@ import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
 import * as themes from "/src/themes/themes.js";
 
-import { autocomplete, insertFromIndex } from "/src/symbols/symbols.js";
+import { autocomplete } from "/src/symbols/symbols.js";
 import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
@@ -1033,14 +1033,15 @@ try {
       newSetInput.setAttribute('type', 'text');
       newSetInput.setAttribute('autocomplete', 'off');
       newSetInput.setAttribute('data-set-input', Number(highestDataElement.getAttribute('data-set-input')) + 1);
-      const buttonGrid = document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1];
+      const buttonGrid = document.querySelector('[data-answer-mode="set"] .button-grid:has([id="set-input"])');
+      if (!buttonGrid) return;
       const insertBeforePosition = buttonGrid.children.length - 2;
       if (insertBeforePosition > 0) {
         buttonGrid.insertBefore(newSetInput, buttonGrid.children[insertBeforePosition]);
       } else {
         buttonGrid.appendChild(newSetInput);
       }
-      document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
+      buttonGrid.style.flexWrap = (setInputs.length > 9) ? 'wrap' : 'nowrap';
       newSetInput.focus();
       document.querySelector("[data-remove-set-input]").disabled = false;
     }
