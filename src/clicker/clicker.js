@@ -110,7 +110,14 @@ try {
       ui.view("settings/code");
       return;
     }
-    await auth.sync(true, updateCode);
+    await auth.sync(true, updateCode)
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ clicker.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
   }
 
   init();
@@ -441,7 +448,14 @@ try {
               text: `Use ${input}`,
               class: 'submit-button',
               onclick: async () => {
-                if (storage.get("code") !== input) await auth.clearBulkLoad();
+                if (storage.get("code") !== input) await auth.clearBulkLoad()
+                  .catch(error => {
+                    if (storage.get("developer")) {
+                      alert(`Error @ clicker.js: ${error.message}`);
+                    } else {
+                      ui.reportBugModal(null, String(error.stack));
+                    }
+                  });
                 storage.set("code", input);
                 init();
                 // Close all modals
@@ -458,7 +472,14 @@ try {
       } else {
         // Close all modals
         ui.view("");
-        if (storage.get("code") !== input) await auth.clearBulkLoad();
+        if (storage.get("code") !== input) await auth.clearBulkLoad()
+          .catch(error => {
+            if (storage.get("developer")) {
+              alert(`Error @ clicker.js: ${error.message}`);
+            } else {
+              ui.reportBugModal(null, String(error.stack));
+            }
+          });
         storage.set("code", input);
         init();
         // Update URL parameters with seat code
@@ -570,7 +591,14 @@ try {
       ]);
     }
     // Render Theme Store
-    themes.renderStore();
+    themes.renderStore()
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ clicker.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
   }
 
   // Show multiple choice card
