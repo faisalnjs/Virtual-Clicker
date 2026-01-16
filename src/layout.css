@@ -309,6 +309,10 @@ div.spacer {
   margin-top: 10px;
 }
 
+dialog:has(.history-feed) > button {
+  margin-top: 5px;
+}
+
 #history-feed {
   overflow-y: auto;
   height: 400px;
