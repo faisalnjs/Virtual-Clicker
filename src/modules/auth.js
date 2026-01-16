@@ -183,7 +183,14 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                             Object.entries(r.settings).forEach(([key, value]) => {
                                 if (key !== "password" && key !== "code" && key !== "usr" && key !== "pwd" && key !== "history" && key !== "questionsAnswered" && key !== "developer" && key !== "cache" && key !== "lastBulkLoad" && key !== "adminCache" && key !== "lastAdminBulkLoad") storage.set(key, value);
                             });
-                            await themes.syncTheme();
+                            await themes.syncTheme()
+                                .catch(error => {
+                                    if (storage.get("developer")) {
+                                        alert(`Error @ auth.js: ${error.message}`);
+                                    } else {
+                                        ui.reportBugModal(null, String(error.stack));
+                                    }
+                                });
                             if (document.getElementById('clicker')) document.getElementById('clicker').classList = r.settings['layout'] || '';
                         }
                         window.location.reload();
@@ -591,7 +598,14 @@ export async function bulkLoad(fields = [], usr = null, pwd = null, isAdmin = fa
     }
     if (fields.includes('courses') ? (!(await storage.idbGet((isAdmin || isTA) ? "adminCache" : "cache") || {})?.['courses']?.length && !fetchedBulkLoad?.courses?.length) : false) {
         console.log('🔴 Bulk load out of sync, reloading');
-        await clearBulkLoad();
+        await clearBulkLoad()
+            .catch(error => {
+                if (storage.get("developer")) {
+                    alert(`Error @ auth.js: ${error.message}`);
+                } else {
+                    ui.reportBugModal(null, String(error.stack));
+                }
+            });
         location.reload();
         return false;
     }

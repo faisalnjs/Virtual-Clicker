@@ -193,13 +193,27 @@ export async function renderStore() {
   await storage.idbReady;
   var initialTheme = storage.get("theme") || "default";
   var checks = (await storage.idbGet("cache"))?.checksCount || 0;
-  document.querySelector('#controls-container .pill')?.setAttribute('checks', checks);
+  document.getElementById("controls-container")?.setAttribute('checks', checks);
   var ownedThemes = (await storage.idbGet("cache"))?.ownedThemes || [];
   if (document.body.getAttribute('data-theme') && !ownedThemes.includes(document.body.getAttribute('data-theme')) && themes.find(theme => theme[0] === document.body.getAttribute('data-theme'))?.[3]) {
     resetTheme();
     ui.toast("Applied theme is not owned.", 2000, "error", "bi bi-exclamation-triangle-fill");
-    await auth.syncPush("theme");
-    renderStore();
+    await auth.syncPush("theme")
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
+    renderStore()
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
     return;
   }
   var featuredTheme = themes.filter(t => t[3] && (t[0] !== document.body.getAttribute('data-theme')))[Math.floor(Math.random() * themes.filter(t => t[3] && (t[0] !== document.body.getAttribute('data-theme'))).length)];
@@ -244,7 +258,14 @@ export async function renderStore() {
         Array.from(store.querySelectorAll('.theme-item button')).forEach(btn => {
           btn.textContent = btn.parentElement.classList.contains('selected') ? "Applied" : (ownedThemes.includes(btn.parentElement.getAttribute('data-theme')) ? "Owned" : "Preview");
         });
-        await auth.syncPush("theme");
+        await auth.syncPush("theme")
+          .catch(error => {
+            if (storage.get("developer")) {
+              alert(`Error @ themes.js: ${error.message}`);
+            } else {
+              ui.reportBugModal(null, String(error.stack));
+            }
+          });
         ui.toast(`Applied ${featuredTheme[1] || featuredTheme[0]} theme.`, 2000, "success", "bi bi-check2-circle");
       } else {
         if (featuredTheme[4] && featuredTheme[4].length && !featuredTheme[4].some(t => ownedThemes.includes(t))) {
@@ -270,7 +291,14 @@ export async function renderStore() {
                 icon: 'bi-bag-check-fill',
                 class: 'submit-button',
                 onclick: async () => {
-                  await auth.buyTheme(featuredTheme[0], featuredTheme[3]);
+                  await auth.buyTheme(featuredTheme[0], featuredTheme[3])
+                    .catch(error => {
+                      if (storage.get("developer")) {
+                        alert(`Error @ themes.js: ${error.message}`);
+                      } else {
+                        ui.reportBugModal(null, String(error.stack));
+                      }
+                    });
                   ownedThemes.push(featuredTheme[0]);
                   const cache = await storage.idbGet("cache") || {};
                   cache.ownedThemes = ownedThemes;
@@ -283,7 +311,14 @@ export async function renderStore() {
                   checksText.innerHTML = `<i class="bi bi-check2-circle"></i> You've got ${cache.checksCount} Check${(cache.checksCount == 1) ? '' : 's'} available to spend!`;
                   storage.set("theme", featuredTheme[0]);
                   document.body.setAttribute('data-theme', featuredTheme[0]);
-                  await auth.syncPush("theme");
+                  await auth.syncPush("theme")
+                    .catch(error => {
+                      if (storage.get("developer")) {
+                        alert(`Error @ themes.js: ${error.message}`);
+                      } else {
+                        ui.reportBugModal(null, String(error.stack));
+                      }
+                    });
                   ui.toast(`Purchased and applied ${featuredTheme[1] || featuredTheme[0]} theme.`, 2000, "success", "bi bi-bag-check-fill");
                 },
                 close: true,
@@ -346,7 +381,14 @@ export async function renderStore() {
         Array.from(store.querySelectorAll('.theme-item button')).forEach(btn => {
           btn.textContent = btn.parentElement.classList.contains('selected') ? "Applied" : (ownedThemes.includes(btn.parentElement.getAttribute('data-theme')) ? "Owned" : "Preview");
         });
-        await auth.syncPush("theme");
+        await auth.syncPush("theme")
+          .catch(error => {
+            if (storage.get("developer")) {
+              alert(`Error @ themes.js: ${error.message}`);
+            } else {
+              ui.reportBugModal(null, String(error.stack));
+            }
+          });
         ui.toast(`Applied ${name} theme.`, 2000, "success", "bi bi-check2-circle");
       } else {
         if (theme[4] && theme[4].length && !theme[4].some(t => ownedThemes.includes(t))) {
@@ -372,7 +414,14 @@ export async function renderStore() {
                 icon: 'bi-bag-check-fill',
                 class: 'submit-button',
                 onclick: async () => {
-                  await auth.buyTheme(theme[0], theme[3]);
+                  await auth.buyTheme(theme[0], theme[3])
+                    .catch(error => {
+                      if (storage.get("developer")) {
+                        alert(`Error @ themes.js: ${error.message}`);
+                      } else {
+                        ui.reportBugModal(null, String(error.stack));
+                      }
+                    });
                   ownedThemes.push(theme[0]);
                   const cache = await storage.idbGet("cache") || {};
                   cache.ownedThemes = ownedThemes;
@@ -385,7 +434,14 @@ export async function renderStore() {
                   checksText.innerHTML = `<i class="bi bi-check2-circle"></i> You've got ${cache.checksCount} Check${(cache.checksCount == 1) ? '' : 's'} available to spend!`;
                   storage.set("theme", theme[0]);
                   document.body.setAttribute('data-theme', theme[0]);
-                  await auth.syncPush("theme");
+                  await auth.syncPush("theme")
+                    .catch(error => {
+                      if (storage.get("developer")) {
+                        alert(`Error @ themes.js: ${error.message}`);
+                      } else {
+                        ui.reportBugModal(null, String(error.stack));
+                      }
+                    });
                   ui.toast(`Purchased and applied ${name} theme.`, 2000, "success", "bi bi-bag-check-fill");
                 },
                 close: true,
@@ -461,8 +517,22 @@ try {
     storage.set("theme", value);
     // Update developer theme input
     if (document.getElementById("theme-debug")) document.getElementById("theme-debug").value = value;
-    await auth.syncPush("theme");
-    await auth.syncPush("custom-theme");
+    await auth.syncPush("theme")
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
+    await auth.syncPush("custom-theme")
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
   });
 
   document.getElementById("theme-reset")?.addEventListener("click", resetTheme);
@@ -477,8 +547,22 @@ try {
     storage.set("custom-theme", customTheme);
     storage.set("theme", "custom");
     applyCustomTheme();
-    await auth.syncPush("custom-theme");
-    await auth.syncPush("theme");
+    await auth.syncPush("custom-theme")
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
+    await auth.syncPush("theme")
+      .catch(error => {
+        if (storage.get("developer")) {
+          alert(`Error @ themes.js: ${error.message}`);
+        } else {
+          ui.reportBugModal(null, String(error.stack));
+        }
+      });
   });
 
   document.getElementById("editor-reset")?.addEventListener("click", () => {
