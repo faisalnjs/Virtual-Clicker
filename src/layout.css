@@ -233,15 +233,6 @@ div.spacer {
   transition: 0.5s;
 }
 
-#controls-container:has(> :last-child:hover) {
-  transition: 0.1s;
-}
-
-#controls-container:not(:has(> :last-child:hover)) {
-  padding-right: 5px;
-  transition: 0.1s;
-}
-
 #controls-container:hover {
   border-radius: 0 100vh 100vh 0;
   transition: 0.5s;
