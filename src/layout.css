@@ -229,16 +229,19 @@ div.spacer {
   align-self: center;
   position: fixed;
   bottom: 25px;
-  padding-left: 5px;
   transition: 0.5s;
 }
 
-#controls-container:hover {
+#controls-container[checks] {
+  padding-left: 5px;
+}
+
+#controls-container[checks]:hover {
   border-radius: 0 100vh 100vh 0;
   transition: 0.5s;
 }
 
-#controls-container::before {
+#controls-container[checks]::before {
   content: attr(checks);
   position: absolute;
   bottom: 0;
@@ -253,7 +256,7 @@ div.spacer {
   transition: 0.5s;
 }
 
-#controls-container:hover::before {
+#controls-container[checks]:hover::before {
   right: 100%;
   background-color: var(--accent-color);
   transition: 0.5s;
