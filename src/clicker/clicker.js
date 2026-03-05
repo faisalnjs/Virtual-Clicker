@@ -10,6 +10,7 @@ import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 import extendedSchedule from "/src/periods/extendedSchedule.json";
+import initDraw from '/src/modules/draw.js';
 ``;
 
 function safeParseJSON(str) {
@@ -47,8 +48,8 @@ try {
   let highestDataElement = null;
   let restoredSetType = "";
   var history = [];
-
   let historyIndex = 0;
+  var drawLoaded = false;
 
   if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 
@@ -1024,6 +1025,7 @@ try {
   document.getElementById("answer-mode-selector").addEventListener("input", (e) => {
     const mode = e.detail;
     answerMode(mode);
+    document.getElementById("submit-button").removeAttribute("hidden");
     if (mode === "input") {
       answerLabel.setAttribute("for", "answer-input");
     } else if (mode === "math") {
@@ -1034,6 +1036,13 @@ try {
       answerLabel.setAttribute("for", "matrix");
     } else if (mode === "frq") {
       answerLabel.setAttribute("for", "frq-input");
+    } else if (mode === "draw") {
+      answerLabel.setAttribute("for", "draw-input");
+      if (!drawLoaded) {
+        window.__drawInstance = initDraw(domain);
+        drawLoaded = true;
+      }
+      document.getElementById("submit-button").setAttribute("hidden", "");
     }
   });
 

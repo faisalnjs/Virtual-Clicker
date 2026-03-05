@@ -68,6 +68,7 @@
           <button aria-selected="false" data-value="set">Set</button>
           <button aria-selected="false" data-value="matrix">Matrix</button>
           <button aria-selected="false" data-value="frq">FRQ</button>
+          <button aria-selected="false" data-value="draw">Draw</button>
         </div>
       </div>
     </div>
@@ -235,6 +236,14 @@
           </div>
           <input type="range" min="0" max="9" value="4" step="1" id="frq-input" />
           <h1 id="frq-score">4</h1>
+        </div>
+        <div data-answer-mode="draw">
+          <canvas></canvas>
+          <div class="button-grid">
+            <button data-action="undo" disabled>Undo</button>
+            <button data-action="clear" disabled>Clear</button>
+            <button data-action="redo" disabled>Redo</button>
+          </div>
         </div>
       </div>
       <button class="pill space" id="submit-button">Submit</button>
