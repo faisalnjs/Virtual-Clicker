@@ -3,7 +3,7 @@ import storage from '/src/modules/storage.js';
 import * as themes from '/src/themes/themes.js';
 
 export default function initDraw(domain) {
-    const wsUrl = `${domain.replace('http', 'ws')}/ws}`;
+    const wsUrl = `${domain.replace('http', 'ws')}/ws`;
     var ws = null;
     var isDrawing = false;
     var lastStroke = null;
