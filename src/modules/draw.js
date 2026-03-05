@@ -9,6 +9,8 @@ export default function initDraw(domain) {
     var lastStroke = null;
     var undoStack = [];
     var redoStack = [];
+    var sendQueue = [];
+    var sendTimer = null;
 
     const container = document.querySelector('[data-answer-mode="draw"]');
     const undoButton = container.querySelector('[data-action="undo"]');
@@ -23,6 +25,7 @@ export default function initDraw(domain) {
     canvas.style.backgroundColor = themes.getCurrentTheme().surfaceColor;
     canvas.width = container.clientWidth;
     canvas.height = 400;
+    canvas.style.touchAction = 'none';
 
     const ctx = canvas.getContext('2d');
     ctx.lineWidth = 3;
@@ -38,6 +41,7 @@ export default function initDraw(domain) {
     }
 
     function start(e) {
+        e.preventDefault();
         isDrawing = true;
         lastStroke = currentPosition(e);
     }
@@ -52,6 +56,7 @@ export default function initDraw(domain) {
 
     function move(e) {
         if (!isDrawing) return;
+        e.preventDefault();
 
         const p = currentPosition(e);
         ctx.beginPath();
@@ -65,19 +70,13 @@ export default function initDraw(domain) {
         redoStack.length = 0;
 
         syncControls();
-
-        if (ws && (ws.readyState === WebSocket.OPEN)) ws.send(JSON.stringify({ type: 'draw', stroke }));
+        queueDraw(stroke);
     }
 
     function end() {
         isDrawing = false;
         lastStroke = null;
     }
-
-    canvas.addEventListener('pointerdown', start);
-    canvas.addEventListener('pointermove', move);
-    canvas.addEventListener('pointerup', end);
-    canvas.addEventListener('pointerleave', end);
 
     function syncControls() {
         if (undoButton) undoButton.disabled = !undoStack.length;
@@ -105,8 +104,35 @@ export default function initDraw(domain) {
         undoStack.push(stroke);
         renderStrokes(undoStack, ctx);
         syncControls();
-        if (ws && (ws.readyState === WebSocket.OPEN)) ws.send(JSON.stringify({ type: 'draw', stroke: stroke }));
+        queueDraw(stroke);
         return true;
+    }
+
+    function queueDraw(stroke) {
+        if (!stroke) return;
+        sendQueue.push(stroke);
+        if (!sendTimer) sendTimer = setTimeout(flushSendQueue, 2000);
+    }
+
+    function flushSendQueue() {
+        if (!sendQueue.length) {
+            sendTimer = null;
+            return;
+        }
+        if (ws && (ws.readyState === WebSocket.OPEN)) {
+            const toSend = sendQueue.slice();
+            sendQueue = [];
+            sendTimer = null;
+            try {
+                toSend.forEach(st => {
+                    try { ws.send(JSON.stringify({ type: 'draw', stroke: st })); } catch (e) { console.warn('ws send failed', e); }
+                });
+            } catch (e) {
+                console.warn('flushSendQueue error', e);
+            }
+        } else {
+            sendTimer = setTimeout(flushSendQueue, 2000);
+        }
     }
 
     function setHold(button, action) {
@@ -150,53 +176,6 @@ export default function initDraw(domain) {
         });
     }
 
-    undoButton?.addEventListener('click', (e) => {
-        e.preventDefault();
-        doUndo();
-    });
-    redoButton?.addEventListener('click', (e) => {
-        e.preventDefault();
-        doRedo();
-    });
-    setHold(undoButton, doUndo);
-    setHold(redoButton, doRedo);
-
-    container.querySelector('[data-action="clear"]')?.addEventListener('click', () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        undoStack.push({ clear: true });
-        redoStack.length = 0;
-        syncControls();
-        if (ws && (ws.readyState === WebSocket.OPEN)) ws.send(JSON.stringify({ type: 'clear' }));
-    });
-
-    if (wsUrl) {
-        const params = new URLSearchParams({
-            role: 'student',
-            seatCode: storage.get('code') || '',
-            source: 'clicker'
-        });
-        ws = new WebSocket(`${wsUrl}?${params.toString()}`);
-        ws.addEventListener('open', () => {
-            (async () => {
-                try {
-                    const sessionKey = `clicker::${storage.get('code') || 'unknown'}`;
-                    const r = await fetch(`${domain}/draw/session/${encodeURIComponent(sessionKey)}/strokes`);
-                    if (r.status === 200) {
-                        const j = await r.json();
-                        if (j.strokes && Array.isArray(j.strokes) && j.strokes.length) renderStrokes(j.strokes, ctx);
-                    }
-                } catch (error) {
-                    if (storage.get("developer")) {
-                        alert(`Error @ draw.js: ${error.message}`);
-                    } else {
-                        ui.reportBugModal(null, String(error.stack));
-                    }
-                    throw error;
-                }
-            })();
-        });
-    }
-
     function renderStrokes(strokes, ctx) {
         try {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -226,5 +205,82 @@ export default function initDraw(domain) {
         }
     }
 
-    return { canvas, ctx, ws };
+    try {
+        canvas.addEventListener('pointerdown', start, { passive: false });
+        canvas.addEventListener('pointermove', move, { passive: false });
+        canvas.addEventListener('pointerup', end, { passive: false });
+        canvas.addEventListener('pointerleave', end, { passive: false });
+
+        undoButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+            doUndo();
+        });
+        redoButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+            doRedo();
+        });
+        setHold(undoButton, doUndo);
+        setHold(redoButton, doRedo);
+
+        container.querySelector('[data-action="clear"]')?.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            undoStack.push({ clear: true });
+            redoStack.length = 0;
+            syncControls();
+            if (ws && (ws.readyState === WebSocket.OPEN)) ws.send(JSON.stringify({ type: 'clear' }));
+        });
+
+        if (wsUrl) {
+            const params = new URLSearchParams({
+                role: 'student',
+                seatCode: storage.get('code') || '',
+                source: 'clicker'
+            });
+            ws = new WebSocket(`${wsUrl}?${params.toString()}`);
+            ws.addEventListener('open', () => {
+                (async () => {
+                    try {
+                        const sessionKey = `clicker::${storage.get('code') || 'unknown'}`;
+                        const getStrokes = await fetch(`${domain}/draw/session/${encodeURIComponent(sessionKey)}/strokes`);
+                        if (getStrokes.status === 200) {
+                            const strokesJSON = await getStrokes.json();
+                            if (strokesJSON.strokes && Array.isArray(strokesJSON.strokes) && strokesJSON.strokes.length) {
+                                const normalized = [];
+                                strokesJSON.strokes.forEach(s => {
+                                    const st = s.stroke || s;
+                                    if (!st) return;
+                                    if (st.clear) {
+                                        normalized.length = 0;
+                                        return;
+                                    }
+                                    normalized.push(st);
+                                });
+                                undoStack = normalized.slice();
+                                redoStack.length = 0;
+                                renderStrokes(undoStack, ctx);
+                                syncControls();
+                            }
+                        }
+                        canvas.removeAttribute('disabled');
+                    } catch (error) {
+                        if (storage.get("developer")) {
+                            alert(`Error @ draw.js: ${error.message}`);
+                        } else {
+                            ui.reportBugModal(null, String(error.stack));
+                        }
+                        throw error;
+                    }
+                })();
+            });
+        }
+
+        return { canvas, ctx, ws };
+    } catch (error) {
+        if (storage.get("developer")) {
+            alert(`Error @ draw.js: ${error.message}`);
+        } else {
+            ui.reportBugModal(null, String(error.stack));
+        }
+        throw error;
+    }
 }
