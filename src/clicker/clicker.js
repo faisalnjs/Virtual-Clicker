@@ -92,6 +92,7 @@ try {
     if (document.querySelector('[data-logout]')) document.querySelector('[data-logout]').addEventListener('click', () => auth.logout(init));
     // Set default answer mode
     answerMode("input");
+    ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "input");
     document.getElementById("code-input").value = '';
     document.querySelectorAll("span.code").forEach((element) => {
       element.innerHTML = '';
@@ -457,6 +458,7 @@ try {
                       ui.reportBugModal(null, String(error.stack));
                     }
                   });
+                if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
                 storage.set("code", input);
                 init();
                 // Close all modals
@@ -481,6 +483,7 @@ try {
               ui.reportBugModal(null, String(error.stack));
             }
           });
+        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
         storage.set("code", input);
         init();
         // Update URL parameters with seat code
@@ -930,6 +933,7 @@ try {
             };
           } else {
             answerMode("input");
+            ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "input");
             const choice = item.answer.match(/^CHOICE ([A-E])$/);
             if (!choice) {
               answerInput.value = item.answer;
@@ -1046,6 +1050,9 @@ try {
       if (!drawLoaded) {
         window.__drawInstance = initDraw(domain);
         drawLoaded = true;
+      } else {
+        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
+        window.__drawInstance = initDraw(domain);
       }
       document.getElementById("submit-button").setAttribute("hidden", "");
     }
