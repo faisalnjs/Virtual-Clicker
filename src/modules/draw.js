@@ -150,7 +150,8 @@ export default function initDraw(domain) {
             syncControls();
             if (stroke && stroke.id) {
                 undoQueue.push(stroke.id);
-                if (!undoTimer) undoTimer = setTimeout(flushUndoQueue, 2000);
+                if (undoTimer) clearTimeout(undoTimer);
+                undoTimer = setTimeout(flushUndoQueue, 2000);
             }
             return true;
         } catch (error) {
@@ -167,6 +168,10 @@ export default function initDraw(domain) {
         try {
             if (!undoQueue.length) {
                 undoTimer = null;
+                return;
+            }
+            if (isDrawing) {
+                undoTimer = setTimeout(flushUndoQueue, 2000);
                 return;
             }
             if (ws && (ws.readyState === WebSocket.OPEN)) {
@@ -212,7 +217,8 @@ export default function initDraw(domain) {
         try {
             if (!stroke) return;
             sendQueue.push(stroke);
-            if (!sendTimer) sendTimer = setTimeout(flushSendQueue, 2000);
+            if (sendTimer) clearTimeout(sendTimer);
+            sendTimer = setTimeout(flushSendQueue, 2000);
         } catch (error) {
             if (storage.get("developer")) {
                 alert(`Error @ draw.js: ${error.message}`);
@@ -227,6 +233,10 @@ export default function initDraw(domain) {
         try {
             if (!sendQueue.length) {
                 sendTimer = null;
+                return;
+            }
+            if (isDrawing) {
+                sendTimer = setTimeout(flushSendQueue, 2000);
                 return;
             }
             if (ws && (ws.readyState === WebSocket.OPEN)) {
