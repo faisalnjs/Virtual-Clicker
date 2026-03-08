@@ -408,14 +408,15 @@ export default function initDraw(domain) {
             const params = new URLSearchParams({
                 role: 'student',
                 seatCode: storage.get('code') || '',
-                source: 'clicker'
+                source: 'clicker',
+                password: storage.get('password') || ''
             });
             ws = new WebSocket(`${wsUrl}?${params.toString()}`);
             ws.addEventListener('open', () => {
                 (async () => {
                     try {
                         const sessionKey = `clicker::${storage.get('code') || 'unknown'}`;
-                        const getStrokes = await fetch(`${domain}/draw/session/${encodeURIComponent(sessionKey)}/strokes`);
+                        const getStrokes = await fetch(`${domain}/draw/session/${encodeURIComponent(sessionKey)}/strokes${storage.get('password') ? `?seatCode=${encodeURIComponent(storage.get('code') || '')}&password=${encodeURIComponent(storage.get('password'))}` : ''}`);
                         if (getStrokes.status === 200) {
                             const strokesJSON = await getStrokes.json();
                             if (strokesJSON.strokes && Array.isArray(strokesJSON.strokes) && strokesJSON.strokes.length) {
