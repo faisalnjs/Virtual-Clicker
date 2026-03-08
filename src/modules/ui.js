@@ -427,7 +427,7 @@ export function view(path = "") {
   if ((path === 'api-fail') || (path === 'no-course') || (path === 'maintenance-mode')) view();
   show(document.querySelector(`[data-modal-page="${pages[0]}"]`), title, buttons);
   if (path.includes('makeup')) {
-    document.getElementById("dismiss-makeup-button").innerText = storage.get("makeUpDate") ? "Turn Off Makeup Mode" : "Dismiss";
+    document.getElementById("dismiss-makeup-button").innerText = storage.get("makeUpDate") ? "Turn Off Makeup Mode" : "Continue Anyway";
     const makeupClickButton = document.getElementById("makeup-click-button");
     const newMakeupClickButton = makeupClickButton.cloneNode(true);
     makeupClickButton.parentNode.replaceChild(newMakeupClickButton, makeupClickButton);
@@ -443,14 +443,14 @@ export function view(path = "") {
         hours = hours ? hours : 12;
         storage.set("makeUpDate", `${dateParts[1]}/${dateParts[2]}/${dateParts[0]} ${hours}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`);
         view("");
+        if (syncPushMakeUpDate) auth.syncPush("makeUpDate");
+        updateTitles();
+        stopLoader();
       } else {
         storage.set("makeUpDate", null);
         document.getElementById("date-input").classList.add("attention");
         document.getElementById("date-input").focus();
       }
-      if (syncPushMakeUpDate) auth.syncPush("makeUpDate");
-      updateTitles();
-      stopLoader();
     });
     const dismissMmakeupClickButton = document.getElementById("dismiss-makeup-button");
     const newDismissMmakeupClickButton = dismissMmakeupClickButton.cloneNode(true);

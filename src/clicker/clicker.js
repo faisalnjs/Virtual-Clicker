@@ -10,6 +10,7 @@ import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 import extendedSchedule from "/src/periods/extendedSchedule.json";
+import initDraw from '/src/modules/draw.js';
 ``;
 
 function safeParseJSON(str) {
@@ -47,8 +48,8 @@ try {
   let highestDataElement = null;
   let restoredSetType = "";
   var history = [];
-
   let historyIndex = 0;
+  var drawLoaded = false;
 
   if (!storage.get("makeUpDate")) storage.set("makeUpDate", null);
 
@@ -91,6 +92,7 @@ try {
     if (document.querySelector('[data-logout]')) document.querySelector('[data-logout]').addEventListener('click', () => auth.logout(init));
     // Set default answer mode
     answerMode("input");
+    ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "input");
     document.getElementById("code-input").value = '';
     document.querySelectorAll("span.code").forEach((element) => {
       element.innerHTML = '';
@@ -456,6 +458,7 @@ try {
                       ui.reportBugModal(null, String(error.stack));
                     }
                   });
+                if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
                 storage.set("code", input);
                 init();
                 // Close all modals
@@ -480,6 +483,7 @@ try {
               ui.reportBugModal(null, String(error.stack));
             }
           });
+        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
         storage.set("code", input);
         init();
         // Update URL parameters with seat code
@@ -494,47 +498,52 @@ try {
   // Update elements with new seat code
   async function updateCode() {
     ui.updateTitles();
-    try {
-      if (!(await auth.bulkLoad(["history"], storage.get("code"), storage.get("password")))) return;
-      await storage.idbReady;
-      const bulkLoad = (await storage.idbGet('cache')) || storage.get("cache") || {};
-      ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
-      history = bulkLoad.history || [];
-      var course = bulkLoad.course || {};
-      if (document.querySelector('.alert')) {
-        var clicker_announcement = JSON.parse(course.clicker_announcement || '{}');
-        if ((clicker_announcement.image || clicker_announcement.title || clicker_announcement.content || clicker_announcement.link) && (clicker_announcement.expires ? new Date(`${clicker_announcement.expires}T${extendedSchedule[parseInt(storage.get("code").slice(0, 1))][1]}:00`) > new Date() : true)) {
-          document.querySelector('.alert').removeAttribute('hidden');
-          document.querySelector('.alert').classList = `alert ${clicker_announcement.layout || ''}`;
-          if (clicker_announcement.image) {
-            document.querySelector('.alert img').removeAttribute('hidden');
-            document.querySelector('.alert img').src = clicker_announcement.image;
+    if (!auth.continueWithoutAPI) {
+      try {
+        if (!(await auth.bulkLoad(["history"], storage.get("code"), storage.get("password")))) return;
+        await storage.idbReady;
+        const bulkLoad = (await storage.idbGet('cache')) || storage.get("cache") || {};
+        ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
+        history = bulkLoad.history || [];
+        var course = bulkLoad.course || {};
+        if (document.querySelector('.alert')) {
+          var clicker_announcement = JSON.parse(course.clicker_announcement || '{}');
+          if ((clicker_announcement.image || clicker_announcement.title || clicker_announcement.content || clicker_announcement.link) && (clicker_announcement.expires ? new Date(`${clicker_announcement.expires}T${extendedSchedule[parseInt(storage.get("code").slice(0, 1))][1]}:00`) > new Date() : true)) {
+            document.querySelector('.alert').removeAttribute('hidden');
+            document.querySelector('.alert').classList = `alert ${clicker_announcement.layout || ''}`;
+            if (clicker_announcement.image) {
+              document.querySelector('.alert img').removeAttribute('hidden');
+              document.querySelector('.alert img').src = clicker_announcement.image;
+            } else {
+              document.querySelector('.alert img').setAttribute('hidden', '');
+            }
+            document.querySelector('.alert h3').innerText = clicker_announcement.title || 'Announcement';
+            if (clicker_announcement.content) {
+              document.querySelector('.alert p').removeAttribute('hidden');
+              document.querySelector('.alert p').innerText = clicker_announcement.content;
+            } else {
+              document.querySelector('.alert p').setAttribute('hidden', '');
+            }
+            if (clicker_announcement.link) {
+              document.querySelector('.alert button').removeAttribute('hidden');
+              document.querySelector('.alert button').innerHTML = `${clicker_announcement.linkTitle || 'Go'} <i class="bi bi-arrow-right-short"></i>`;
+              document.querySelector('.alert button').addEventListener('click', () => {
+                window.open(clicker_announcement.link, '_blank');
+              });
+            } else {
+              document.querySelector('.alert button').setAttribute('hidden', '');
+              document.querySelector('.alert button').removeEventListener('click', () => { });
+            }
           } else {
-            document.querySelector('.alert img').setAttribute('hidden', '');
+            document.querySelector('.alert').setAttribute('hidden', '');
           }
-          document.querySelector('.alert h3').innerText = clicker_announcement.title || 'Announcement';
-          if (clicker_announcement.content) {
-            document.querySelector('.alert p').removeAttribute('hidden');
-            document.querySelector('.alert p').innerText = clicker_announcement.content;
-          } else {
-            document.querySelector('.alert p').setAttribute('hidden', '');
-          }
-          if (clicker_announcement.link) {
-            document.querySelector('.alert button').removeAttribute('hidden');
-            document.querySelector('.alert button').innerHTML = `${clicker_announcement.linkTitle || 'Go'} <i class="bi bi-arrow-right-short"></i>`;
-            document.querySelector('.alert button').addEventListener('click', () => {
-              window.open(clicker_announcement.link, '_blank');
-            });
-          } else {
-            document.querySelector('.alert button').setAttribute('hidden', '');
-            document.querySelector('.alert button').removeEventListener('click', () => { });
-          }
-        } else {
-          document.querySelector('.alert').setAttribute('hidden', '');
         }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      document.querySelector('#answer-mode-selector [data-value="draw"]').remove();
+      document.querySelector('[data-answer-mode="draw"]').remove();
     }
     // Update history feed
     try {
@@ -924,6 +933,7 @@ try {
             };
           } else {
             answerMode("input");
+            ui.setButtonSelectValue(document.getElementById("answer-mode-selector"), "input");
             const choice = item.answer.match(/^CHOICE ([A-E])$/);
             if (!choice) {
               answerInput.value = item.answer;
@@ -1024,6 +1034,7 @@ try {
   document.getElementById("answer-mode-selector").addEventListener("input", (e) => {
     const mode = e.detail;
     answerMode(mode);
+    document.getElementById("submit-button").removeAttribute("hidden");
     if (mode === "input") {
       answerLabel.setAttribute("for", "answer-input");
     } else if (mode === "math") {
@@ -1034,6 +1045,16 @@ try {
       answerLabel.setAttribute("for", "matrix");
     } else if (mode === "frq") {
       answerLabel.setAttribute("for", "frq-input");
+    } else if (mode === "draw") {
+      answerLabel.setAttribute("for", "draw-input");
+      if (!drawLoaded) {
+        window.__drawInstance = initDraw(domain);
+        drawLoaded = true;
+      } else {
+        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
+        window.__drawInstance = initDraw(domain);
+      }
+      document.getElementById("submit-button").setAttribute("hidden", "");
     }
   });
 

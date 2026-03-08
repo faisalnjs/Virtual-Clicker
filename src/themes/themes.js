@@ -193,7 +193,7 @@ export async function renderStore() {
   await storage.idbReady;
   var initialTheme = storage.get("theme") || "default";
   var checks = (await storage.idbGet("cache"))?.checksCount || 0;
-  document.getElementById("controls-container")?.setAttribute('checks', checks);
+  if (!auth.continueWithoutAPI) document.getElementById("controls-container")?.setAttribute('checks', checks);
   var ownedThemes = (await storage.idbGet("cache"))?.ownedThemes || [];
   if (document.body.getAttribute('data-theme') && !ownedThemes.includes(document.body.getAttribute('data-theme')) && themes.find(theme => theme[0] === document.body.getAttribute('data-theme'))?.[3]) {
     resetTheme();
@@ -220,7 +220,7 @@ export async function renderStore() {
   const checksText = document.createElement("p");
   checksText.classList = 'checks-text';
   checksText.innerHTML = `<i class="bi bi-check2-circle"></i> You've got ${checks} Check${checks == 1 ? '' : 's'} available to spend!`;
-  store.appendChild(checksText);
+  if (!auth.continueWithoutAPI) store.appendChild(checksText);
   if (featuredTheme) {
     const promo = document.createElement("div");
     promo.classList = 'promo';
@@ -238,6 +238,8 @@ export async function renderStore() {
         promoButton.textContent = "Apply Theme";
       } else if (featuredTheme[4] && featuredTheme[4].length && !featuredTheme[4].some(t => ownedThemes.includes(t))) {
         promoButton.textContent = "Locked";
+      } else if (auth.continueWithoutAPI) {
+        promoButton.textContent = "API Offline";
       } else if (checks >= featuredTheme[3]) {
         promoButton.textContent = `Purchase for ${featuredTheme[3]} Check${featuredTheme[3] == 1 ? '' : 's'}`;
       } else {
@@ -267,7 +269,7 @@ export async function renderStore() {
             }
           });
         ui.toast(`Applied ${featuredTheme[1] || featuredTheme[0]} theme.`, 2000, "success", "bi bi-check2-circle");
-      } else {
+      } else if (!auth.continueWithoutAPI) {
         if (featuredTheme[4] && featuredTheme[4].length && !featuredTheme[4].some(t => ownedThemes.includes(t))) {
           ui.toast(`Cannot purchase ${featuredTheme[1] || featuredTheme[0]} theme. Missing required themes: ${featuredTheme[4].map(t => themes.find(th => th[0] == t)[1] || t).join(', ')}.`, 4000, "error", "bi bi-exclamation-triangle-fill");
           return;
@@ -360,6 +362,8 @@ export async function renderStore() {
         themeButton.textContent = "Apply Now";
       } else if (theme[4] && theme[4].length && !theme[4].some(t => ownedThemes.includes(t))) {
         themeButton.textContent = "Locked";
+      } else if (auth.continueWithoutAPI) {
+        themeButton.textContent = "API Offline";
       } else if (checks >= theme[3]) {
         themeButton.textContent = `Purchase for ${theme[3]} Check${theme[3] == 1 ? '' : 's'}`;
       } else {
@@ -390,7 +394,7 @@ export async function renderStore() {
             }
           });
         ui.toast(`Applied ${name} theme.`, 2000, "success", "bi bi-check2-circle");
-      } else {
+      } else if (!auth.continueWithoutAPI) {
         if (theme[4] && theme[4].length && !theme[4].some(t => ownedThemes.includes(t))) {
           ui.toast(`Cannot purchase ${name} theme. Missing required themes: ${theme[4].map(t => themes.find(th => th[0] == t)[1] || t).join(', ')}.`, 4000, "error", "bi bi-exclamation-triangle-fill");
           return;
@@ -479,6 +483,17 @@ export async function renderStore() {
   costInfo.classList = 'cost-info';
   costInfo.innerHTML = `<i class="bi bi-info-circle"></i> Information<li>Checks can be obtained by responding to a question correctly, at any time.</li><li>Checks conversion rate is 1 Check to 1 correct answer.</li><li>Checks may only be obtained on the Virtual Checker platform.</li><li>If your response is marked correct late, you will get your Checks at that time.</li><li>If your response is falsely marked as correct and later marked incorrect, your Checks balance will be deducted from.</li><li>The minimum Checks balance is 0.</li><li>Themes marked as "Free" can be applied without spending any Checks.</li><li>Premium themes require you to spend your available Checks to unlock and use them.</li><li>Themes that have requirements need you to own the specified themes before you can purchase them.</li><li>HD themes may require more resources to run smoothly, and cost more Checks.</li><li>All theme images are licensed Free To Use.</li><li>The cost for themes are based on average student correct answer data.</li>`;
   store.appendChild(costInfo);
+}
+
+export function getCurrentTheme() {
+  return {
+    textColor: getComputedStyle(document.body).getPropertyValue("--text-color").trim(),
+    backgroundColor: getComputedStyle(document.body).getPropertyValue("--background-color").trim(),
+    surfaceColor: getComputedStyle(document.body).getPropertyValue("--surface-color").trim(),
+    accentColor: getComputedStyle(document.body).getPropertyValue("--accent-color").trim(),
+    accentTextColor: getComputedStyle(document.body).getPropertyValue("--accent-text-color").trim(),
+    errorColor: getComputedStyle(document.body).getPropertyValue("--error-color").trim(),
+  }
 }
 
 try {
