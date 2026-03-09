@@ -600,7 +600,7 @@ try {
       ]);
     }
     // Render Theme Store
-    themes.renderStore()
+    themes.renderStore(domain)
       .catch(error => {
         if (storage.get("developer")) {
           alert(`Error @ clicker.js: ${error.message}`);

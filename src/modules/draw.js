@@ -448,18 +448,14 @@ export default function initDraw(domain) {
                     }
                 })();
             });
-            ws.on('message', (data) => {
+            ws.on('resetPeriod', (data) => {
                 try {
                     const parsed = (typeof data === 'string') ? JSON.parse(data) : data;
-                    if (parsed && (parsed.type === 'resetPeriod')) {
-                        const period = String(parsed.period);
-                        const myCode = String(storage.get('code') || '');
-                        if (myCode.startsWith(period)) {
-                            context.clearRect(0, 0, canvas.width, canvas.height);
-                            undoStack.length = 0;
-                            redoStack.length = 0;
-                            syncControls();
-                        }
+                    if (parsed && String(storage.get('code') || '').startsWith(String(parsed.period))) {
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        undoStack.length = 0;
+                        redoStack.length = 0;
+                        syncControls();
                     }
                 } catch (error) {
                     if (storage.get("developer")) {
