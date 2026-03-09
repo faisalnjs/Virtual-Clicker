@@ -1,6 +1,7 @@
 import * as ui from "/src/modules/ui.js";
 import storage from '/src/modules/storage.js';
 import * as themes from '/src/themes/themes.js';
+import { io } from 'socket.io-client';
 
 export default function initDraw(domain) {
     const wsUrl = `${domain.replace('http', 'ws')}/ws`;
@@ -174,12 +175,12 @@ export default function initDraw(domain) {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
                 return;
             }
-            if (ws && (ws.readyState === WebSocket.OPEN)) {
+            if (ws && ws.connected) {
                 const toSend = undoQueue.slice();
                 undoQueue = [];
                 undoTimer = null;
                 toSend.forEach(id => {
-                    ws.send(JSON.stringify({ type: 'undo', strokeId: id }));
+                    ws.emit('message', { type: 'undo', strokeId: id });
                 });
             } else {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
@@ -239,12 +240,12 @@ export default function initDraw(domain) {
                 sendTimer = setTimeout(flushSendQueue, 2000);
                 return;
             }
-            if (ws && (ws.readyState === WebSocket.OPEN)) {
+            if (ws && ws.connected) {
                 const toSend = sendQueue.slice();
                 sendQueue = [];
                 sendTimer = null;
                 toSend.forEach(st => {
-                    ws.send(JSON.stringify({ type: 'draw', stroke: st }));
+                    ws.emit('message', { type: 'draw', stroke: st });
                 });
             } else {
                 sendTimer = setTimeout(flushSendQueue, 2000);
@@ -401,18 +402,18 @@ export default function initDraw(domain) {
             undoStack.push({ clear: true });
             redoStack.length = 0;
             syncControls();
-            if (ws && (ws.readyState === WebSocket.OPEN)) ws.send(JSON.stringify({ type: 'clear' }));
+            if (ws && ws.connected) ws.emit('message', { type: 'clear' });
         });
 
-        if (wsUrl) {
+        if (wsUrl && typeof io !== 'undefined') {
             const params = new URLSearchParams({
                 role: 'student',
                 seatCode: storage.get('code') || '',
                 source: 'clicker',
                 password: storage.get('password') || ''
             });
-            ws = new WebSocket(`${wsUrl}?${params.toString()}`);
-            ws.addEventListener('open', () => {
+            ws = io(`${wsUrl}`, { query: Object.fromEntries(params), transports: ['websocket'] });
+            ws.on('connect', () => {
                 (async () => {
                     try {
                         const sessionKey = `clicker::${storage.get('code') || 'unknown'}`;
@@ -447,11 +448,11 @@ export default function initDraw(domain) {
                     }
                 })();
             });
-            ws.addEventListener('message', (e) => {
+            ws.on('message', (data) => {
                 try {
-                    const data = JSON.parse(e.data);
-                    if (data && (data.type === 'resetPeriod')) {
-                        const period = String(data.period);
+                    const parsed = (typeof data === 'string') ? JSON.parse(data) : data;
+                    if (parsed && (parsed.type === 'resetPeriod')) {
+                        const period = String(parsed.period);
                         const myCode = String(storage.get('code') || '');
                         if (myCode.startsWith(period)) {
                             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -472,7 +473,7 @@ export default function initDraw(domain) {
         }
 
         let destroy = function () {
-            if (ws && (ws.readyState === WebSocket.OPEN)) ws.close();
+            if (ws && ws.connected) try { ws.disconnect(); } catch (e) { console.warn('draw ws.disconnect failed', e); }
             if (sendTimer) {
                 clearTimeout(sendTimer);
                 sendTimer = null;
