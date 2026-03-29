@@ -626,3 +626,9 @@ body:has(.topbar) {
 [data-manual-reset-cache] {
   margin-top: 10px;
 }
+
+canvas[disabled] {
+  cursor: not-allowed;
+  opacity: 0.75;
+  pointer-events: none;
+}

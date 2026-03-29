@@ -2,9 +2,10 @@ import * as ui from "./ui.js";
 import storage from "./storage.js";
 import * as themes from "../themes/themes.js";
 
-const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? 'https://api.check.vssfalcons.com' : `http://${document.domain}:5000`;
+const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}api.check.vssfalcons.com` : `http://${document.domain}:5000`;
 
 var hasPassword = false;
+export var continueWithoutAPI = false;
 
 function sortKeys(obj) {
     return Object.keys(obj).sort().reduce((acc, key) => {
@@ -60,6 +61,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
         if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
         const continueWithoutAPIButton = document.getElementById("continue-without-api");
         continueWithoutAPIButton.addEventListener("click", () => {
+            continueWithoutAPI = true;
             ui.view();
             returnFunction();
             const newContinueWithoutAPIButton = continueWithoutAPIButton.cloneNode(true);
