@@ -181,9 +181,7 @@ export default function initDraw(domain) {
                 const toSend = undoQueue.slice();
                 undoQueue = [];
                 undoTimer = null;
-                toSend.forEach(id => {
-                    broadcaster.sendQuiet({ type: 'undo', source: 'clicker', strokeId: id });
-                });
+                broadcaster.sendQuiet({ type: 'undo', source: 'clicker', strokes: toSend });
             } else {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
             }
