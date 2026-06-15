@@ -1,11 +1,10 @@
 import * as ui from "/src/modules/ui.js";
 import storage from '/src/modules/storage.js';
 import * as themes from '/src/themes/themes.js';
-import { io } from 'socket.io-client';
+import HTTPSockClient from 'httpsock/client.mjs';
+import HTTPSockBroadcast from 'httpsock/broadcast.mjs';
 
 export default function initDraw(domain) {
-    const wsUrl = `${domain.replace('http', 'ws')}/ws`;
-    var ws = null;
     var isDrawing = false;
     var lastStroke = null;
     var undoStack = [];
@@ -14,6 +13,8 @@ export default function initDraw(domain) {
     var sendTimer = null;
     var undoQueue = [];
     var undoTimer = null;
+    var client = null;
+    var broadcaster = null;
 
     const container = document.querySelector('[data-answer-mode="draw"]');
     const undoButton = container.querySelector('[data-action="undo"]');
@@ -175,12 +176,12 @@ export default function initDraw(domain) {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
                 return;
             }
-            if (ws && ws.connected) {
+            if (broadcaster && broadcaster.connected) {
                 const toSend = undoQueue.slice();
                 undoQueue = [];
                 undoTimer = null;
                 toSend.forEach(id => {
-                    ws.emit('message', { type: 'undo', strokeId: id });
+                    broadcaster.sendQuiet({ type: 'undo', source: 'clicker', strokeId: id });
                 });
             } else {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
@@ -240,13 +241,11 @@ export default function initDraw(domain) {
                 sendTimer = setTimeout(flushSendQueue, 2000);
                 return;
             }
-            if (ws && ws.connected) {
+            if (broadcaster && broadcaster.connected) {
                 const toSend = sendQueue.slice();
                 sendQueue = [];
                 sendTimer = null;
-                toSend.forEach(st => {
-                    ws.emit('message', { type: 'draw', stroke: st });
-                });
+                broadcaster.sendQuiet({ type: 'draw', source: 'clicker', strokes: toSend });
             } else {
                 sendTimer = setTimeout(flushSendQueue, 2000);
             }
@@ -380,6 +379,108 @@ export default function initDraw(domain) {
         }
     }
 
+    function messageHandler(data) {
+        console.log(data)
+        switch (data.type) {
+            case 'welcome':
+                console.log('🟢 Connected to Live Drawings server!');
+                (async () => {
+                    try {
+                        if (data.strokes && Array.isArray(data.strokes) && data.strokes.length) {
+                            const normalized = [];
+                            data.strokes.forEach(s => {
+                                var st = s.stroke || s;
+                                if (!st) return;
+                                try {
+                                    if (typeof st === 'string') {
+                                        const parsed = JSON.parse(st);
+                                        if (!parsed || (typeof parsed !== 'object')) return;
+                                        st = parsed;
+                                    }
+                                } catch (e) {
+                                    return;
+                                }
+                                if (st.clear) {
+                                    normalized.length = 0;
+                                    return;
+                                }
+                                normalized.push(st);
+                            });
+                            undoStack = normalized.slice();
+                            redoStack.length = 0;
+                            renderStrokes(undoStack, context);
+                            syncControls();
+                        }
+                        canvas.removeAttribute('disabled');
+                    } catch (error) {
+                        if (storage.get("developer")) {
+                            alert(`Error @ draw.js: ${error.message}`);
+                        } else {
+                            ui.reportBugModal(null, String(error.stack));
+                        }
+                        throw error;
+                    }
+                })();
+
+                broadcaster = new HTTPSockBroadcast({
+                    server: `${domain}/${storage.get('code')[0]}`,
+                    cert: './certs/chain.pem',
+                    auth: {
+                        username: storage.get('code') || '',
+                        password: storage.get('password') || ''
+                    },
+                    callback: () => { },
+                    close: streamClosed,
+                    error: streamClosed
+                });
+
+                broadcaster.sendQuiet({ type: 'message', message: `${storage.get('code') || ''} has joined` });
+                break;
+            case 'clear':
+                try {
+                    const parsed = (typeof data === 'string') ? JSON.parse(data) : data;
+                    if (parsed && String(storage.get('code') || '').startsWith(String(parsed.period))) {
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        undoStack.length = 0;
+                        redoStack.length = 0;
+                        syncControls();
+                    }
+                } catch (error) {
+                    if (storage.get("developer")) {
+                        alert(`Error @ draw.js: ${error.message}`);
+                    } else {
+                        ui.reportBugModal(null, String(error.stack));
+                    }
+                    throw error;
+                }
+                break;
+            case 'message':
+                if (!data.message) break;
+                var icon = 'bi bi-info-circle';
+                var type = 'info';
+                if (data.message.toLowerCase().includes('error')) {
+                    icon = 'bi bi-x-circle';
+                    type = 'error';
+                } else if (data.message.toLowerCase().includes('success')) {
+                    icon = 'bi bi-check-circle';
+                    type = 'success';
+                } else if (data.message.toLowerCase().includes('save')) {
+                    icon = 'bi bi-floppy';
+                    type = 'success';
+                } else if (data.message.toLowerCase().includes('clear')) {
+                    icon = 'bi bi-eraser';
+                    type = 'success';
+                }
+                if (data.message) ui.toast(data.message, 5000, type, icon);
+                break;
+        }
+    }
+
+    function streamClosed() {
+        ui.startLoader();
+        location.reload();
+    }
+
     try {
         canvas.addEventListener('pointerdown', start, { passive: false });
         canvas.addEventListener('pointermove', move, { passive: false });
@@ -402,74 +503,29 @@ export default function initDraw(domain) {
             undoStack.push({ clear: true });
             redoStack.length = 0;
             syncControls();
-            if (ws && ws.connected) ws.emit('message', { type: 'clear' });
+            if (broadcaster && broadcaster.connected) broadcaster.sendQuiet({ type: 'clear', source: 'clicker' });
         });
 
-        if (wsUrl && typeof io !== 'undefined') {
-            const params = new URLSearchParams({
-                role: 'student',
-                seatCode: storage.get('code') || '',
-                source: 'clicker',
+        client = new HTTPSockClient({
+            server: `${domain}/${storage.get('code')[0]}`,
+            cert: './certs/chain.pem',
+            auth: {
+                username: storage.get('code') || '',
                 password: storage.get('password') || ''
-            });
-            ws = io(`${wsUrl}`, { query: Object.fromEntries(params), transports: ['websocket'] });
-            ws.on('connect', () => {
-                (async () => {
-                    try {
-                        const sessionKey = `clicker::${storage.get('code') || 'unknown'}`;
-                        const getStrokes = await fetch(`${domain}/draw/session/${encodeURIComponent(sessionKey)}/strokes${storage.get('password') ? `?seatCode=${encodeURIComponent(storage.get('code') || '')}&password=${encodeURIComponent(storage.get('password'))}` : ''}`);
-                        if (getStrokes.status === 200) {
-                            const strokesJSON = await getStrokes.json();
-                            if (strokesJSON.strokes && Array.isArray(strokesJSON.strokes) && strokesJSON.strokes.length) {
-                                const normalized = [];
-                                strokesJSON.strokes.forEach(s => {
-                                    const st = s.stroke || s;
-                                    if (!st) return;
-                                    if (st.clear) {
-                                        normalized.length = 0;
-                                        return;
-                                    }
-                                    normalized.push(st);
-                                });
-                                undoStack = normalized.slice();
-                                redoStack.length = 0;
-                                renderStrokes(undoStack, context);
-                                syncControls();
-                            }
-                        }
-                        canvas.removeAttribute('disabled');
-                    } catch (error) {
-                        if (storage.get("developer")) {
-                            alert(`Error @ draw.js: ${error.message}`);
-                        } else {
-                            ui.reportBugModal(null, String(error.stack));
-                        }
-                        throw error;
-                    }
-                })();
-            });
-            ws.on('resetPeriod', (data) => {
-                try {
-                    const parsed = (typeof data === 'string') ? JSON.parse(data) : data;
-                    if (parsed && String(storage.get('code') || '').startsWith(String(parsed.period))) {
-                        context.clearRect(0, 0, canvas.width, canvas.height);
-                        undoStack.length = 0;
-                        redoStack.length = 0;
-                        syncControls();
-                    }
-                } catch (error) {
-                    if (storage.get("developer")) {
-                        alert(`Error @ draw.js: ${error.message}`);
-                    } else {
-                        ui.reportBugModal(null, String(error.stack));
-                    }
-                    throw error;
-                }
-            });
-        }
+            },
+            callback: messageHandler,
+            close: streamClosed,
+            error: streamClosed
+        });
+
+        client.stream();
 
         let destroy = function () {
-            if (ws && ws.connected) try { ws.disconnect(); } catch (e) { console.warn('draw ws.disconnect failed', e); }
+            if (client && client.connected) try {
+                client.stop();
+            } catch (e) {
+                console.warn('draw destroy failed', e);
+            }
             if (sendTimer) {
                 clearTimeout(sendTimer);
                 sendTimer = null;
@@ -482,7 +538,7 @@ export default function initDraw(domain) {
             if (redoButton && redoButton._removeHold) redoButton._removeHold();
         };
 
-        return { canvas, context: context, ws, destroy, _sendQueueSize: () => sendQueue.length };
+        return { canvas, context: context, client, broadcaster, destroy, _sendQueueSize: () => sendQueue.length };
     } catch (error) {
         if (storage.get("developer")) {
             alert(`Error @ draw.js: ${error.message}`);
