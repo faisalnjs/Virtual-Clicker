@@ -15,6 +15,7 @@ export default function initDraw(domain) {
     var undoTimer = null;
     var client = null;
     var broadcaster = null;
+    var canvasIsClear = true;
 
     const container = document.querySelector('[data-answer-mode="draw"]');
     const undoButton = container.querySelector('[data-action="undo"]');
@@ -353,14 +354,16 @@ export default function initDraw(domain) {
     function renderStrokes(strokes, context) {
         try {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            strokes.forEach(s => {
+            for (var s of strokes) {
                 const stroke = s.stroke || s;
                 if (!stroke) return;
                 if (stroke.clear) {
                     context.clearRect(0, 0, canvas.width, canvas.height);
+                    canvasIsClear = true;
                     return;
                 }
                 if (stroke.from && stroke.to) {
+                    canvasIsClear = false;
                     context.beginPath();
                     context.moveTo(stroke.from.x, stroke.from.y);
                     context.lineTo(stroke.to.x, stroke.to.y);
@@ -368,7 +371,8 @@ export default function initDraw(domain) {
                     context.strokeStyle = themes.getCurrentTheme().textColor;
                     context.stroke();
                 }
-            });
+            }
+            if (canvasIsClear) container.querySelector('[data-action="clear"]')?.setAttribute('disabled', 'disabled');
         } catch (error) {
             if (storage.get("developer")) {
                 alert(`Error @ draw.js: ${error.message}`);
@@ -380,7 +384,7 @@ export default function initDraw(domain) {
     }
 
     function messageHandler(data) {
-        console.log(data)
+        console.log(data);
         switch (data.type) {
             case 'welcome':
                 console.log('🟢 Connected to Live Drawings server!');
@@ -445,6 +449,7 @@ export default function initDraw(domain) {
                         redoStack.length = 0;
                         syncControls();
                     }
+                    canvasIsClear = true;
                 } catch (error) {
                     if (storage.get("developer")) {
                         alert(`Error @ draw.js: ${error.message}`);
@@ -504,6 +509,8 @@ export default function initDraw(domain) {
             redoStack.length = 0;
             syncControls();
             if (broadcaster && broadcaster.connected) broadcaster.sendQuiet({ type: 'clear', source: 'clicker' });
+            canvasIsClear = true;
+            container.querySelector('[data-action="clear"]').setAttribute('disabled', 'disabled');
         });
 
         client = new HTTPSockClient({
