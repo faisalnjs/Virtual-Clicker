@@ -1245,6 +1245,11 @@ try {
     if (document.querySelector("[data-add-matrix-row]")) document.querySelector("[data-add-matrix-row]").addEventListener("click", addRow);
     if (document.querySelector("[data-remove-matrix-row]")) document.querySelector("[data-remove-matrix-row]").addEventListener("click", removeRow);
   }
+
+  document.querySelector('.live-drawings-reconnect').onclick = () => {
+    window.__drawInstance?.destroy();
+    window.__drawInstance = initDraw(HTTPSockServerDomain);
+  }
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ clicker.js: ${error.message}`);

@@ -18,9 +18,11 @@ export default function initDraw(domain) {
     var canvasIsClear = true;
 
     const container = document.querySelector('[data-answer-mode="draw"]');
+    if (!container) return null;
     const undoButton = container.querySelector('[data-action="undo"]');
     const redoButton = container.querySelector('[data-action="redo"]');
-    if (!container) return null;
+    const clearButton = container.querySelector('[data-action="clear"]');
+    const savedIcon = container.querySelector('.bi-floppy');
 
     const canvas = container.querySelector('canvas');
     canvas.style.width = '100%';
@@ -36,6 +38,12 @@ export default function initDraw(domain) {
     context.lineWidth = 3;
     context.lineCap = 'round';
     context.strokeStyle = themes.getCurrentTheme().textColor;
+
+    const reconnect = document.querySelector('.live-drawings-reconnect');
+    reconnect.classList.remove('active');
+    if (undoButton) undoButton.disabled = true;
+    if (redoButton) redoButton.disabled = true;
+    if (clearButton) clearButton.disabled = true;
 
     function currentPosition(e) {
         try {
@@ -81,6 +89,8 @@ export default function initDraw(domain) {
         try {
             if (!isDrawing) return;
             e.preventDefault();
+            canvasIsClear = false;
+            savedIcon.classList.remove('active');
 
             const position = currentPosition(e);
             context.beginPath();
@@ -127,10 +137,10 @@ export default function initDraw(domain) {
 
     function syncControls() {
         try {
-            if (!undoStack.length && !redoStack.length) {
-                container.querySelector('[data-action="clear"]')?.setAttribute('disabled', 'disabled');
+            if (canvasIsClear) {
+                clearButton?.setAttribute('disabled', 'disabled');
             } else {
-                container.querySelector('[data-action="clear"]')?.removeAttribute('disabled');
+                clearButton?.removeAttribute('disabled');
             }
         } catch (error) {
             if (storage.get("developer")) {
@@ -145,6 +155,7 @@ export default function initDraw(domain) {
     function doUndo() {
         try {
             if (!undoStack.length) return false;
+            savedIcon.classList.remove('active');
             const stroke = undoStack.pop();
             redoStack.push(stroke);
             renderStrokes(undoStack, context);
@@ -175,6 +186,7 @@ export default function initDraw(domain) {
                 undoTimer = setTimeout(flushUndoQueue, 2000);
                 return;
             }
+            if (canvasIsClear) return;
             if (broadcaster && broadcaster.connected) {
                 const toSend = undoQueue.slice();
                 undoQueue = [];
@@ -196,6 +208,7 @@ export default function initDraw(domain) {
     function doRedo() {
         try {
             if (!redoStack.length) return false;
+            savedIcon.classList.remove('active');
             const stroke = redoStack.pop();
             undoStack.push(stroke);
             renderStrokes(undoStack, context);
@@ -238,6 +251,7 @@ export default function initDraw(domain) {
                 sendTimer = setTimeout(flushSendQueue, 2000);
                 return;
             }
+            if (canvasIsClear) return;
             if (broadcaster && broadcaster.connected) {
                 const toSend = sendQueue.slice();
                 sendQueue = [];
@@ -368,7 +382,8 @@ export default function initDraw(domain) {
                     context.stroke();
                 }
             }
-            if (canvasIsClear) container.querySelector('[data-action="clear"]')?.setAttribute('disabled', 'disabled');
+            if (strokes[strokes.length - 1] && (!strokes[strokes.length - 1].clear && undoButton)) undoButton.disabled = false;
+            if (canvasIsClear) clearButton?.setAttribute('disabled', 'disabled');
         } catch (error) {
             if (storage.get("developer")) {
                 alert(`Error @ draw.js: ${error.message}`);
@@ -380,7 +395,7 @@ export default function initDraw(domain) {
     }
 
     function messageHandler(data) {
-        console.log(data);
+        // console.log(data);
         switch (data.type) {
             case 'welcome':
                 console.log('🟢 Connected to Live Drawings server!');
@@ -435,17 +450,13 @@ export default function initDraw(domain) {
                 });
 
                 broadcaster.sendQuiet({ type: 'message', message: `${storage.get('code') || ''} has joined` });
+
+                reconnect.classList.remove('active');
                 break;
             case 'clear':
                 try {
                     const parsed = (typeof data === 'string') ? JSON.parse(data) : data;
-                    if (parsed && String(storage.get('code') || '').startsWith(String(parsed.period))) {
-                        context.clearRect(0, 0, canvas.width, canvas.height);
-                        undoStack.length = 0;
-                        redoStack.length = 0;
-                        syncControls();
-                    }
-                    canvasIsClear = true;
+                    if (parsed && String(storage.get('code') || '').startsWith(String(parsed.period))) clearCanvas(true);
                 } catch (error) {
                     if (storage.get("developer")) {
                         alert(`Error @ draw.js: ${error.message}`);
@@ -468,11 +479,17 @@ export default function initDraw(domain) {
                 } else if (data.message.toLowerCase().includes('save')) {
                     icon = 'bi bi-floppy';
                     type = 'success';
+                    canvasIsClear = false;
                     if (undoButton) undoButton.disabled = !undoStack.length;
                     if (redoButton) redoButton.disabled = !redoStack.length;
+                    if (clearButton) clearButton.disabled = !undoStack.length;
+                    savedIcon.classList.add('active');
+                    break;
                 } else if (data.message.toLowerCase().includes('clear')) {
                     icon = 'bi bi-eraser';
                     type = 'success';
+                    if (undoButton) undoButton.disabled = !undoStack.length;
+                    if (redoButton) redoButton.disabled = !redoStack.length;
                 }
                 if (data.message) ui.toast(data.message, 5000, type, icon);
                 break;
@@ -480,8 +497,23 @@ export default function initDraw(domain) {
     }
 
     function streamClosed() {
-        ui.startLoader();
-        location.reload();
+        reconnect.classList.add('active');
+        canvas.setAttribute('disabled', 'disabled');
+    }
+
+    function clearCanvas(silent = false) {
+        clearButton.setAttribute('disabled', 'disabled');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        canvasIsClear = true;
+        undoStack = [];
+        redoStack = [];
+        sendQueue = [];
+        undoTimer = null;
+        sendTimer = null;
+        syncControls();
+        if (!silent && broadcaster && broadcaster.connected) broadcaster.sendQuiet({ type: 'clear', source: 'clicker' });
+        if (undoButton) undoButton.setAttribute('disabled', 'disabled');
+        if (redoButton) redoButton.setAttribute('disabled', 'disabled');
     }
 
     try {
@@ -490,26 +522,23 @@ export default function initDraw(domain) {
         canvas.addEventListener('pointerup', end, { passive: false });
         canvas.addEventListener('pointerleave', end, { passive: false });
 
-        undoButton?.addEventListener('click', (e) => {
+        const undoButtonHandler = (e) => {
             e.preventDefault();
             doUndo();
-        });
-        redoButton?.addEventListener('click', (e) => {
+        };
+        const redoButtonHandler = (e) => {
             e.preventDefault();
             doRedo();
-        });
+        };
+        const clearButtonHandler = (e) => {
+            e.preventDefault();
+            clearCanvas();
+        };
+        undoButton?.addEventListener('click', undoButtonHandler);
+        redoButton?.addEventListener('click', redoButtonHandler);
         undoButton._removeHold = setHold(undoButton, doUndo);
         redoButton._removeHold = setHold(redoButton, doRedo);
-
-        container.querySelector('[data-action="clear"]')?.addEventListener('click', () => {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            undoStack.push({ clear: true });
-            redoStack.length = 0;
-            syncControls();
-            if (broadcaster && broadcaster.connected) broadcaster.sendQuiet({ type: 'clear', source: 'clicker' });
-            canvasIsClear = true;
-            container.querySelector('[data-action="clear"]').setAttribute('disabled', 'disabled');
-        });
+        clearButton?.addEventListener('click', clearButtonHandler);
 
         client = new HTTPSockClient({
             server: `${domain}/${storage.get('code')[0]}`,
@@ -539,8 +568,12 @@ export default function initDraw(domain) {
             canvas.removeEventListener('pointermove', move, { passive: false });
             canvas.removeEventListener('pointerup', end, { passive: false });
             canvas.removeEventListener('pointerleave', end, { passive: false });
+            undoButton?.removeEventListener('click', undoButtonHandler);
+            redoButton?.removeEventListener('click', redoButtonHandler);
+            clearButton?.removeEventListener('click', clearButtonHandler);
             if (undoButton && undoButton._removeHold) undoButton._removeHold();
             if (redoButton && redoButton._removeHold) redoButton._removeHold();
+            reconnect.classList.add('active');
         };
 
         return { canvas, context: context, client, broadcaster, destroy, _sendQueueSize: () => sendQueue.length };
