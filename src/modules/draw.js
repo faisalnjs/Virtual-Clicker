@@ -127,8 +127,6 @@ export default function initDraw(domain) {
 
     function syncControls() {
         try {
-            if (undoButton) undoButton.disabled = !undoStack.length;
-            if (redoButton) redoButton.disabled = !redoStack.length;
             if (!undoStack.length && !redoStack.length) {
                 container.querySelector('[data-action="clear"]')?.setAttribute('disabled', 'disabled');
             } else {
@@ -470,6 +468,8 @@ export default function initDraw(domain) {
                 } else if (data.message.toLowerCase().includes('save')) {
                     icon = 'bi bi-floppy';
                     type = 'success';
+                    if (undoButton) undoButton.disabled = !undoStack.length;
+                    if (redoButton) redoButton.disabled = !redoStack.length;
                 } else if (data.message.toLowerCase().includes('clear')) {
                     icon = 'bi bi-eraser';
                     type = 'success';
