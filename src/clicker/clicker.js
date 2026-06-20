@@ -32,7 +32,7 @@ function safeParseJSON(str) {
 
 try {
   const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}api.check.vssfalcons.com` : `http://${document.domain}:5000`;
-  const HTTPSockServerDomain = ((window.location.hostname.search('check') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}ws.api.check.vssfalcons.com` : `http://${document.domain}:1234`;
+  const HTTPSockServerDomain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}ws.api.check.vssfalcons.com` : `http://${document.domain}:1234`;
   var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
