@@ -9,7 +9,7 @@ import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
 import Element from "/src/modules/element.js";
-import initDraw from '/src/modules/draw.js';
+import * as draw from '/src/modules/draw.js';
 
 let selectedTheme = "";
 const defaultTheme = {
@@ -235,7 +235,7 @@ export async function renderStore(domain) {
     promoButton.addEventListener("mouseover", () => {
       initialTheme = document.body.getAttribute('data-theme') || '';
       document.body.setAttribute('data-theme', featuredTheme[0] || '');
-      initDraw(domain);
+      draw.updateTheme();
       if (ownedThemes.includes(featuredTheme[0]) || !featuredTheme[3]) {
         promoButton.textContent = "Apply Theme";
       } else if (featuredTheme[4] && featuredTheme[4].length && !featuredTheme[4].some(t => ownedThemes.includes(t))) {
@@ -250,7 +250,7 @@ export async function renderStore(domain) {
     });
     promoButton.addEventListener("mouseout", () => {
       document.body.setAttribute('data-theme', initialTheme);
-      initDraw(domain);
+      draw.updateTheme();
       promoButton.textContent = ownedThemes.includes(featuredTheme[0]) ? "Owned" : "Preview Theme";
     });
     promoButton.addEventListener("click", async () => {
@@ -258,7 +258,7 @@ export async function renderStore(domain) {
         initialTheme = featuredTheme[0];
         storage.set("theme", featuredTheme[0]);
         document.body.setAttribute('data-theme', featuredTheme[0]);
-        initDraw(domain);
+        draw.updateTheme();
         Array.from(store.querySelectorAll('.theme-item.selected')).forEach(el => el.classList.remove('selected'));
         Array.from(store.querySelectorAll(`.theme-item[data-theme="${featuredTheme[0]}"]`)).forEach(el => el.classList.add('selected'));
         Array.from(store.querySelectorAll('.theme-item button')).forEach(btn => {
@@ -317,7 +317,7 @@ export async function renderStore(domain) {
                   checksText.innerHTML = `<i class="bi bi-check2-circle"></i> You've got ${cache.checksCount} Check${(cache.checksCount == 1) ? '' : 's'} available to spend!`;
                   storage.set("theme", featuredTheme[0]);
                   document.body.setAttribute('data-theme', featuredTheme[0]);
-                  initDraw(domain);
+                  draw.updateTheme();
                   await auth.syncPush("theme")
                     .catch(error => {
                       if (storage.get("developer")) {
@@ -361,7 +361,7 @@ export async function renderStore(domain) {
     themeButton.addEventListener("mouseover", () => {
       initialTheme = document.body.getAttribute('data-theme') || '';
       document.body.setAttribute('data-theme', theme[0] || '');
-      initDraw(domain);
+      draw.updateTheme();
       if (themeItem.classList.contains('selected')) {
         themeButton.textContent = "Applied";
       } else if (ownedThemes.includes(theme[0]) || !theme[3]) {
@@ -378,7 +378,7 @@ export async function renderStore(domain) {
     });
     themeButton.addEventListener("mouseout", () => {
       document.body.setAttribute('data-theme', initialTheme);
-      initDraw(domain);
+      draw.updateTheme();
       themeButton.textContent = themeItem.classList.contains('selected') ? "Applied" : (ownedThemes.includes(theme[0]) ? "Owned" : "Preview");
     });
     themeButton.addEventListener("click", async () => {
@@ -387,7 +387,7 @@ export async function renderStore(domain) {
         initialTheme = theme[0];
         storage.set("theme", theme[0]);
         document.body.setAttribute('data-theme', theme[0]);
-        initDraw(domain);
+        draw.updateTheme();
         Array.from(store.querySelectorAll('.theme-item.selected')).forEach(el => el.classList.remove('selected'));
         themeItem.classList.add('selected');
         Array.from(store.querySelectorAll('.theme-item button')).forEach(btn => {
@@ -446,7 +446,7 @@ export async function renderStore(domain) {
                   checksText.innerHTML = `<i class="bi bi-check2-circle"></i> You've got ${cache.checksCount} Check${(cache.checksCount == 1) ? '' : 's'} available to spend!`;
                   storage.set("theme", theme[0]);
                   document.body.setAttribute('data-theme', theme[0]);
-                  initDraw(domain);
+                  draw.updateTheme();
                   await auth.syncPush("theme")
                     .catch(error => {
                       if (storage.get("developer")) {

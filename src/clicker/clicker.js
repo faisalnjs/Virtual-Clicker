@@ -10,7 +10,7 @@ import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 import extendedSchedule from "/src/periods/extendedSchedule.json";
-import initDraw from '/src/modules/draw.js';
+import * as draw from '/src/modules/draw.js';
 ``;
 
 function safeParseJSON(str) {
@@ -1048,14 +1048,12 @@ try {
       answerLabel.setAttribute("for", "frq-input");
     } else if (mode === "draw") {
       answerLabel.setAttribute("for", "draw-input");
-      if (!drawLoaded) {
-        window.__drawInstance = initDraw(HTTPSockServerDomain);
-        drawLoaded = true;
-      } else {
-        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
-        window.__drawInstance = initDraw(HTTPSockServerDomain);
-      }
+      draw.connect(HTTPSockServerDomain);
       document.getElementById("submit-button").setAttribute("hidden", "");
+    }
+    if ((mode !== "draw") && drawLoaded) {
+      draw.close();
+      drawLoaded = false;
     }
   });
 
@@ -1244,11 +1242,6 @@ try {
     if (document.querySelector("[data-remove-matrix-column]")) document.querySelector("[data-remove-matrix-column]").addEventListener("click", removeColumn);
     if (document.querySelector("[data-add-matrix-row]")) document.querySelector("[data-add-matrix-row]").addEventListener("click", addRow);
     if (document.querySelector("[data-remove-matrix-row]")) document.querySelector("[data-remove-matrix-row]").addEventListener("click", removeRow);
-  }
-
-  document.querySelector('.live-drawings-reconnect').onclick = () => {
-    window.__drawInstance?.destroy();
-    window.__drawInstance = initDraw(HTTPSockServerDomain);
   }
 } catch (error) {
   if (storage.get("developer")) {

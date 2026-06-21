@@ -238,7 +238,7 @@
           <h1 id="frq-score">4</h1>
         </div>
         <div data-answer-mode="draw">
-          <p class="live-drawings-reconnect"><i class="bi bi-arrow-clockwise"></i> Reconnect</p>
+          <p class="live-drawings-reconnect"><i class="bi bi-wifi-off"></i> Click to connect</p>
           <i class="bi bi-floppy"></i>
           <canvas disabled></canvas>
           <div class="button-grid">
@@ -490,6 +490,12 @@
         <button id="editor-reset">Reset</button>
         <button id="editor-apply">Apply</button>
       </div>
+    </div>
+  </dialog>
+  <dialog data-modal-page="draw-session-closed" data-page-title="Session Closed">
+    <p>The host is not accepting drawings from your period.</p>
+    <div data-modal-actions>
+      <button class="submit-button" id="reconnect-draw-session"><i class="bi bi-arrow-clockwise"></i> Retry</button>
     </div>
   </dialog>
   <dialog data-modal-page="menu" data-page-title="Virtual Clicker">
