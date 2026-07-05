@@ -78,7 +78,14 @@ export function connect(drawDomain) {
                 callback: async (response) => {
                     try {
                         var responseJSON = JSON.parse(response);
-                        console.log(responseJSON);
+                        var lastDrawingsMessageTimestamp = storage.get('lastDrawingsMessageTimestamp') || 0;
+                        if ((responseJSON.type === 'messages') && (responseJSON.messages && responseJSON.messages.length)) {
+                            responseJSON.messages.forEach(msg => {
+                                if (msg.timestamp <= lastDrawingsMessageTimestamp) return;
+                                if (msg.content === 'clear') clearCanvas();
+                            });
+                            storage.set('lastDrawingsMessageTimestamp', Date.now());
+                        }
                     } catch (e) { e; }
                     if (saveIcon.classList.contains('active')) {
                         saveIcon.classList.add('saved');
@@ -107,10 +114,12 @@ export function connect(drawDomain) {
                         connect(domain);
                     }, 5000);
                 },
-                close,
+                close: (e) => close(e, true),
                 error: (e) => close(e, true)
             });
             connected = false;
+            reconnectInterval && clearInterval(reconnectInterval);
+            reconnectInterval = null;
         }
         try {
             broadcaster.sendQuiet('ping');
@@ -130,6 +139,7 @@ export function connect(drawDomain) {
 export function close(err = null, retry = false) {
     try {
         reconnectInterval && clearInterval(reconnectInterval);
+        reconnectInterval = null;
         if (!retry) {
             console.log('Live Drawings server connection closed');
         } else if (connected) {
