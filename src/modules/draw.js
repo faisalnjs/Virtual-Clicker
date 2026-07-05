@@ -33,7 +33,9 @@ reconnect?.addEventListener('click', () => {
 
 document.getElementById('reconnect-draw-session')?.addEventListener('click', () => {
     ui.view();
-    connect(domain);
+    setTimeout(() => {
+        connect(domain);
+    }, 500);
 });
 
 canvas?.addEventListener('pointerdown', start, { passive: false });
@@ -67,13 +69,17 @@ export function connect(drawDomain) {
         if (!domain) domain = drawDomain;
         if (!broadcaster) {
             broadcaster = new HTTPSockBroadcast({
-                server: `${domain}/${storage.get('code')[0]}`,
+                server: `${domain}/${storage.get('code')[0]}?noBroadcast=true`,
                 cert: './certs/chain.pem',
                 auth: {
                     username: storage.get('code') || '',
                     password: storage.get('password') || ''
                 },
-                callback: async () => {
+                callback: async (response) => {
+                    try {
+                        var responseJSON = JSON.parse(response);
+                        console.log(responseJSON);
+                    } catch (e) { e; }
                     if (saveIcon.classList.contains('active')) {
                         saveIcon.classList.add('saved');
                         if (undoButton) undoButton.disabled = !undoStack.length;
@@ -81,8 +87,7 @@ export function connect(drawDomain) {
                         if (clearButton) clearButton.disabled = canvasIsClear;
                     }
                     if (connected) return;
-                    console.log('🟢 Connected to Live Drawings server!', broadcaster);
-                    ui.toast('Connected to Live Drawings server!', 3000, 'success', 'bi bi-check-circle');
+                    console.log('🟢 Connected to Live Drawings server!');
                     const strokes = await fetch(`${domain}/${storage.get('code')[0]}/strokes`, {
                         method: 'POST',
                         headers: {
@@ -100,7 +105,7 @@ export function connect(drawDomain) {
                     connected = true;
                     if (!reconnectInterval) reconnectInterval = setInterval(() => {
                         connect(domain);
-                    }, 10000);
+                    }, 5000);
                 },
                 close,
                 error: (e) => close(e, true)
@@ -454,7 +459,6 @@ function setHold(button, action) {
         button.addEventListener('pointerleave', onPointerLeave);
         button.addEventListener('keydown', onKeyDown);
         button.addEventListener('keyup', onKeyUp);
-
         return function removeHold() {
             button.removeEventListener('pointerdown', onPointerDown);
             button.removeEventListener('pointerup', onPointerUp);
@@ -546,7 +550,6 @@ async function init(strokes = []) {
         if (undoButton) undoButton.disabled = true;
         if (redoButton) redoButton.disabled = true;
         if (clearButton) clearButton.disabled = true;
-
         if (strokes && Array.isArray(strokes) && strokes.length) {
             const normalized = [];
             strokes.forEach(s => {
@@ -572,7 +575,6 @@ async function init(strokes = []) {
             renderStrokes(undoStack, context);
             syncControls();
         }
-
         canvas.removeAttribute('disabled');
         reconnect.classList.add('connected');
     } catch (error) {
