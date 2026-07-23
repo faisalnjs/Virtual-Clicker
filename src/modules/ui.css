@@ -476,6 +476,7 @@ body:has(.topbar) {
   color: var(--text-color);
   font-size: 20px;
   font-weight: bold;
+  text-shadow: 0 0 10px var(--background-color);
 }
 
 [data-modal-page="store"] .promo:has(button:hover) {
@@ -643,4 +644,15 @@ canvas[disabled] {
   cursor: not-allowed;
   opacity: 0.75;
   pointer-events: none;
+}
+
+body > video {
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
 }
