@@ -13,6 +13,11 @@ dialog {
   background: var(--background-color);
 }
 
+dialog.large {
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
+}
+
 dialog::backdrop {
   display: none;
 }
@@ -421,8 +426,6 @@ body:has(.topbar) {
 }
 
 [data-modal-page="store"] {
-  width: min(100%, 1500px);
-  height: min(90%, 800px);
   gap: 10px;
   opacity: 1;
   transition: 0.25s background-color;
@@ -478,6 +481,10 @@ body:has(.topbar) {
 [data-modal-page="store"] .promo:has(button:hover) {
   background-image: none !important;
   border-color: transparent;
+}
+
+[data-modal-page="store"] .promo:has(button:hover)::before {
+  opacity: 0;
 }
 
 [data-modal-page="store"] .promo .promo-inner {
@@ -583,6 +590,7 @@ body:has(.topbar) {
 [data-modal-page="store"] .themes-grid .theme-item p,
 [data-modal-page="store"] .themes-grid .theme-item small {
   background: none;
+  text-shadow: 0 0 10px var(--background-color);
 }
 
 [data-modal-page="store"] .themes-grid .theme-item button {
@@ -597,6 +605,10 @@ body:has(.topbar) {
 
 [data-modal-page="store"] .themes-grid .theme-item:not(:has(small)) p {
   margin-bottom: 5px;
+}
+
+[data-modal-page="store"] .themes-grid .theme-item:has(.hd) h5 {
+  max-width: calc(100% - 45px);
 }
 
 [data-modal-page="store"] .themes-grid .theme-item button:hover {

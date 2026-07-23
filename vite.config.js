@@ -10,6 +10,7 @@ export default {
         error: '404.html',
         resetcookies: 'resetcookies.html'
       }
-    }
+    },
+    target: 'esnext',
   }
 };

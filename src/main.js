@@ -11,6 +11,7 @@ import "/src/symbols/symbols.js";
 import "/src/themes/themes.js";
 import "/src/keybinds/keybinds.js";
 
+import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 
 try {

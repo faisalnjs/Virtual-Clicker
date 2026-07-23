@@ -10,7 +10,7 @@ import { unixToTimeString } from "/src/modules/time.js";
 import { getExtendedPeriod } from "/src/periods/periods";
 import { convertLatexToAsciiMath, convertLatexToMarkup, renderMathInElement } from "mathlive";
 import extendedSchedule from "/src/periods/extendedSchedule.json";
-import initDraw from '/src/modules/draw.js';
+import * as draw from '/src/modules/draw.js';
 ``;
 
 function safeParseJSON(str) {
@@ -32,6 +32,7 @@ function safeParseJSON(str) {
 
 try {
   const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}api.check.vssfalcons.com` : `http://${document.domain}:5000`;
+  const HTTPSockServerDomain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}ws.api.check.vssfalcons.com` : `http://${document.domain}:1234`;
   var period = document.getElementById("period-input").value;
   const questionInput = document.getElementById("question-input");
   const answerInput = document.getElementById("answer-input");
@@ -1047,14 +1048,12 @@ try {
       answerLabel.setAttribute("for", "frq-input");
     } else if (mode === "draw") {
       answerLabel.setAttribute("for", "draw-input");
-      if (!drawLoaded) {
-        window.__drawInstance = initDraw(domain);
-        drawLoaded = true;
-      } else {
-        if (window.__drawInstance && typeof window.__drawInstance.destroy === 'function') window.__drawInstance.destroy();
-        window.__drawInstance = initDraw(domain);
-      }
+      draw.connect(HTTPSockServerDomain);
       document.getElementById("submit-button").setAttribute("hidden", "");
+    }
+    if ((mode !== "draw") && drawLoaded) {
+      draw.close();
+      drawLoaded = false;
     }
   });
 

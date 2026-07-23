@@ -68,7 +68,7 @@
           <button aria-selected="false" data-value="set">Set</button>
           <button aria-selected="false" data-value="matrix">Matrix</button>
           <button aria-selected="false" data-value="frq">FRQ</button>
-          <!-- <button aria-selected="false" data-value="draw">Draw</button> -->
+          <button aria-selected="false" data-value="draw">Draw</button>
         </div>
       </div>
     </div>
@@ -238,6 +238,8 @@
           <h1 id="frq-score">4</h1>
         </div>
         <div data-answer-mode="draw">
+          <p class="live-drawings-reconnect"><i class="bi bi-wifi-off"></i> Click to connect</p>
+          <i class="bi bi-floppy"></i>
           <canvas disabled></canvas>
           <div class="button-grid">
             <button data-action="undo" disabled>Undo</button>
@@ -366,6 +368,7 @@
           (@faisalnjs)</a> - Commits after 5/21/2024 including Set, Matrix, and FRQ input modes, make-up mode, Live
         Drawings, banner images, authentication, syncing</p>
       <p><a href="https://github.com/khui0">khui0</a> - Original design and development, logo image</p>
+      <p><i class="bi bi-cc-square"></i> Theme wallpapers are licensed under Creative Commons: Free to Share and Use</p>
       <div class="row center" style="gap: 7.5px; margin-top: 5px;">
         <a href="https://github.com/faisalnjs/virtual-clicker" class="icon" tooltip="GitHub Repository"><i
             class="bi bi-github"></i></a>
@@ -414,7 +417,7 @@
     </p>
   </dialog>
   <!-- Theme Store -->
-  <dialog data-modal-page="store" data-page-title="Theme Store">
+  <dialog data-modal-page="store" data-page-title="Theme Store" class="large">
     <div data-modal-page="theme" data-page-title="Your Themes">
       <div id="theme-preview">
         <h1 class="text-placeholder">000</h1>
@@ -487,6 +490,12 @@
         <button id="editor-reset">Reset</button>
         <button id="editor-apply">Apply</button>
       </div>
+    </div>
+  </dialog>
+  <dialog data-modal-page="draw-session-closed" data-page-title="Session Closed">
+    <p>The host is not accepting drawings from your period.</p>
+    <div data-modal-actions>
+      <button class="submit-button" id="reconnect-draw-session"><i class="bi bi-arrow-clockwise"></i> Retry</button>
     </div>
   </dialog>
   <dialog data-modal-page="menu" data-page-title="Virtual Clicker">

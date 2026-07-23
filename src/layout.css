@@ -215,6 +215,67 @@ div.spacer {
   width: fit-content !important;
 }
 
+[data-answer-mode="draw"] {
+  position: relative;
+}
+
+[data-answer-mode="draw"] .live-drawings-reconnect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  backdrop-filter: blur(24px);
+  background: transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+[data-answer-mode="draw"] .live-drawings-reconnect.connected {
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+[data-answer-mode="draw"] .bi-floppy {
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  top: 10px;
+  right: 12.5px;
+  z-index: 1;
+  opacity: 0.5;
+  transition: 0.25s;
+}
+
+[data-answer-mode="draw"] .bi-floppy:not(.active) {
+  opacity: 0;
+  transition: 0.25s;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+[data-answer-mode="draw"] .bi-floppy.active:not(.saved) {
+  animation: fade 2s infinite;
+  transition: 0.25s;
+}
+
 #insert-row {
   flex: 1;
   overflow: hidden;
@@ -230,6 +291,7 @@ div.spacer {
   position: fixed;
   bottom: 25px;
   transition: 0.5s;
+  z-index: 5;
 }
 
 #controls-container[checks] {
