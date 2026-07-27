@@ -3,7 +3,7 @@ const CACHE_VERSION = new URL(self.location.href).searchParams.get('v') || 'v1';
 const PAGE_CACHE = `${CACHE_PREFIX}-pages-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}-assets-${CACHE_VERSION}`;
 const STATIC_DESTINATIONS = new Set(['style', 'script', 'worker', 'image', 'font', 'video', 'audio', 'manifest']);
-const PRECACHE_URLS = ['/', '/index.html', '/404.html', '/resetcookies.html'];
+const PRECACHE_URLS = ['/', '/index.html', '/404.html', '/resetcookies.html', '/manifest.webmanifest', '/banner-meta.png', '/favicon.ico'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
