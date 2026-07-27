@@ -10,6 +10,7 @@ import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
 import Element from "/src/modules/element.js";
 import * as draw from '/src/modules/draw.js';
+import { syncPwaTheme } from "/src/modules/service-worker.js";
 
 let selectedTheme = "";
 const defaultTheme = {
@@ -33,6 +34,7 @@ export function resetTheme() {
   enableTransitions();
   storage.set("theme", "default");
   storage.delete("custom-theme");
+  syncPwaTheme().catch(() => null);
 }
 
 export function disableTransitions() {
@@ -57,6 +59,7 @@ export async function syncTheme() {
     // Update developer theme input
     if (document.getElementById("theme-debug")) document.getElementById("theme-debug").value = value;
   }
+  await syncPwaTheme().catch(() => null);
 }
 
 function copyThemeCSS() {
