@@ -5,6 +5,7 @@ import * as themes from "../themes/themes.js";
 const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}api.check.vssfalcons.com` : `http://${document.domain}:5000`;
 
 var hasPassword = false;
+var registrationRestricted = false;
 export var continueWithoutAPI = false;
 
 function sortKeys(obj) {
@@ -55,7 +56,8 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                 "seatCode": storage.get("code"),
             })
         });
-        hasPassword = userPassword.ok ? true : false;
+        hasPassword = (userPassword.status === 200) ? true : false;
+        registrationRestricted = (userPassword.status === 403) ? true : false;
     } catch (e) {
         console.error(e);
         if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
@@ -206,6 +208,8 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                 console.error(e);
                 if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
             });
+    } else if (registrationRestricted) {
+        ui.view("registration-restricted");
     } else if (!hasPassword) {
         if (storage.get("password")) storage.delete("password");
         ui.modal({
