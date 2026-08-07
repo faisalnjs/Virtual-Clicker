@@ -492,6 +492,7 @@ try {
         params.set("code", input);
       }
     } else {
+      ui.view("");
       ui.alert("Error", "Seat code isn't possible");
     }
   }
