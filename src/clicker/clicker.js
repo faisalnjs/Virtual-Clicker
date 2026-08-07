@@ -540,6 +540,28 @@ try {
             document.querySelector('.alert').setAttribute('hidden', '');
           }
         }
+        if (bulkLoad.makeupsNeeded && bulkLoad.makeupsNeeded.length) {
+          ui.toast(`You have ${bulkLoad.makeupsNeeded.length} missed day${(bulkLoad.makeupsNeeded.length === 1) ? '' : 's'}.`, 5000, "warning", "bi bi-exclamation-triangle-fill");
+          document.querySelector('[data-modal-view="makeups"]').removeAttribute('hidden');
+          const makeupsNeeded = document.getElementById('makeup-dates');
+          if (makeupsNeeded) {
+            makeupsNeeded.innerHTML = '';
+            bulkLoad.makeupsNeeded.reverse().forEach(date => {
+              const dateElement = document.createElement('button');
+              dateElement.classList = 'makeup-date';
+              var formattedDate = date.split('-');
+              dateElement.innerHTML = `${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}`;
+              dateElement.addEventListener('click', () => {
+                if (document.querySelector('[data-modal-page="makeup"] #date-input')) document.querySelector('[data-modal-page="makeup"] #date-input').value = date;
+                storage.set("makeUpDate", date);
+                auth.syncPush("makeUpDate");
+                ui.updateTitles();
+                ui.view("");
+              });
+              makeupsNeeded.append(dateElement);
+            });
+          }
+        }
       } catch (error) {
         console.error(error);
       }
