@@ -563,6 +563,7 @@ try {
     if (questionInput) questionInput.focus();
     // Focus answer input
     document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
+    document.querySelector("[data-sync]").addEventListener("click", () => auth.syncManual());
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
       ui.view("settings/makeup");
