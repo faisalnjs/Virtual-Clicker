@@ -59,8 +59,8 @@ export async function sync(hideWelcome = true, returnFunction = null) {
         hasPassword = (userPassword.status === 200) ? true : false;
         registrationRestricted = (userPassword.status === 403) ? true : false;
     } catch (e) {
-        console.error(e);
-        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+        console.error(e, e.message);
+        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         const continueWithoutAPIButton = document.getElementById("continue-without-api");
         continueWithoutAPIButton.addEventListener("click", () => {
             continueWithoutAPI = true;
@@ -201,12 +201,12 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                     })
                     .catch((e) => {
                         console.error(e);
-                        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                     });
             })
             .catch((e) => {
                 console.error(e);
-                if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
             });
     } else if (registrationRestricted) {
         ui.view("registration-restricted");
@@ -266,7 +266,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                             })
                             .catch((e) => {
                                 console.error(e);
-                                if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                                if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                             });
                     },
                     close: true,
@@ -362,12 +362,12 @@ export async function syncPush(key = null) {
                 })
                 .catch((e) => {
                     console.error(e);
-                    if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                    if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                 });
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
 
@@ -401,7 +401,7 @@ export async function syncManual(hideWelcome = false) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
     if (!hasPassword || !storage.get("password")) {
         window.location.reload();
@@ -487,7 +487,7 @@ export async function syncManual(hideWelcome = false) {
                                                 })
                                                 .catch((e) => {
                                                     console.error(e);
-                                                    if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                                                    if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                                                 });
                                         } else {
                                             ui.toast("No settings found to backup.", 3000, "warning", "bi bi-exclamation-triangle-fill");
@@ -527,7 +527,7 @@ export async function syncManual(hideWelcome = false) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
 
@@ -588,7 +588,7 @@ export async function bulkLoad(fields = [], usr = null, pwd = null, isAdmin = fa
         });
     } catch (e) {
         console.error(e);
-        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         return false;
     }
     var fetchedBulkLoad = await bulkLoadResponse.json();
@@ -697,7 +697,7 @@ export async function buyTheme(theme = null, cost = 0) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
 
@@ -735,6 +735,6 @@ export async function refundThemes(themes = []) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
