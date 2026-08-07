@@ -424,7 +424,5 @@ label:has(i) {
   grid-template-columns: repeat(3, calc(100% / 3));
   grid-template-rows: auto;
   gap: 0.25rem;
-  overflow-y: scroll;
-  overflow-x: hidden;
   max-height: 500px;
 }
