@@ -421,7 +421,7 @@ label:has(i) {
 
 #makeup-dates {
   display: grid;
-  grid-template-columns: repeat(3, calc(100% / 3));
+  grid-template-columns: repeat(2, calc(100% / 2));
   grid-template-rows: auto;
   gap: 0.25rem;
   max-height: 500px;

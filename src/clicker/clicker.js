@@ -547,10 +547,14 @@ try {
           if (makeupsNeeded) {
             makeupsNeeded.innerHTML = '';
             bulkLoad.makeupsNeeded.reverse().forEach(date => {
+              const buttonGrid = document.createElement('div');
+              buttonGrid.classList = 'button-grid';
               const dateElement = document.createElement('button');
               dateElement.classList = 'makeup-date';
-              var formattedDate = date.split('-');
-              dateElement.innerHTML = `${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}`;
+              dateElement.style.width = '100%';
+              var splitDate = date.split('-');
+              var formattedDate = `${splitDate[1]}/${splitDate[2]}/${splitDate[0]}`;
+              dateElement.innerHTML = formattedDate;
               dateElement.addEventListener('click', () => {
                 if (document.querySelector('[data-modal-page="makeup"] #date-input')) document.querySelector('[data-modal-page="makeup"] #date-input').value = date;
                 storage.set("makeUpDate", date);
@@ -558,7 +562,17 @@ try {
                 ui.updateTitles();
                 ui.view("");
               });
-              makeupsNeeded.append(dateElement);
+              buttonGrid.appendChild(dateElement);
+              const courseRecording = JSON.parse(course.recordings).find(recording => recording.date === formattedDate);
+              if (courseRecording) {
+                const recordingElement = document.createElement('button');
+                recordingElement.innerHTML = '<i class="bi bi-person-video3"></i>';
+                recordingElement.addEventListener('click', () => {
+                  window.open(courseRecording.link);
+                });
+                buttonGrid.appendChild(recordingElement);
+              }
+              makeupsNeeded.appendChild(buttonGrid);
             });
           }
         }
