@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fafafa" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" media="(prefers-color-scheme: dark)" />
   <link rel="shortcut icon" href="favicon-dark.ico" type="image/x-icon" media="(prefers-color-scheme: light)" />
@@ -268,6 +270,9 @@
     <button class="icon" data-modal-view="history" tooltip="Click History">
       <i class="bi bi-clock-history"></i>
     </button>
+    <button class="icon" data-modal-view="makeups" tooltip="Makeups Needed" hidden>
+      <i class="bi bi-exclamation-circle"></i>
+    </button>
     <!-- <button class="icon" data-modal-view="clear-data-fix" tooltip="Clear Data Fix">
         <i class="bi bi-exclamation-triangle"></i>
       </button> -->
@@ -497,6 +502,17 @@
     <div data-modal-actions>
       <button class="submit-button" id="reconnect-draw-session"><i class="bi bi-arrow-clockwise"></i> Retry</button>
     </div>
+  </dialog>
+  <dialog data-modal-page="registration-restricted" data-page-title="Registration Restricted">
+    <p>Registration is currently restricted for this course. Please contact your instructor for assistance.</p>
+    <div data-modal-actions>
+      <button class="submit-button" data-modal-view="settings/code">Change Seat Code</button>
+    </div>
+  </dialog>
+  <!-- Makeups Needed -->
+  <dialog data-modal-page="makeups" data-page-title="Makeups Needed">
+    <p>You have missed classes.</p>
+    <div id="makeup-dates"></div>
   </dialog>
   <dialog data-modal-page="menu" data-page-title="Virtual Clicker">
     <div class="menu-icons">

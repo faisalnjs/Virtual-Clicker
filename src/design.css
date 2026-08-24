@@ -3,6 +3,10 @@
   background-color: inherit;
 }
 
+body:has(> video) {
+  background-color: inherit;
+}
+
 :root {
   color-scheme: light;
   --text-color: #2c2c2c;
@@ -93,6 +97,7 @@ button {
   transition: 100ms var(--easing);
   cursor: pointer;
   min-width: fit-content;
+  min-height: 36px;
 }
 
 button.icon {
@@ -142,6 +147,14 @@ select {
   border-radius: 0.5rem;
   background-color: var(--surface-color);
   width: 100%;
+  cursor: pointer;
+}
+
+input {
+  cursor: text;
+}
+
+select {
   cursor: pointer;
 }
 

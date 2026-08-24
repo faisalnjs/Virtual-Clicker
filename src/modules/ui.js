@@ -46,7 +46,7 @@ export function modal(options) {
       dialog.appendChild(label);
     }
     const input = document.createElement((options.input.type === "select") ? "select" : ((options.input.type === "textarea") ? "textarea" : "input"));
-    if (options.input.type !== "select") input.type = options.input.type || "text";
+    if (options.input.type === "input") input.type = options.input.type || "text";
     if ((options.input.type === "select") && options.input.multiple) input.multiple = options.input.multiple;
     if ((options.input.type === "select") && options.input.options) {
       options.input.options.forEach(option => {
@@ -66,6 +66,7 @@ export function modal(options) {
     input.max = options.input.max || "";
     if (options.input.required) input.required = options.input.required;
     if (options.input.innerHTML) input.innerHTML = options.input.innerHTML;
+    if (options.input.pattern) input.pattern = options.input.pattern;
     dialog.appendChild(input);
   }
 
@@ -97,6 +98,7 @@ export function modal(options) {
       inputElement.max = input.max || "";
       if (input.required) inputElement.required = input.required;
       if (input.innerHTML) inputElement.innerHTML = input.innerHTML;
+      if (input.pattern) inputElement.pattern = input.pattern;
       dialog.appendChild(inputElement);
     });
   }
@@ -132,8 +134,8 @@ export function modal(options) {
               });
               if (hasEmptyRequiredInput) return;
               const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
-                return dialogInput.multiple ? [...dialogInput.selectedOptions].map(e => Number(e.value)) : dialogInput.value;
-              }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null);
+                return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialogInput.value)) ? dialogInput.value : Number(dialogInput.value));
+              }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value)) : null);
               button.onclick(inputValue);
             }
             if (button.close) {
@@ -168,8 +170,8 @@ export function modal(options) {
             });
             if (hasEmptyRequiredInput) return;
             const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
-              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(e => Number(e.value)) : dialogInput.value;
-            }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").value : null);
+              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialogInput.value)) ? dialogInput.value : Number(dialogInput.value));
+            }) : (dialog.querySelector(".dialog-input") ? (dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value))) : null);
             button.onclick(inputValue);
           }
           if (button.close) {

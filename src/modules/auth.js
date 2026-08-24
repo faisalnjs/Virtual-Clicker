@@ -5,6 +5,7 @@ import * as themes from "../themes/themes.js";
 const domain = ((window.location.hostname.search('click') != -1) || (window.location.hostname.search('127') != -1)) ? `https://${(window.location.hostname.search('beta') != -1) ? 'beta.' : ''}api.check.vssfalcons.com` : `http://${document.domain}:5000`;
 
 var hasPassword = false;
+var registrationRestricted = false;
 export var continueWithoutAPI = false;
 
 function sortKeys(obj) {
@@ -55,10 +56,11 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                 "seatCode": storage.get("code"),
             })
         });
-        hasPassword = userPassword.ok ? true : false;
+        hasPassword = (userPassword.status === 200) ? true : false;
+        registrationRestricted = (userPassword.status === 403) ? true : false;
     } catch (e) {
-        console.error(e);
-        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+        console.error(e, e.message);
+        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         const continueWithoutAPIButton = document.getElementById("continue-without-api");
         continueWithoutAPIButton.addEventListener("click", () => {
             continueWithoutAPI = true;
@@ -199,13 +201,15 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                     })
                     .catch((e) => {
                         console.error(e);
-                        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                     });
             })
             .catch((e) => {
                 console.error(e);
-                if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
             });
+    } else if (registrationRestricted) {
+        ui.view("registration-restricted");
     } else if (!hasPassword) {
         if (storage.get("password")) storage.delete("password");
         ui.modal({
@@ -262,7 +266,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                             })
                             .catch((e) => {
                                 console.error(e);
-                                if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                                if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                             });
                     },
                     close: true,
@@ -358,12 +362,12 @@ export async function syncPush(key = null) {
                 })
                 .catch((e) => {
                     console.error(e);
-                    if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                    if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                 });
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
 
@@ -397,7 +401,7 @@ export async function syncManual(hideWelcome = false) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
     if (!hasPassword || !storage.get("password")) {
         window.location.reload();
@@ -438,7 +442,7 @@ export async function syncManual(hideWelcome = false) {
             if (!hideWelcome) ui.toast("Welcome back!", 3000, "success", "bi bi-key");
             ui.modal({
                 title: 'Manual Sync',
-                body: `<p>Backup and restore your current settings to seat code <code>${storage.get("code")}</code>. This action is not reversible. Contact an administrator to restore a backup of your settings.</p>`,
+                body: `<p>Backup and restore your current settings to seat code <code>${storage.get("code")}</code>. This action is not reversible.</p>`,
                 buttonGroups: [
                     {
                         label: 'Backup',
@@ -483,7 +487,7 @@ export async function syncManual(hideWelcome = false) {
                                                 })
                                                 .catch((e) => {
                                                     console.error(e);
-                                                    if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+                                                    if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
                                                 });
                                         } else {
                                             ui.toast("No settings found to backup.", 3000, "warning", "bi bi-exclamation-triangle-fill");
@@ -523,7 +527,7 @@ export async function syncManual(hideWelcome = false) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }
 
@@ -584,7 +588,7 @@ export async function bulkLoad(fields = [], usr = null, pwd = null, isAdmin = fa
         });
     } catch (e) {
         console.error(e);
-        if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+        if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         return false;
     }
     var fetchedBulkLoad = await bulkLoadResponse.json();
@@ -693,6 +697,44 @@ export async function buyTheme(theme = null, cost = 0) {
         })
         .catch((e) => {
             console.error(e);
-            if (!e.message || (e.message && !e.message.includes("."))) ui.view("api-fail");
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
+        });
+}
+
+export async function refundThemes(themes = []) {
+    if (!themes || !Array.isArray(themes) || themes.length === 0 || !storage.get("code")) return;
+    await fetch(domain + '/refund_themes', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "seatCode": storage.get("code"),
+            "password": storage.get("password"),
+            "themes": themes,
+        })
+    })
+        .then(async (r) => {
+            if (!r.ok) {
+                try {
+                    var re = await r.json();
+                    if (re.error || re.message) {
+                        ui.toast(re.error || re.message, 5000, "error", "bi bi-exclamation-triangle-fill");
+                        if ((re.error === "Access denied.") || (re.message === "Access denied.")) {
+                            if (storage.get("password")) storage.delete("password");
+                        }
+                        throw new Error(re.error || re.message);
+                    } else {
+                        throw new Error("API error");
+                    }
+                } catch (e) {
+                    throw new Error(e.message || "API error");
+                }
+            }
+            return await r.json();
+        })
+        .catch((e) => {
+            console.error(e);
+            if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
 }

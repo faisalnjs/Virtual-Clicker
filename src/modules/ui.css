@@ -28,7 +28,7 @@ dialog:modal {
 }
 
 dialog img {
-  box-shadow: inset 0 0 0px 1000px var(--accent-color);
+  box-shadow: inset 0 0 0px 1000px var(--backlight-color, var(--accent-color));
   border-radius: 0.5rem;
 }
 
@@ -431,13 +431,17 @@ body:has(.topbar) {
   transition: 0.25s background-color;
 }
 
+[data-modal-page="store"]::-webkit-scrollbar {
+  width: 28px !important;
+}
+
 [data-modal-page="store"]:has(.promo button:hover),
 [data-modal-page="store"]:has(.themes-grid .theme-item button:hover) {
   color: transparent;
   background-color: transparent;
   box-shadow: none;
   overflow-y: hidden;
-  padding-right: 1.75rem;
+  padding-right: 28px;
   transition: 0.25s background-color;
 }
 
@@ -446,7 +450,8 @@ body:has(.topbar) {
 [data-modal-page="store"]:has(.themes-grid .theme-item button:hover) .promo,
 [data-modal-page="store"]:has(.themes-grid .theme-item button:hover)
   .theme-item:not(:has(button:hover)),
-[data-modal-page="store"]:has(.themes-grid .theme-item button:hover) [data-modal-buttons] {
+[data-modal-page="store"]:has(.themes-grid .theme-item button:hover) [data-modal-buttons],
+[data-modal-page="store"]:has(.themes-grid .theme-item button:hover) > button {
   opacity: 0;
   transition: 0.25s opacity;
 }
@@ -476,6 +481,7 @@ body:has(.topbar) {
   color: var(--text-color);
   font-size: 20px;
   font-weight: bold;
+  text-shadow: 0 0 10px var(--background-color);
 }
 
 [data-modal-page="store"] .promo:has(button:hover) {
@@ -565,7 +571,7 @@ body:has(.topbar) {
   left: 0;
 }
 
-[data-modal-page="store"] .themes-grid .theme-item i:not(.hd) {
+[data-modal-page="store"] .themes-grid .theme-item i:not(.hd):not(.animated) {
   position: absolute;
   bottom: 10px;
   right: 20px;
@@ -574,7 +580,7 @@ body:has(.topbar) {
   transition: opacity 0.25s ease-in-out;
 }
 
-[data-modal-page="store"] .themes-grid .theme-item:hover i:not(.hd) {
+[data-modal-page="store"] .themes-grid .theme-item:hover i:not(.hd):not(.animated) {
   opacity: 1;
   transition: opacity 0.25s ease-in-out;
 }
@@ -584,6 +590,17 @@ body:has(.topbar) {
   top: 10px;
   right: 20px;
   font-size: 25px;
+}
+
+[data-modal-page="store"] .themes-grid .theme-item i.animated {
+  position: absolute;
+  top: 12.5px;
+  right: 20px;
+  font-size: 20px;
+}
+
+[data-modal-page="store"] .themes-grid .theme-item:has(i.hd) i.animated {
+  right: 50px;
 }
 
 [data-modal-page="store"] .themes-grid .theme-item h5,
@@ -643,4 +660,15 @@ canvas[disabled] {
   cursor: not-allowed;
   opacity: 0.75;
   pointer-events: none;
+}
+
+body > video {
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
 }

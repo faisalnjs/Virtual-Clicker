@@ -492,6 +492,7 @@ try {
         params.set("code", input);
       }
     } else {
+      ui.view("");
       ui.alert("Error", "Seat code isn't possible");
     }
   }
@@ -539,6 +540,42 @@ try {
             document.querySelector('.alert').setAttribute('hidden', '');
           }
         }
+        if (bulkLoad.makeupsNeeded && bulkLoad.makeupsNeeded.length) {
+          ui.toast(`You have ${bulkLoad.makeupsNeeded.length} missed day${(bulkLoad.makeupsNeeded.length === 1) ? '' : 's'}.`, 5000, "warning", "bi bi-exclamation-triangle-fill");
+          document.querySelector('[data-modal-view="makeups"]').removeAttribute('hidden');
+          const makeupsNeeded = document.getElementById('makeup-dates');
+          if (makeupsNeeded) {
+            makeupsNeeded.innerHTML = '';
+            bulkLoad.makeupsNeeded.reverse().forEach(date => {
+              const buttonGrid = document.createElement('div');
+              buttonGrid.classList = 'button-grid';
+              const dateElement = document.createElement('button');
+              dateElement.classList = 'makeup-date';
+              dateElement.style.width = '100%';
+              var splitDate = date.split('-');
+              var formattedDate = `${splitDate[1]}/${splitDate[2]}/${splitDate[0]}`;
+              dateElement.innerHTML = formattedDate;
+              dateElement.addEventListener('click', () => {
+                if (document.querySelector('[data-modal-page="makeup"] #date-input')) document.querySelector('[data-modal-page="makeup"] #date-input').value = date;
+                storage.set("makeUpDate", date);
+                auth.syncPush("makeUpDate");
+                ui.updateTitles();
+                ui.view("");
+              });
+              buttonGrid.appendChild(dateElement);
+              const courseRecording = JSON.parse(course.recordings).find(recording => recording.date === formattedDate);
+              if (courseRecording) {
+                const recordingElement = document.createElement('button');
+                recordingElement.innerHTML = '<i class="bi bi-person-video3"></i>';
+                recordingElement.addEventListener('click', () => {
+                  window.open(courseRecording.link);
+                });
+                buttonGrid.appendChild(recordingElement);
+              }
+              makeupsNeeded.appendChild(buttonGrid);
+            });
+          }
+        }
       } catch (error) {
         console.error(error);
       }
@@ -562,6 +599,7 @@ try {
     if (questionInput) questionInput.focus();
     // Focus answer input
     document.getElementById("answer-suggestion").addEventListener("click", () => answerInput.focus());
+    document.querySelector("[data-sync]").addEventListener("click", () => auth.syncManual());
     const matchesCurrentPeriod = parseInt(storage.get("code").slice(0, 1)) === getExtendedPeriod() + 1;
     if ((new Date()).getDay() === 0 || (new Date()).getDay() === 6 || getExtendedPeriod() === -1) {
       ui.view("settings/makeup");
