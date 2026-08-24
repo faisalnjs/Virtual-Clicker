@@ -95,5 +95,6 @@
   ["strawberry-pro", "Strawberry Pro", "fork-knife", 70, ["fruit"], false, false],
   ["watermelon", "Watermelon", "fork-knife", 70, ["fruit"], false, false],
   ["watermelon-2", "Watermelon 2", "fork-knife", 80, ["fruit", "watermelon"], false, false],
-  ["watermelon-pro", "Watermelon Pro", "fork-knife", 90, ["fruit", "watermelon", "watermelon-2"], false, false]
+  ["watermelon-pro", "Watermelon Pro", "fork-knife", 90, ["fruit", "watermelon", "watermelon-2"], false, false],
+  ["coconut-tree", "Coconut Tree", "tree", 90, ["fruit", "coconut"], false, false]
 ]
