@@ -230,8 +230,7 @@ div.spacer {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  backdrop-filter: blur(24px);
-  background: transparent;
+  background: var(--surface-color);
   border-radius: 0.5rem;
   cursor: pointer;
 }
