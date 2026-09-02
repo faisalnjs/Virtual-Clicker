@@ -5,6 +5,7 @@
 Next generation clicking: fixed, upgraded, and cloud hosted ☁️🚀
 
 - LaTeX Math, Multiple Choice, Set, FRQ Inputs
+- Attendance Tracking & Class Recordings
 - Predictive Typing, Keyboard Shortcuts
 - WYSIWYG Numerical & Written Answers
 - Many Themes, Custom Theme Builder
