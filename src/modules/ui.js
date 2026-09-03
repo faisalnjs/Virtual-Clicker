@@ -835,13 +835,13 @@ export function suggestionsModal(event = null, suggestion = null) {
   view();
   modal({
     title: 'Make Suggestion',
-    body: '<p>Make a suggestion for the Virtual Checker or internal APIs.</p>',
+    body: '<p>Make a suggestion for the Virtual Clicker or internal APIs.</p>',
     inputs: [
       {
         type: 'select',
         label: 'Suggestion for',
         options: [
-          { value: 'Virtual Checker', text: 'Virtual Checker' },
+          { value: 'Virtual Clicker', text: 'Virtual Clicker' },
           { value: 'Homework Checker (API)', text: 'API' },
           { value: 'Theme', text: 'New Theme', selected: suggestion },
         ],
