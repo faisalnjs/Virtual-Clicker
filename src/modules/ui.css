@@ -429,6 +429,7 @@ body:has(.topbar) {
   gap: 10px;
   opacity: 1;
   transition: 0.25s background-color;
+  overflow-x: hidden;
 }
 
 [data-modal-page="store"]::-webkit-scrollbar {

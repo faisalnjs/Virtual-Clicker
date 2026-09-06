@@ -66,7 +66,7 @@ export function modal(options) {
         input.type = options.input.type || "text";
     }
     input.placeholder = options.input.placeholder || "";
-    if (options.input.defaultValue) input.value = options.input.defaultValue || "";
+    if (options.input.defaultValue !== undefined) input.value = options.input.defaultValue || "";
     if (options.input.disabled) input.disabled = true;
     input.className = `dialog-input${options.input.selectAll ? " selectAll" : ""}`;
     input.min = options.input.min || "";
@@ -105,7 +105,7 @@ export function modal(options) {
           inputElement.type = input.type || "text";
       }
       inputElement.placeholder = input.placeholder || "";
-      if (input.defaultValue) inputElement.value = input.defaultValue || "";
+      if (input.defaultValue !== undefined) inputElement.value = input.defaultValue || "";
       if (input.disabled) inputElement.disabled = true;
       inputElement.className = `dialog-input${input.selectAll ? " selectAll" : ""}`;
       inputElement.min = input.min || "";
@@ -148,8 +148,8 @@ export function modal(options) {
               });
               if (hasEmptyRequiredInput) return;
               const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
-                return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialogInput.value)) ? dialogInput.value : Number(dialogInput.value));
-              }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value)) : null);
+                return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => ((option.value.trim() === '') || Number.isNaN(Number(option.value))) ? option.value : Number(option.value)) : (((dialogInput.value.trim() === '') || Number.isNaN(Number(dialogInput.value))) ? dialogInput.value : Number(dialogInput.value));
+              }) : (dialog.querySelector(".dialog-input") ? dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => ((option.value.trim() === '') || Number.isNaN(Number(option.value))) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value)) : null);
               button.onclick(inputValue);
             }
             if (button.close) {
@@ -184,8 +184,8 @@ export function modal(options) {
             });
             if (hasEmptyRequiredInput) return;
             const inputValue = (dialog.querySelectorAll(".dialog-input").length > 1) ? [...dialog.querySelectorAll(".dialog-input")].map(dialogInput => {
-              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialogInput.value)) ? dialogInput.value : Number(dialogInput.value));
-            }) : (dialog.querySelector(".dialog-input") ? (dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => Number.isNaN(Number(option.value)) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value))) : null);
+              return dialogInput.multiple ? [...dialogInput.selectedOptions].map(option => ((option.value.trim() === '') || Number.isNaN(Number(option.value))) ? option.value : Number(option.value)) : (((dialogInput.value.trim() === '') || Number.isNaN(Number(dialogInput.value))) ? dialogInput.value : Number(dialogInput.value));
+            }) : (dialog.querySelector(".dialog-input") ? (dialog.querySelector(".dialog-input").multiple ? [...dialog.querySelector(".dialog-input").selectedOptions].map(option => ((option.value.trim() === '') || Number.isNaN(Number(option.value))) ? option.value : Number(option.value)) : (Number.isNaN(Number(dialog.querySelector(".dialog-input").value)) ? dialog.querySelector(".dialog-input").value : Number(dialog.querySelector(".dialog-input").value))) : null);
             button.onclick(inputValue);
           }
           if (button.close) {
@@ -835,13 +835,13 @@ export function suggestionsModal(event = null, suggestion = null) {
   view();
   modal({
     title: 'Make Suggestion',
-    body: '<p>Make a suggestion for the Virtual Checker or internal APIs.</p>',
+    body: '<p>Make a suggestion for the Virtual Clicker or internal APIs.</p>',
     inputs: [
       {
         type: 'select',
         label: 'Suggestion for',
         options: [
-          { value: 'Virtual Checker', text: 'Virtual Checker' },
+          { value: 'Virtual Clicker', text: 'Virtual Clicker' },
           { value: 'Homework Checker (API)', text: 'API' },
           { value: 'Theme', text: 'New Theme', selected: suggestion },
         ],
