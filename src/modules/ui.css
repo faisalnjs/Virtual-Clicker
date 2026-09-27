@@ -208,7 +208,7 @@ div[data-color-input] > div[data-color-preview]:hover {
   }
 }
 
-#loader {
+.loader {
   position: fixed;
   top: 0;
   left: 0;
@@ -223,11 +223,11 @@ div[data-color-input] > div[data-color-preview]:hover {
   transition: 0.5s opacity;
 }
 
-#loader > * {
+.loader > * {
   animation: fadeIn 1s ease-in-out infinite alternate;
 }
 
-#loader.active {
+.loader.active {
   display: flex;
   opacity: 1;
   transition: 0.5s opacity;

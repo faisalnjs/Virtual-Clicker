@@ -150,7 +150,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                 )));
                 console.log(`${settingsIsSynced ? '🟢' : '🟡'} Settings is ${!settingsIsSynced ? 'not ' : ''}synced!`);
                 if (settingsIsSynced) {
-                    if (document.getElementById('clicker')) document.getElementById('clicker').classList = r.settings['layout'] || '';
+                    if (document.querySelector(".clicker")) document.querySelector(".clicker").classList = 'clicker ' + (r.settings['layout'] || '');
                     if (returnFunction) returnFunction();
                     return;
                 }
@@ -195,7 +195,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                                         ui.reportBugModal(null, String(error.stack));
                                     }
                                 });
-                            if (document.getElementById('clicker')) document.getElementById('clicker').classList = r.settings['layout'] || '';
+                            if (document.querySelector(".clicker")) document.querySelector(".clicker").classList = 'clicker ' + (r.settings['layout'] || '');
                         }
                         window.location.reload();
                     })
@@ -737,4 +737,10 @@ export async function refundThemes(themes = []) {
             console.error(e);
             if (!e.message || (e.message && (e.message.includes('NetworkError') || !e.message.includes(".")))) ui.view("api-fail");
         });
+}
+
+export function getDailyThemeImageUrl(imageUrl) {
+    const match = /^https:\/\/img\.peapix\.com\/([a-f0-9]{32})_640\.jpg$/.exec(imageUrl);
+    if (!match) throw new Error("Invalid daily theme thumbnail URL");
+    return `${domain}/daily_theme_image/${match[1]}`;
 }

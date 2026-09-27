@@ -29,6 +29,9 @@
 
 body[data-theme="butterfly"] {
   background-image: url("./background.png");
+}
+
+body[data-theme="butterfly"] .clicker {
   font-family: "typerwriter";
   font-weight: normal;
 }
@@ -37,11 +40,11 @@ body[data-theme="butterfly"] #virtual-clicker-butterfly {
   display: unset;
 }
 
-body[data-theme="butterfly"] #header > .virtual-clicker-logo {
+body[data-theme="butterfly"] .header > .virtual-clicker-logo {
   display: none;
 }
 
-body[data-theme="butterfly"] :is(#header, #clicker) {
+body[data-theme="butterfly"] :is(.header, .clicker) {
   background-color: transparent;
 }
 
@@ -49,17 +52,17 @@ body[data-theme="butterfly"] [data-button-select] {
   background-color: var(--surface-color);
 }
 
-body[data-theme="butterfly"] :is(#header, #clicker > h1, #clicker > label) {
+body[data-theme="butterfly"] :is(.header, .clicker > h1, .clicker > label) {
   color: #ffffff;
 }
 
-body[data-theme="butterfly"] #header h1 {
+body[data-theme="butterfly"] .header h1 {
   font-family: "ultinoid";
   font-size: 2.5rem;
   font-weight: normal;
 }
 
-body[data-theme="butterfly"] #clicker > h1 {
+body[data-theme="butterfly"] .clicker > h1 {
   animation: glow 1.5s linear infinite alternate;
 }
 

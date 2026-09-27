@@ -70,7 +70,7 @@ body.enable-transitions {
   --easing: cubic-bezier(0.32, 0, 0.67, 0);
 }
 
-body:has(#header) > *:not([id]):not(dialog) {
+body:has(.header) > *:not([id]):not(.header):not(.clicker):not(.controls-container):not(.loader):not(dialog) {
   position: fixed;
 }
 
@@ -460,7 +460,7 @@ div.ML__keyboard {
   }
 }
 
-#clicker button {
+.clicker button {
   width: inherit;
   min-width: 36px;
   min-height: 36px;
@@ -548,7 +548,7 @@ div.ML__keyboard {
   transition: 0.25s;
 }
 
-#clicker:has([data-value="frq"][aria-selected="true"]) #answer-container {
+.clicker:has([data-value="frq"][aria-selected="true"]) #answer-container {
   overflow: visible !important;
 }
 
@@ -593,11 +593,11 @@ div.ML__keyboard {
   min-width: fit-content !important;
 }
 
-#clicker:not(:has(.section)):not(:has(#submit-button)) {
+.clicker:not(:has(.section)):not(:has(#submit-button)) {
   align-items: center;
 }
 
-#clicker:not(:has(.section)):not(:has(#submit-button)) *:not(ul):not(ol):not(li) {
+.clicker:not(:has(.section)):not(:has(#submit-button)) *:not(ul):not(ol):not(li) {
   text-align: center;
 }
 
