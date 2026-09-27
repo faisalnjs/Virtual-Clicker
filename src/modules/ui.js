@@ -741,12 +741,12 @@ export function toast(message, duration = 3000, type = "info", icon = null) {
 }
 
 export function startLoader() {
-  const loader = document.getElementById("loader");
+  const loader = document.querySelector(".loader");
   if (loader) loader.classList.add("active");
 }
 
 export function stopLoader() {
-  const loader = document.getElementById("loader");
+  const loader = document.querySelector(".loader");
   if (loader) loader.classList.remove("active");
 }
 

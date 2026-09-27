@@ -312,7 +312,7 @@ body[data-theme="dune-2"] #atreides-logo {
   display: unset;
 }
 
-body[data-theme="dune-2"] #header>.virtual-clicker-logo {
+body[data-theme="dune-2"] .header>.virtual-clicker-logo {
   display: none;
 }
 

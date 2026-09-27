@@ -150,7 +150,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                 )));
                 console.log(`${settingsIsSynced ? '🟢' : '🟡'} Settings is ${!settingsIsSynced ? 'not ' : ''}synced!`);
                 if (settingsIsSynced) {
-                    if (document.getElementById('clicker')) document.getElementById('clicker').classList = r.settings['layout'] || '';
+                    if (document.querySelector(".clicker")) document.querySelector(".clicker").classList = 'clicker ' + (r.settings['layout'] || '');
                     if (returnFunction) returnFunction();
                     return;
                 }
@@ -195,7 +195,7 @@ export async function sync(hideWelcome = true, returnFunction = null) {
                                         ui.reportBugModal(null, String(error.stack));
                                     }
                                 });
-                            if (document.getElementById('clicker')) document.getElementById('clicker').classList = r.settings['layout'] || '';
+                            if (document.querySelector(".clicker")) document.querySelector(".clicker").classList = 'clicker ' + (r.settings['layout'] || '');
                         }
                         window.location.reload();
                     })

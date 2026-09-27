@@ -371,7 +371,7 @@ try {
         a++;
       });
     }
-    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = 'nowrap';
+    document.querySelector('[data-answer-mode="set"] .button-grid:has([data-set-input])').style.flexWrap = 'nowrap';
     resetMatrix();
     frqInput.value = 4;
     // Switch input mode (exit multiple choice)
@@ -1148,12 +1148,12 @@ try {
       if (highestDataElement !== null) highestDataElement.remove();
     }
     if (setInputs.length === 2) document.querySelector("[data-remove-set-input]").disabled = true;
-    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
+    document.querySelector('[data-answer-mode="set"] .button-grid:has([data-set-input])').style.flexWrap = (setInputs.length < 12) ? 'nowrap' : 'wrap';
   }
 
   function resetSetInput() {
     ui.setButtonSelectValue(document.getElementById("set-type-selector"), "brackets");
-    document.querySelectorAll('[data-answer-mode="set"] .button-grid')[1].innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
+    document.querySelector('[data-answer-mode="set"] .button-grid:has([data-set-input])').innerHTML = '<input type="text" autocomplete="off" id="set-input" data-set-input="1" /><button square data-add-set-input><i class="bi bi-plus"></i></button><button square data-remove-set-input disabled><i class="bi bi-dash"></i></button>';
     if (document.querySelector("[data-add-set-input]")) {
       document.querySelector("[data-add-set-input]").addEventListener("click", addSet);
     }
@@ -1214,6 +1214,7 @@ try {
       var newColumn = document.createElement('input');
       newColumn.setAttribute('type', 'text');
       newColumn.setAttribute('autocomplete', 'off');
+      newColumn.classList.add('matrix-column');
       newColumn.setAttribute('data-matrix-column', row.children.length + 1);
       row.appendChild(newColumn);
     });
@@ -1248,6 +1249,7 @@ try {
       var newColumn = document.createElement('input');
       newColumn.setAttribute('type', 'text');
       newColumn.setAttribute('autocomplete', 'off');
+      newColumn.classList.add('matrix-column');
       newColumn.setAttribute('data-matrix-column', column.getAttribute('data-matrix-column'));
       newRow.appendChild(newColumn);
     });
@@ -1273,7 +1275,7 @@ try {
 
   function resetMatrix() {
     var matrix = document.getElementById('matrix');
-    matrix.innerHTML = '<div class="row" data-matrix-row="1"><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="2" /></div><div class="row" data-matrix-row="2"><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" id="matrix-column" data-matrix-column="2" /></div>';
+    matrix.innerHTML = '<div class="row" data-matrix-row="1"><input type="text" autocomplete="off" class="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" class="matrix-column" data-matrix-column="2" /></div><div class="row" data-matrix-row="2"><input type="text" autocomplete="off" class="matrix-column" data-matrix-column="1" /><input type="text" autocomplete="off" class="matrix-column" data-matrix-column="2" /></div>';
     document.querySelectorAll('[data-answer-mode="matrix"] .button-grid')[1].innerHTML = '<button square data-add-matrix-column tooltip="Add Matrix Column"><i class="bi bi-arrow-90deg-left rotate-right"></i></button><button square data-remove-matrix-column tooltip="Remove Matrix Column"><i class="bi bi-x"></i></button>';
     document.querySelectorAll('[data-answer-mode="matrix"] .button-grid')[2].innerHTML = '<button square data-add-matrix-row tooltip="Add Matrix Row"><i class="bi bi-arrow-return-left"></i></button><button square data-remove-matrix-row tooltip="Remove Matrix Row"><i class="bi bi-x"></i></button>';
     if (document.querySelector("[data-add-matrix-column]")) document.querySelector("[data-add-matrix-column]").addEventListener("click", addColumn);
