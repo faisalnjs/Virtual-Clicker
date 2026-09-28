@@ -688,6 +688,7 @@ body:has(.topbar) {
   height: 100%;
   backdrop-filter: hue-rotate(-90deg);
   z-index: 0;
+  border-radius: 8px 0 0 8px;
 }
 
 [data-modal-page="store"] .themes-grid .theme-item:has(i.colorized) h5::after {
@@ -699,6 +700,7 @@ body:has(.topbar) {
   height: 100%;
   backdrop-filter: hue-rotate(90deg);
   z-index: 0;
+  border-radius: 0 8px 8px 0;
 }
 
 [data-modal-page="store"] .cost-info {
