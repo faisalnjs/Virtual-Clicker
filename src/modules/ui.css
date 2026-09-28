@@ -156,6 +156,7 @@ div.modeless {
   box-shadow: 0 0 2rem rgba(0, 0, 0, 0.2);
   pointer-events: none;
   background: var(--background-color);
+  text-align: center;
 }
 
 div.modeless > h2 {
@@ -579,7 +580,7 @@ body:has(.topbar) {
 [data-modal-page="store"]
   .themes-grid
   .theme-item
-  i:not(.hd):not(.animated):not(.pattern):not(.colorized) {
+  i:not(.hd):not(.animated):not(.pattern):not(.colorized):not(.random) {
   position: absolute;
   bottom: 10px;
   right: 20px;
@@ -591,7 +592,7 @@ body:has(.topbar) {
 [data-modal-page="store"]
   .themes-grid
   .theme-item:hover
-  i:not(.hd):not(.animated):not(.pattern):not(.colorized) {
+  i:not(.hd):not(.animated):not(.pattern):not(.colorized):not(.random) {
   opacity: 1;
   transition: opacity 0.25s ease-in-out;
 }
@@ -603,6 +604,13 @@ body:has(.topbar) {
   font-size: 25px;
 }
 
+[data-modal-page="store"] .themes-grid .theme-item i.random {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 17.5px;
+}
+
 [data-modal-page="store"] .themes-grid .theme-item i.animated,
 [data-modal-page="store"] .themes-grid .theme-item i.pattern,
 [data-modal-page="store"] .themes-grid .theme-item i.colorized {
@@ -612,6 +620,7 @@ body:has(.topbar) {
   font-size: 20px;
 }
 
+[data-modal-page="store"] .themes-grid .theme-item:has(i.hd) i.random,
 [data-modal-page="store"] .themes-grid .theme-item:has(i.hd) i.animated,
 [data-modal-page="store"] .themes-grid .theme-item:has(i.hd) i.pattern,
 [data-modal-page="store"] .themes-grid .theme-item:has(i.hd) i.colorized,
@@ -655,8 +664,12 @@ body:has(.topbar) {
   margin-bottom: 5px;
 }
 
-[data-modal-page="store"] .themes-grid .theme-item:has(.hd) h5 {
+[data-modal-page="store"] .themes-grid .theme-item:has(.hd, .random) h5 {
   max-width: calc(100% - 45px);
+}
+
+[data-modal-page="store"] .themes-grid .theme-item:has(.hd):has(.random) h5 {
+  max-width: calc(100% - 75px);
 }
 
 [data-modal-page="store"] .themes-grid .theme-item button:hover {
@@ -688,6 +701,7 @@ body:has(.topbar) {
   height: 100%;
   backdrop-filter: hue-rotate(-90deg);
   z-index: 0;
+  border-radius: 8px 0 0 8px;
 }
 
 [data-modal-page="store"] .themes-grid .theme-item:has(i.colorized) h5::after {
@@ -699,6 +713,7 @@ body:has(.topbar) {
   height: 100%;
   backdrop-filter: hue-rotate(90deg);
   z-index: 0;
+  border-radius: 0 8px 8px 0;
 }
 
 [data-modal-page="store"] .cost-info {
