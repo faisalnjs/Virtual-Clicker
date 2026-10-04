@@ -26,7 +26,7 @@ self.addEventListener('activate', (event) => {
     }
     const cacheNames = await caches.keys();
     await Promise.all(cacheNames.map((cacheName) => {
-      if (cacheName.startsWith(CACHE_PREFIX) && cacheName !== PAGE_CACHE && cacheName !== ASSET_CACHE) {
+      if (cacheName.startsWith(CACHE_PREFIX) && (cacheName !== PAGE_CACHE) && (cacheName !== ASSET_CACHE)) {
         return caches.delete(cacheName);
       }
       return Promise.resolve();
@@ -38,27 +38,20 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (DEVELOPMENT) return;
   const { request } = event;
-
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
-
-  if (request.mode === 'navigate' || new URL(request.url).pathname === '/manifest.webmanifest') {
+  if ((request.method !== 'GET') || (new URL(request.url).origin !== self.location.origin)) return;
+  if ((request.mode === 'navigate') || (new URL(request.url).pathname === '/manifest.webmanifest')) {
     event.respondWith(networkFirst(request));
     return;
   }
-
   if (!STATIC_DESTINATIONS.has(request.destination)) return;
-
   event.respondWith(cacheFirst(request));
 });
 
 async function networkFirst(request) {
   const cache = await caches.open(PAGE_CACHE);
-
   try {
     const response = await fetch(request);
-    if (response && response.ok) {
-      cache.put(request, response.clone());
-    }
+    if (response && response.ok) cache.put(request, response.clone());
     return response;
   } catch (error) {
     const cached = await cache.match(request, { ignoreSearch: true });
@@ -71,10 +64,43 @@ async function cacheFirst(request) {
   const cache = await caches.open(ASSET_CACHE);
   const cached = await cache.match(request);
   if (cached) return cached;
-
   const response = await fetch(request);
-  if (response && response.ok) {
-    cache.put(request, response.clone());
-  }
+  if (response && response.ok) cache.put(request, response.clone());
   return response;
 }
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const client = clients.find(item => {
+      const url = new URL(item.url);
+      return url.origin === self.location.origin && ['/', '/index.html'].includes(url.pathname);
+    });
+    if (client) {
+      await client.focus();
+      client.postMessage({ type: 'open-suggestions' });
+    } else {
+      await self.clients.openWindow('/#suggestions');
+    }
+  })());
+});
+
+self.addEventListener('push', event => {
+  event.waitUntil((async () => {
+    let payload;
+    try {
+      payload = event.data?.json();
+    } catch {
+      return;
+    }
+    if (payload?.type !== 'suggestions') return;
+    await self.registration.showNotification('New suggestion response', {
+      body: 'An admin replied to your suggestion. Open My Suggestions to read it.',
+      icon: '/banner-meta.png', badge: '/favicon.ico',
+      tag: `suggestion-responses-${payload.seatCode}`,
+      data: { type: 'suggestions', url: '/#suggestions' },
+    });
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(client => client.postMessage({ type: 'suggestions-updated' }));
+  })());
+});

@@ -138,7 +138,8 @@ dialog > button[data-modal-view]:not(.icon),
 dialog > button[data-logout],
 dialog > button[data-sync],
 dialog > button[data-report-bug],
-dialog > button[data-suggestions] {
+dialog > button[data-suggestions],
+dialog > button[data-my-suggestions] {
   text-align: unset;
 }
 
@@ -598,7 +599,7 @@ body:has(.topbar) {
 }
 
 [data-modal-page="store"] .themes-grid .theme-item.suggest-theme {
-  border: 2px dashed var(--accent-color) !important;
+  border: 2px dashed var(--text-color) !important;
   background: transparent !important;
   cursor: pointer;
   transition: background-color 0.25s ease-in-out;
