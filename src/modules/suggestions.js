@@ -128,6 +128,7 @@ async function refresh() {
         }
       }
     } catch (error) {
+      console.error(error);
       if ((identity() === current) && dialog?.open) dialog.querySelector('.suggestions-status').textContent = error.message || 'Could not load suggestions. Try Refresh.';
     } finally { pending = null; }
   })();
@@ -185,7 +186,7 @@ export function openSuggestions() {
       status.textContent = '';
       try {
         if (checkbox.checked) {
-          if (!await syncSuggestionPush(true)) throw new Error('Sign in to enable Enable reply notifications.');
+          if (!await syncSuggestionPush(true)) throw new Error('Sign in to enable reply notifications.');
         } else {
           await disableSuggestionPush();
         }

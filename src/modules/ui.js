@@ -751,7 +751,7 @@ export function stopLoader() {
 }
 
 export function updateTitles() {
-  document.getElementById("code-input").value = storage.get("code");
+  document.querySelector(".code-input").value = storage.get("code");
   document.querySelectorAll("span.code").forEach((element) => {
     element.innerHTML = storage.get("code") + (storage.get("makeUpDate") ? '*' : '');
   });

@@ -150,7 +150,7 @@ export function close(err = null, retry = false) {
         } else {
             reconnect.classList.remove('connected');
             canvas.setAttribute('disabled', 'disabled');
-            ui.view('draw-session-closed');
+            if (ui.getButtonSelectValue(document.getElementById("answer-mode-selector")) === 'draw') ui.view('draw-session-closed');
         }
         connected = false;
     } catch (error) {
