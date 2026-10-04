@@ -13,6 +13,7 @@ export async function syncSuggestionPush(enable = false) {
   if (!pushSupported()) return false;
   if (!enable && localStorage.getItem('suggestion-notifications-disabled') === 'true') return false;
   if (!storage.get('code') || !storage.get('password')) return false;
+  if (enable) localStorage.removeItem('suggestion-notifications-disabled');
   const current = account();
   if (!enable && (registeredAccount === current) && (Notification.permission === 'granted')) return true;
   if (pending) {
@@ -30,7 +31,7 @@ export async function syncSuggestionPush(enable = false) {
       return false;
     }
     let subscription = await registration.pushManager.getSubscription();
-    const optedIn = localStorage.getItem('suggestion-push-enabled') === 'true';
+    const optedIn = localStorage.getItem('suggestion-notifications-disabled') !== 'true';
     if (!subscription && !enable && !optedIn) return false;
     const config = await auth.suggestionRequest('/suggestions/push/config');
     if (!config.publicKey) {
@@ -73,4 +74,19 @@ export async function disableSuggestionPush() {
   if (!subscription) return;
   await subscription.unsubscribe();
   if (storage.get('code') && storage.get('password')) await auth.suggestionRequest('/suggestions/push/unsubscribe', { endpoint: subscription.endpoint });
+}
+
+export function initializeNotificationPermission() {
+  if (!pushSupported()) return;
+  document.addEventListener('click', event => {
+    if (!event.isTrusted || event.target.closest('.suggestion-notifications')) return;
+    if (!storage.get('code') || !storage.get('password')) return;
+    if (Notification.permission !== 'default') return;
+    if (localStorage.getItem('suggestion-notifications-disabled') === 'true') return;
+    if (localStorage.getItem('suggestion-notification-permission-requested') === 'true') return;
+    localStorage.setItem('suggestion-notification-permission-requested', 'true');
+    syncSuggestionPush(true).catch(() => {}).finally(() => {
+      document.querySelector('.suggestions-dialog')?.dispatchEvent(new Event('notification-permission-updated'));
+    });
+  });
 }

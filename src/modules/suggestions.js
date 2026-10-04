@@ -1,4 +1,4 @@
-import { pushSupported, syncSuggestionPush, disableSuggestionPush } from "./suggestion-push.js";
+import { pushSupported, syncSuggestionPush, disableSuggestionPush, initializeNotificationPermission } from "./suggestion-push.js";
 import * as ui from "./ui.js";
 import * as auth from "./auth.js";
 import storage from "./storage.js";
@@ -51,8 +51,9 @@ function readState(seat) {
   try {
     const state = JSON.parse(localStorage.getItem(`suggestion-replies:${seat}`));
     return (state && (typeof state === 'object') && !Array.isArray(state)) ? state : (memoryState.get(seat) || {});
+  } catch {
+    return memoryState.get(seat) || {};
   }
-  catch { return memoryState.get(seat) || {}; }
 }
 function writeState(seat, state) {
   memoryState.set(seat, state);
@@ -60,15 +61,13 @@ function writeState(seat, state) {
 }
 function updateBadge(count) {
   document.querySelectorAll('[data-my-suggestions]').forEach(button => {
-    let badge = button.querySelector('.suggestion-count');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'suggestion-count';
-      button.append(badge);
+    if (count) {
+      button.classList.add('unread');
+    } else {
+      button.classList.remove('unread');
     }
-    badge.textContent = count ? String(count) : '';
-    badge.hidden = !count;
     button.setAttribute('aria-label', count ? `My Suggestions, ${count} unread replies` : 'My Suggestions');
+    button.setAttribute('tooltip', count ? `My Suggestions (${count} unread)` : 'My Suggestions');
   });
 }
 function renderHistory() {
@@ -160,7 +159,7 @@ export function openSuggestions() {
     indicator.className = 'checkbox';
     indicator.setAttribute('aria-hidden', 'true');
     const text = document.createElement('span');
-    text.textContent = 'Enable reply notifications';
+    text.textContent = 'Enable notifications';
     const status = document.createElement('p');
     status.className = 'suggestions-status';
     status.setAttribute('role', 'status');
@@ -171,16 +170,22 @@ export function openSuggestions() {
       try {
         const registration = await navigator.serviceWorker.getRegistration();
         const subscription = await registration?.pushManager.getSubscription();
-        checkbox.checked = (Notification.permission === 'granted') && Boolean(subscription) && (localStorage.getItem('suggestion-push-enabled') === 'true') && (localStorage.getItem('suggestion-notifications-disabled') !== 'true');
+        checkbox.checked = localStorage.getItem('suggestion-notifications-disabled') !== 'true';
+        if (checkbox.checked && Notification.permission === 'default') status.textContent = 'Notifications are enabled in the app. Allow browser permission to receive them.';
+        if (checkbox.checked && Notification.permission === 'granted' && !subscription && !status.textContent) status.textContent = 'Notifications are enabled. Connecting this device...';
       } catch (error) {
-        checkbox.checked = false;
+        checkbox.checked = localStorage.getItem('suggestion-notifications-disabled') !== 'true';
         status.textContent = error.message;
       } finally {
-        checkbox.disabled = Notification.permission === 'denied';
-        if (checkbox.disabled) status.textContent = 'Notifications blocked in browser settings.';
+        checkbox.disabled = false;
+        if (Notification.permission === 'denied') status.textContent = 'Notifications blocked in browser settings.';
       }
     }
 
+    dialog.addEventListener('notification-permission-updated', () => {
+      status.textContent = '';
+      updateNotificationCheckbox();
+    });
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       status.textContent = '';
@@ -204,6 +209,7 @@ export function openSuggestions() {
 export function initializeSuggestions() {
   if (initialized) return;
   initialized = true;
+  initializeNotificationPermission();
   document.querySelectorAll('[data-my-suggestions]').forEach(button => button.addEventListener('click', openSuggestions));
   const syncPush = () => { syncSuggestionPush().catch(() => { }); };
   syncPush();
