@@ -94,8 +94,8 @@ self.addEventListener('push', event => {
       return;
     }
     if (payload?.type !== 'suggestions') return;
-    await self.registration.showNotification('New suggestion response', {
-      body: 'An admin replied to your suggestion. Open My Suggestions to read it.',
+    await self.registration.showNotification('Reply to suggestion', {
+      body: 'Your suggestion has been replied to. Open My Suggestions to read it.',
       icon: '/banner-meta.png', badge: '/favicon.ico',
       tag: `suggestion-responses-${payload.seatCode}`,
       data: { type: 'suggestions', url: '/#suggestions' },
