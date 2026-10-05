@@ -171,7 +171,7 @@ select.disabled:disabled {
   opacity: 0.5;
 }
 
-input:not(#code-input) {
+input:not(.code-input) {
   min-height: 2.25em;
 }
 
@@ -244,7 +244,7 @@ button[data-theme] {
   color: var(--logo-color);
 }
 
-#code-input {
+.code-input {
   font-size: 2.5em;
   text-align: center;
   height: 1.5em;
