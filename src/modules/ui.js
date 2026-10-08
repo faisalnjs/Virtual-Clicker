@@ -1,6 +1,7 @@
 import "./ui.css";
 import storage from "/src/modules/storage.js";
 import * as auth from "/src/modules/auth.js";
+import { openAccountSwitcher } from "./account-switcher.js";
 
 export function alert(title, text, callback, blur) {
   return modal({
@@ -390,7 +391,11 @@ export function show(dialog, title, buttons, actions, blur, effects = true) {
   blur && menu.querySelectorAll("[data-modal-buttons]>button").forEach((button) => button.blur());
 }
 
-export function view(path = "") {
+export function view(path = "", skipAccountSwitcher = false) {
+  if ((path === 'settings/code') && !skipAccountSwitcher && storage.get('code') && storage.get('password')) {
+    openAccountSwitcher();
+    return;
+  }
   if (!path) {
     const event = new Event("triggerclose");
     document.querySelector("dialog[open]")?.dispatchEvent(event);
