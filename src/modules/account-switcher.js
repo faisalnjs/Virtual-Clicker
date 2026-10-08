@@ -1,7 +1,6 @@
 import * as ui from "./ui.js";
 import * as auth from "./auth.js";
 import storage from "./storage.js";
-import { disableSuggestionPush } from "./suggestion-push.js";
 
 const accountKey = 'virtual-authenticated-accounts';
 let dialog = null;
@@ -40,17 +39,6 @@ async function switchAccount(seatCode, password) {
   if (identity() !== original) throw new Error('The active account changed. Open Seat Code Switcher again.');
   remember(result.current, storage.get('password'));
   remember(result.account, password);
-  const disabled = localStorage.getItem('suggestion-notifications-disabled');
-  const enabled = localStorage.getItem('suggestion-push-enabled');
-  await disableSuggestionPush().catch(() => { });
-  if (identity() !== original) throw new Error('The active account changed. Open Seat Code Switcher again.');
-  for (const [key, value] of [['suggestion-notifications-disabled', disabled], ['suggestion-push-enabled', enabled]]) {
-    if (value === null) {
-      localStorage.removeItem(key);
-    } else {
-      localStorage.setItem(key, value);
-    }
-  }
   await storage.idbReady;
   await storage.idbDelete('cache');
   await storage.idbDelete('adminCache');
@@ -162,7 +150,7 @@ function renderAccounts() {
       const remove = document.createElement('button');
       remove.innerHTML = '<i class="bi bi-x"></i>';
       remove.setAttribute('square', '');
-      remove.setAttribute('aria-label', `Forget seat ${account.seatCode}`);
+      remove.setAttribute('aria-label', 'Forget');
       remove.addEventListener('click', async () => {
         if (busy) return;
         busy = true;
