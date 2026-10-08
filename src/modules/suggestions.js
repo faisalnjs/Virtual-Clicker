@@ -89,7 +89,7 @@ async function refresh() {
     account = current;
     rows = [];
     updateBadge(0);
-    if (dialog?.open) dialog.querySelector('.enhanced-grid').replaceChildren();
+    if (dialog?.open) dialog.querySelector('.col').replaceChildren();
   }
   if (!storage.get('code') || !storage.get('password')) {
     if (dialog?.open) dialog.querySelector('.suggestions-status').textContent = 'Sign in with your seat code and password to view suggestions.';
@@ -172,7 +172,7 @@ export function openSuggestions() {
         const subscription = await registration?.pushManager.getSubscription();
         checkbox.checked = localStorage.getItem('suggestion-notifications-disabled') !== 'true';
         if (checkbox.checked && Notification.permission === 'default') status.textContent = 'Notifications are enabled in the app. Allow browser permission to receive them.';
-        if (checkbox.checked && Notification.permission === 'granted' && !subscription && !status.textContent) status.textContent = 'Notifications are enabled. Connecting this device...';
+        if (checkbox.checked && (Notification.permission === 'granted') && !subscription && !status.textContent) status.textContent = 'Notifications are enabled. Connecting this device...';
       } catch (error) {
         checkbox.checked = localStorage.getItem('suggestion-notifications-disabled') !== 'true';
         status.textContent = error.message;

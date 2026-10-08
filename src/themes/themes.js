@@ -341,7 +341,7 @@ export async function renderStore(domain) {
                 icon: 'bi-bag-check-fill',
                 class: 'submit-button',
                 onclick: async () => {
-                  await auth.buyTheme(featuredTheme[0], featuredTheme[3])
+                  const result = await auth.buyTheme(featuredTheme[0], featuredTheme[3])
                     .catch(error => {
                       if (storage.get("developer")) {
                         alert(`Error @ themes.js: ${error.message}`);
@@ -349,10 +349,12 @@ export async function renderStore(domain) {
                         ui.reportBugModal(null, String(error.stack));
                       }
                     });
-                  ownedThemes.push(featuredTheme[0]);
+                  if (!result) return;
+                  ownedThemes = result.ownedThemes;
                   const cache = await storage.idbGet("cache") || {};
                   cache.ownedThemes = ownedThemes;
-                  cache.checksCount = (cache.checksCount || 0) - featuredTheme[3];
+                  cache.checksCount = result.checksCount;
+                  checks = result.checksCount;
                   await storage.idbSet("cache", cache);
                   Array.from(store.querySelectorAll('.theme-item.selected')).forEach(el => el.classList.remove('selected'));
                   Array.from(store.querySelectorAll(`.theme-item[data-theme="${featuredTheme[0]}"]`)).forEach(el => el.classList.add('selected'));
@@ -510,7 +512,7 @@ export async function renderStore(domain) {
                 icon: 'bi-bag-check-fill',
                 class: 'submit-button',
                 onclick: async () => {
-                  await auth.buyTheme(theme[0], theme[3])
+                  const result = await auth.buyTheme(theme[0], theme[3])
                     .catch(error => {
                       if (storage.get("developer")) {
                         alert(`Error @ themes.js: ${error.message}`);
@@ -518,10 +520,12 @@ export async function renderStore(domain) {
                         ui.reportBugModal(null, String(error.stack));
                       }
                     });
-                  ownedThemes.push(theme[0]);
+                  if (!result) return;
+                  ownedThemes = result.ownedThemes;
                   const cache = await storage.idbGet("cache") || {};
                   cache.ownedThemes = ownedThemes;
-                  cache.checksCount = (cache.checksCount || 0) - theme[3];
+                  cache.checksCount = result.checksCount;
+                  checks = result.checksCount;
                   await storage.idbSet("cache", cache);
                   Array.from(store.querySelectorAll('.theme-item.selected')).forEach(el => el.classList.remove('selected'));
                   themeItem.classList.add('selected');
@@ -638,7 +642,7 @@ export async function renderStore(domain) {
                   text: 'Confirm',
                   class: 'submit-button',
                   onclick: async () => {
-                    await auth.refundThemes(inputValues)
+                    const result = await auth.refundThemes(inputValues)
                       .catch(error => {
                         if (storage.get("developer")) {
                           alert(`Error @ themes.js: ${error.message}`);
@@ -647,11 +651,10 @@ export async function renderStore(domain) {
                         }
                       });
                     const cache = await storage.idbGet("cache") || {};
-                    inputValues.forEach(ownedTheme => {
-                      let theme = themes.find(t => t[0] === ownedTheme);
-                      cache.ownedThemes = cache.ownedThemes.filter(t => t !== ownedTheme);
-                      cache.checksCount = (cache.checksCount || 0) + (theme[3] / 2);
-                    });
+                    if (!result) return;
+                    cache.ownedThemes = result.ownedThemes;
+                    cache.checksCount = result.checksCount;
+                    checks = result.checksCount;
                     await storage.idbSet("cache", cache);
                     ui.toast(`Refunded ${inputValues.length} theme${(inputValues.length === 1) ? '' : 's'}.`, 2000, "success", "bi bi-check2-circle");
                     renderStore(domain)
