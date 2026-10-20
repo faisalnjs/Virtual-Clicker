@@ -480,6 +480,7 @@ label:has(i) {
   min-height: 100px;
   background-color: var(--background-color);
   color: var(--text-color);
+  resize: vertical;
 }
 
 .enhanced-card button:not(:hover) {
@@ -518,4 +519,8 @@ label:has(i) {
 
 .suggestion-notifications .checkbox {
   flex-shrink: 0;
+}
+
+#suggestions-grid {
+	grid-template-columns: 1fr;
 }
