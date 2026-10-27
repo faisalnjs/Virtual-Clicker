@@ -101,6 +101,9 @@ div.spacer {
   justify-content: center;
   width: min(100%, 900px);
   gap: 12.5px;
+  transition:
+    0.25s width,
+    0.25s align-self;
 }
 
 #question-container {
@@ -427,10 +430,10 @@ label:has(i) {
 }
 
 .enhanced-grid {
-	display: grid;
-	gap: 16px;
-	grid-template-columns: 1fr 1fr 1fr;
-	width: -webkit-fill-available;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: -webkit-fill-available;
 }
 
 .enhanced-card {
@@ -522,5 +525,190 @@ label:has(i) {
 }
 
 #suggestions-grid {
-	grid-template-columns: 1fr;
+  grid-template-columns: 1fr;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) {
+  align-items: stretch;
+  flex-direction: row;
+  justify-content: stretch;
+  max-width: none;
+  width: calc(100% - 24px);
+}
+
+.clicker-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12.5px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) .clicker-content {
+  overflow: auto;
+  padding-right: 12px;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) .input-group:last-of-type {
+  padding-top: calc(42px + 0.25rem);
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) #answer-container,
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) [data-answer-mode],
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) #answer-textarea-container,
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) #math-input {
+  height: 100%;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) .button-grid:has(> #set-input) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(2.5rem, 1fr));
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) [data-add-set-input],
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) [data-remove-set-input] {
+  width: 100% !important;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) [data-add-set-input] {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.clicker:has(#whiteboard:not([hidden])):not(.whiteboard-fullscreen) [data-remove-set-input] {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.clicker.whiteboard-fullscreen .clicker-content {
+  display: none;
+}
+
+.clicker.whiteboard-fullscreen #whiteboard {
+  height: calc(100vh - 180px);
+  min-height: 500px;
+  width: calc(100% + (((100vw - min(100%, 900px)) / 2.5) * 2));
+  margin-left: calc(-1 * ((100vw - min(100%, 900px)) / 2.5));
+}
+
+.clicker:not(.whiteboard-fullscreen) #whiteboard {
+  flex: 1;
+}
+
+#whiteboard {
+  background: var(--surface-color);
+  min-width: 0;
+  overflow: auto;
+}
+
+#whiteboard button {
+  z-index: 20;
+}
+
+#whiteboard > *:not(.button-grid) *:not(.Island *):not(.FixedSideContainer *) {
+  background: transparent;
+}
+
+.whiteboard-wrapper {
+  height: calc(100% - 3rem);
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.excalidraw {
+  --color-surface-high: var(--surface-color) !important;
+  --color-surface-mid: var(--surface-color) !important;
+  --color-surface-low: var(--surface-color) !important;
+  --color-surface-lowest: var(--surface-color) !important;
+  --island-bg-color: var(--surface-color) !important;
+  --popup-bg-color: var(--surface-color) !important;
+  --text-primary-color: var(--text-color) !important;
+  --color-on-surface: var(--text-color) !important;
+  --icon-fill-color: var(--text-color) !important;
+  --dialog-border-color: var(--accent-color) !important;
+  --color-primary-light: var(--background-color) !important;
+  --color-surface-primary-container: var(--accent-color) !important;
+  --color-on-primary-container: var(--accent-text-color) !important;
+  --color-primary: var(--text-color) !important;
+  --keybinding-color: var(--accent-text-color) !important;
+  --color-primary-darker: var(--color-primary) !important;
+  --color-brand-hover: var(--color-primary) !important;
+  --color-slider-track: var(--color-primary) !important;
+  --button-hover-bg: var(--accent-color) !important;
+  --default-border-color: var(--accent-color) !important;
+  --sab: 0;
+  --sal: 0;
+  --sar: 0;
+  --sat: 0;
+}
+
+.excalidraw .HelpDialog__header,
+.excalidraw .App-menu_top__left .dropdown-menu-group,
+.excalidraw .App-menu_top__left div:has(+ .dropdown-menu-group),
+.excalidraw .App-menu_top__left .dropdown-menu-group + div,
+.excalidraw .App-menu_top__left .dropdown-menu .Island > *:not(:nth-child(1)):not(:nth-child(2)),
+.excalidraw .App-bottom-bar .dropdown-menu-group,
+.excalidraw .App-bottom-bar div:has(+ .dropdown-menu-group),
+.excalidraw .App-bottom-bar .dropdown-menu-group + div,
+.excalidraw .App-bottom-bar .dropdown-menu .Island > *:not(:nth-child(1)):not(:nth-child(2)),
+.excalidraw .layer-ui__wrapper__footer-right,
+.excalidraw .scroll-back-to-content,
+.excalidraw-tooltip {
+  display: none !important;
+}
+
+.excalidraw .HelpDialog__island-content {
+  overflow: hidden;
+}
+
+.excalidraw .dropdown-menu .dropdown-menu-item svg {
+  width: 15px;
+  height: 15px;
+  max-width: unset;
+}
+
+.excalidraw .dropdown-menu-button {
+  background-color: var(--island-bg-color) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.excalidraw .context-menu-item:hover {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text-color) !important;
+}
+
+[data-toggle-whiteboard] {
+  position: absolute !important;
+  top: 2.5px;
+  right: 0;
+  z-index: 1;
+}
+
+.clicker:has(#whiteboard[hidden]) [data-toggle-whiteboard] .bi-easel-fill,
+.clicker:not(:has(#whiteboard)) [data-toggle-whiteboard] .bi-easel-fill,
+.clicker:has(#whiteboard:not([hidden])) [data-toggle-whiteboard] .bi-easel,
+.clicker:not(:has(#whiteboard)) [data-toggle-fullscreen-whiteboard],
+.clicker:has(#whiteboard[hidden]) [data-toggle-fullscreen-whiteboard],
+.clicker:not(.whiteboard-fullscreen) [data-toggle-fullscreen-whiteboard] .bi-arrows-fullscreen,
+.clicker.whiteboard-fullscreen [data-toggle-fullscreen-whiteboard] .bi-fullscreen-exit,
+.excalidraw .context-menu > :nth-last-child(2),
+.excalidraw .context-menu > :last-child {
+  display: none;
+}
+
+[data-toggle-fullscreen-whiteboard] {
+  position: absolute !important;
+  top: 2.5px;
+  right: 40px;
+  z-index: 1;
+}
+
+.excalidraw .App-bottom-bar > .Island {
+  box-shadow: unset !important;
+}
+
+.excalidraw .App-toolbar-content {
+  padding: 0 !important;
 }
