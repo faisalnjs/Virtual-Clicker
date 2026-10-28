@@ -104,7 +104,6 @@ function updateBadge(count) {
 function renderHistory() {
   if (!dialog?.open) return;
   const list = dialog.querySelector('.col');
-  console.log(dialog, list)
   const scroll = list.scrollTop;
   list.replaceChildren();
   if (!rows.length) {
