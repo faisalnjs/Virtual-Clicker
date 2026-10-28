@@ -233,6 +233,7 @@ export function initializeThemeEditor() {
 export async function renderStore(domain) {
   const store = document.querySelector(`[data-modal-page="store"]`);
   if (!store) return;
+  await daily.load().catch(() => null);
   store.innerHTML = "";
   await storage.idbReady;
   var initialTheme = storage.get("theme") || "default";
