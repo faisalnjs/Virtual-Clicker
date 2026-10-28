@@ -8,6 +8,7 @@ import { Excalidraw, restoreElements } from '@excalidraw/excalidraw';
 const domain = ((location.hostname.includes('click')) || location.hostname.includes('127')) ? `https://${location.hostname.includes('beta') ? 'beta.' : ''}ws.api.check.vssfalcons.com` : `http://${document.domain}:1234`;
 let broadcaster = null;
 let pingTimer = null;
+let reconnectTimer = null;
 let latestScene = null;
 let viewerRoot = null;
 let viewerApi = null;
@@ -47,7 +48,6 @@ toggleFullscreenWhiteboardButton.addEventListener('click', () => {
 });
 
 function toggle() {
-  if (!latestScene) return;
   const { clicker } = clickerLayout();
   if (!clicker) return;
   let viewer = document.getElementById('whiteboard');
@@ -73,9 +73,12 @@ function toggle() {
     viewerRoot = createRoot(root);
     viewerTheme = whiteboardState().theme;
     renderWhiteboard();
+    connect();
     return;
   }
   viewer.toggleAttribute('hidden');
+  if (viewer.hidden) disconnect();
+  else connect();
   renderScene();
   setTimeout(() => {
     requestAnimationFrame(autoFocus);
@@ -98,10 +101,10 @@ function autoFocus() {
 }
 
 function renderWhiteboard() {
-  if (!viewerRoot || !latestScene) return;
+  if (!viewerRoot) return;
   automaticViewportUntil = performance.now() + 1000;
   viewerRoot.render(React.createElement(Excalidraw, {
-    initialData: latestScene,
+    initialData: latestScene || { elements: [], appState: whiteboardState(), files: {} },
     viewModeEnabled: true,
     theme: viewerTheme,
     excalidrawAPI: value => {
@@ -151,7 +154,7 @@ function receive(response) {
 }
 
 function connect() {
-  if (broadcaster || !storage.get('code') || !storage.get('password')) return;
+  if (broadcaster || !document.getElementById('whiteboard') || document.getElementById('whiteboard').hidden || !storage.get('code') || !storage.get('password')) return;
   broadcaster = new HTTPSockBroadcast({
     server: `${domain}/${String(storage.get('code'))[0]}/whiteboard?noBroadcast=true`,
     cert: './certs/chain.pem',
@@ -160,16 +163,30 @@ function connect() {
       password: storage.get('password')
     },
     callback: receive,
-    close: () => { broadcaster = null; clearInterval(pingTimer); },
-    error: () => { broadcaster = null; clearInterval(pingTimer); }
+    close: reconnect,
+    error: reconnect
   });
   broadcaster.sendQuiet('ping');
   pingTimer = setInterval(() => broadcaster?.sendQuiet('ping'), 2000);
 }
 
-setInterval(() => {
-  connect();
-}, 1000);
+function reconnect() {
+  broadcaster = null;
+  clearInterval(pingTimer);
+  pingTimer = null;
+  if (!document.getElementById('whiteboard') || document.getElementById('whiteboard').hidden) return;
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(connect, 1000);
+}
+
+function disconnect() {
+  clearInterval(pingTimer);
+  clearTimeout(reconnectTimer);
+  pingTimer = null;
+  reconnectTimer = null;
+  broadcaster?.close?.();
+  broadcaster = null;
+}
 
 const themeObserver = new MutationObserver(syncWhiteboardTheme);
 themeObserver.observe(document.body, { attributes: true, attributeFilter: ['data-theme', 'style'] });
