@@ -220,7 +220,7 @@ div[data-color-input] > div[data-color-preview]:hover {
   display: none;
   align-items: center;
   justify-content: center;
-  background-color: var(--background-color);
+  background-color: var(--surface-color);
   z-index: 9999;
   opacity: 0;
   transition: 0.5s opacity;
