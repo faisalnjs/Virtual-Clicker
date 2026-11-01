@@ -78,9 +78,9 @@ self.addEventListener('notificationclick', event => {
     });
     if (client) {
       await client.focus();
-      client.postMessage({ type: 'open-suggestions' });
+      client.postMessage({ type: event.notification.data?.type === 'bugs' ? 'open-bug-reports' : 'open-suggestions' });
     } else {
-      await self.clients.openWindow('/#suggestions');
+      await self.clients.openWindow(event.notification.data?.type === 'bugs' ? '/#bug-reports' : '/#suggestions');
     }
   })());
 });
@@ -93,14 +93,15 @@ self.addEventListener('push', event => {
     } catch {
       return;
     }
-    if (payload?.type !== 'suggestions') return;
-    await self.registration.showNotification('Reply to suggestion', {
-      body: `Seat ${payload.seatCode}: Your suggestion has been replied to. Open My Suggestions to read it.`,
+    if (!['suggestions', 'bugs'].includes(payload?.type)) return;
+    const bug = payload.type === 'bugs';
+    await self.registration.showNotification(bug ? 'Reply to bug report' : 'Reply to suggestion', {
+      body: `Seat ${payload.seatCode}: ${bug ? 'Your bug report has been replied to. Open My Bug Reports to read it.' : 'Your suggestion has been replied to. Open My Suggestions to read it.'}`,
       icon: '/banner-meta.png', badge: '/favicon.ico',
-      tag: `suggestion-responses-${payload.seatCode}`,
-      data: { type: 'suggestions', url: '/#suggestions' },
+      tag: `${bug ? 'bug-report-replies' : 'suggestion-responses'}-${payload.seatCode}`,
+      data: { type: payload.type, url: bug ? '/#bug-reports' : '/#suggestions' },
     });
     const clients = await self.clients.matchAll({ type: 'window' });
-    clients.forEach(client => client.postMessage({ type: 'suggestions-updated' }));
+    clients.forEach(client => client.postMessage({ type: bug ? 'bug-reports-updated' : 'suggestions-updated' }));
   })());
 });
