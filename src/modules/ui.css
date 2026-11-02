@@ -145,6 +145,16 @@ dialog > button[data-my-suggestions] {
   text-align: unset;
 }
 
+dialog[data-modal-page="settings"] button:not(.icon) {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+dialog[data-modal-page="settings"] > * button:not(.icon) {
+  justify-content: center;
+}
+
 div.modeless {
   position: fixed;
   top: 50%;
