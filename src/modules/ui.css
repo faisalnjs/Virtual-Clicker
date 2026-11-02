@@ -139,9 +139,20 @@ dialog > button[data-modal-view]:not(.icon),
 dialog > button[data-logout],
 dialog > button[data-sync],
 dialog > button[data-report-bug],
+dialog > button[data-my-bug-reports],
 dialog > button[data-suggestions],
 dialog > button[data-my-suggestions] {
   text-align: unset;
+}
+
+dialog[data-modal-page="settings"] button:not(.icon) {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+dialog[data-modal-page="settings"] > * button:not(.icon) {
+  justify-content: center;
 }
 
 div.modeless {
@@ -220,7 +231,7 @@ div[data-color-input] > div[data-color-preview]:hover {
   display: none;
   align-items: center;
   justify-content: center;
-  background-color: var(--background-color);
+  background-color: var(--surface-color);
   z-index: 9999;
   opacity: 0;
   transition: 0.5s opacity;

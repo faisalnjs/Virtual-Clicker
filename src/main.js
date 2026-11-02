@@ -14,6 +14,7 @@ import "/src/keybinds/keybinds.js";
 import * as ui from "/src/modules/ui.js";
 import storage from "/src/modules/storage.js";
 import { initializeSuggestions } from "./modules/suggestions.js";
+import { initializeBugReports } from "./modules/bug-reports.js";
 import { registerServiceWorker } from "/src/modules/service-worker.js";
 import "/src/modules/whiteboard.js";
 
@@ -21,6 +22,7 @@ try {
   const version = import.meta.env.PACKAGE_VERSION;
   registerServiceWorker(version);
   initializeSuggestions();
+  initializeBugReports();
 
   updateVersionString();
   function updateVersionString(beta = false) {

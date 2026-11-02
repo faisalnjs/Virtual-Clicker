@@ -508,6 +508,7 @@ try {
         ui.toast(`Welcome back${bulkLoad.name ? `, ${bulkLoad.name}` : ''}!`, 3000, "success", "bi bi-key");
         history = bulkLoad.history || [];
         var course = bulkLoad.course || {};
+        themes.showBirthday(bulkLoad.birthday);
         if (document.querySelector('.alert')) {
           var clicker_announcement = JSON.parse(course.clicker_announcement || '{}');
           if ((clicker_announcement.image || clicker_announcement.title || clicker_announcement.content || clicker_announcement.link) && (clicker_announcement.expires ? new Date(`${clicker_announcement.expires}T${extendedSchedule[parseInt(storage.get("code").slice(0, 1))][1]}:00`) > new Date() : true)) {
@@ -1361,6 +1362,22 @@ try {
     if (document.querySelector("[data-add-matrix-row]")) document.querySelector("[data-add-matrix-row]").addEventListener("click", addRow);
     if (document.querySelector("[data-remove-matrix-row]")) document.querySelector("[data-remove-matrix-row]").addEventListener("click", removeRow);
   }
+
+  async function saveBirthday() {
+    const birthday = document.getElementById("birthday-input").value;
+    const response = await fetch(`${domain}/birthday`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usr: storage.get("code"), pwd: storage.get("password"), birthday }),
+    });
+    if (!response.ok) throw new Error("Unable to save birthday.");
+    ui.view("");
+    ui.toast("Birthday saved.", 3000, "success", "bi bi-check-lg");
+  }
+
+  document.getElementById("save-birthday-button")?.addEventListener("click", () => {
+    saveBirthday().catch(() => ui.view("api-fail"));
+  });
 } catch (error) {
   if (storage.get("developer")) {
     alert(`Error @ clicker.js: ${error.message}`);
