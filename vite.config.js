@@ -7,12 +7,6 @@ export default {
     minify: false,
     cssMinify: false,
     sourcemap: false,
-    cssCodeSplit: false,
-    rolldownOptions: {
-      output: {
-        codeSplitting: false,
-      },
-    },
     rollupOptions: {
       input: {
         main: 'index.html',

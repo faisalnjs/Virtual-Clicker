@@ -5,24 +5,25 @@ import { insertFromIndex } from "/src/symbols/symbols.js";
 
 try {
   document.addEventListener("keydown", async (e) => {
+    if (!e.key) return;
     const anyDialogOpen = Array.from(document.querySelectorAll("dialog")).some(
       (dialog) => dialog.open,
     );
     const isTyping = document.activeElement.matches("input, textarea");
     if (e.ctrlKey) {
-      if (e.key == "Enter" && !anyDialogOpen) {
+      if ((e.key == "Enter") && !anyDialogOpen) {
         e.preventDefault();
         document.getElementById("submit-button").click();
       }
-      if (e.key == "," && !anyDialogOpen) {
+      if ((e.key == ",") && !anyDialogOpen) {
         e.preventDefault();
         ui.view("settings");
       }
-      if (e.key == "." && !anyDialogOpen) {
+      if ((e.key == ".") && !anyDialogOpen) {
         e.preventDefault();
         ui.view("history");
       }
-      if (e.key == "/" && !anyDialogOpen) {
+      if ((e.key == "/") && !anyDialogOpen) {
         e.preventDefault();
         ui.view("settings/keybinds");
       }
@@ -30,7 +31,7 @@ try {
         e.preventDefault();
         ui.reportBugModal();
       }
-      if (e.key == "s" && !anyDialogOpen) {
+      if ((e.key == "s") && !anyDialogOpen) {
         e.preventDefault();
         ui.suggestionsModal();
       }
@@ -40,7 +41,7 @@ try {
         insertFromIndex(parseInt(e.key) - 1);
       }
     } else if (e.shiftKey) {
-      if (e.key == "R" && !anyDialogOpen && !isTyping) {
+      if ((e.key == "R") && !anyDialogOpen && !isTyping) {
         e.preventDefault();
         themes.resetTheme();
         await storage.idbReady;
@@ -48,7 +49,7 @@ try {
         storage.delete("lastBulkLoad");
         location.reload();
       }
-    } else if (e.key == "Enter" && anyDialogOpen) {
+    } else if ((e.key == "Enter") && anyDialogOpen) {
       e.preventDefault();
       document.querySelector('dialog[open] .submit-button')?.click();
     }

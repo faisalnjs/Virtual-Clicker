@@ -456,6 +456,7 @@ function setHold(button, action) {
         const onPointerUp = stop;
         const onPointerLeave = stop;
         const onKeyDown = (ev) => {
+            if (!ev.key) return;
             if ((ev.key === ' ') || (ev.key === 'Enter')) {
                 ev.preventDefault();
                 start();

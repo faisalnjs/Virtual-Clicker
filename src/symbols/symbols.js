@@ -11,7 +11,8 @@ class Autocomplete {
     this.suggestion = suggestion;
 
     this.input.addEventListener("keydown", (e) => {
-      if (e.key == "Tab" && this.matches.length != 0) {
+      if (!e.key) return;
+      if ((e.key == "Tab") && this.matches.length != 0) {
         e.preventDefault();
         e.target.setRangeText(symbols[this.matches[0]], this.#start, this.#end, "end");
         this.#start = e.target.selectionEnd;
@@ -171,7 +172,7 @@ function insert(symbol, customInput) {
   } else if (answerInput) {
     answerInput.setRangeText(symbol, answerInput.selectionStart, answerInput.selectionEnd, "end");
     answerInput.focus();
-  } else if (document.activeElement && (document.activeElement.tagName.toLowerCase() === 'input' && document.activeElement.getAttribute("type") && (document.activeElement.getAttribute("type") === "text") || document.activeElement.tagName.toLowerCase() === 'textarea')) {
+  } else if (document.activeElement && ((document.activeElement.tagName.toLowerCase() === 'input') && document.activeElement.getAttribute("type") && (document.activeElement.getAttribute("type") === "text") || document.activeElement.tagName.toLowerCase() === 'textarea')) {
     const activeInput = document.activeElement;
     activeInput.setRangeText(symbol, activeInput.selectionStart, activeInput.selectionEnd, "end");
     activeInput.focus();
