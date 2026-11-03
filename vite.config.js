@@ -4,6 +4,8 @@ import version from 'vite-plugin-package-version';
 export default {
   plugins: [webfontDownload(), version()],
   build: {
+    minify: false,
+    cssMinify: false,
     rollupOptions: {
       input: {
         main: 'index.html',
