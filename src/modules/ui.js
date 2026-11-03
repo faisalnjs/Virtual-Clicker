@@ -392,6 +392,7 @@ export function show(dialog, title, buttons, actions, blur, effects = true) {
 }
 
 export function view(path = "", skipAccountSwitcher = false) {
+  path = (typeof path === "string") ? path : "";
   if ((path === 'settings/code') && !skipAccountSwitcher && storage.get('code') && storage.get('password')) {
     openAccountSwitcher();
     return;
