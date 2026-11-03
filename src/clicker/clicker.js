@@ -299,13 +299,13 @@ try {
     }
     function submit() {
       submitClick(storage.get("code"), question, prettyAnswer);
-      if (mode === "math" && !multipleChoice) {
+      if ((mode === "math") && !multipleChoice) {
         storeClick(storage.get("code"), question, mf.value, "latex");
-      } else if (mode === "set" && !multipleChoice) {
+      } else if ((mode === "set") && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "array");
-      } else if (mode === "matrix" && !multipleChoice) {
+      } else if ((mode === "matrix") && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "matrix");
-      } else if (mode === "frq" && !multipleChoice) {
+      } else if ((mode === "frq") && !multipleChoice) {
         storeClick(storage.get("code"), question, answer, "frq");
       } else {
         storeClick(storage.get("code"), question, answer, "text");
@@ -347,9 +347,8 @@ try {
 
   // Prevent MathLive default behavior
   mf.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.key == "Enter") {
-      e.preventDefault();
-    }
+    if (!e.key) return;
+    if (e.ctrlKey && (e.key == "Enter")) e.preventDefault();
   });
 
   // Reset inputs to default state
@@ -415,6 +414,7 @@ try {
 
   // Save seat code on enter
   document.querySelector(".code-input").addEventListener("keydown", (e) => {
+    if (!e.key) return;
     if (e.key == "Enter") {
       e.preventDefault();
       setTimeout(() => {
@@ -1275,6 +1275,7 @@ try {
   }
 
   document.getElementById('matrix')?.addEventListener('keydown', event => {
+    if (!event.key) return;
     const cell = event.target;
     if (!(cell instanceof HTMLInputElement) || !cell.matches('[data-matrix-column]')) return;
     const rows = [...document.querySelectorAll('#matrix [data-matrix-row]')];
