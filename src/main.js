@@ -16,6 +16,7 @@ import storage from "/src/modules/storage.js";
 import { initializeSuggestions } from "./modules/suggestions.js";
 import { initializeBugReports } from "./modules/bug-reports.js";
 import { registerServiceWorker } from "/src/modules/service-worker.js";
+import { initializePets } from "/src/modules/pets.js";
 import "/src/modules/whiteboard.js";
 
 try {
@@ -23,6 +24,7 @@ try {
   registerServiceWorker(version);
   initializeSuggestions();
   initializeBugReports();
+  initializePets();
 
   updateVersionString();
   function updateVersionString(beta = false) {

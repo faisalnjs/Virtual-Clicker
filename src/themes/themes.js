@@ -234,10 +234,11 @@ export async function renderStore(domain) {
   await daily.load().catch(() => null);
   store.innerHTML = "";
   await storage.idbReady;
+  const cache = (await storage.idbGet("cache")) || {};
   var initialTheme = storage.get("theme") || "default";
-  var checks = (await storage.idbGet("cache"))?.checksCount || 0;
+  var checks = cache?.checksCount || 0;
   if (!auth.continueWithoutAPI) document.getElementById("controls-container")?.setAttribute('checks', checks);
-  var ownedThemes = (await storage.idbGet("cache"))?.ownedThemes || [];
+  var ownedThemes = cache?.ownedThemes || [];
   if (document.body.getAttribute('data-theme') && !ownedThemes.includes(document.body.getAttribute('data-theme')) && themes.find(theme => theme[0] === document.body.getAttribute('data-theme'))?.[3]) {
     resetTheme();
     ui.toast("Applied theme is not owned.", 2000, "error", "bi bi-exclamation-triangle-fill");
